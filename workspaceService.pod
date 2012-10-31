@@ -49,7 +49,7 @@ and C<global_permission> are permission strings.
 A permission string must be one of the following single character
 strings, which define specific permission roles:
 
-=over4
+=over 4
 
 =item C<"r">
 
@@ -117,7 +117,7 @@ List the objects in the workspace. C<options> is an object that
 may contain optional flags to limit or alter the behavior of the
 list operation. Currently only one flag is supported:
 
-=over4
+=over 4
 
 =item type
 
@@ -189,7 +189,7 @@ Save an object C<$data> into the workspace C<workspace_id> under
 the C<object_id> identifier with the supplied type C<object_type>.
 C<$options> is a JSON "object" with the following supported properties:
 
-=over4
+=over 4
 
 =item command
 
