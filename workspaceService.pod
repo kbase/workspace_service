@@ -1,0 +1,308 @@
+#===============================================================================
+#
+#         FILE: workspaceService.pod
+#
+#  DESCRIPTION: POD Documentation for workspace services
+#
+#===============================================================================
+
+=head1 Workspace Service
+
+Services operating on workspaces and objects
+
+I<Note: This document is a early draft and should not be taken seriously.>
+
+=head2 SYNOPSIS
+
+    my $serv = Bio::KBase::workspaceService->new;
+    # Create a private workspace called "foo"
+    my $ws   = $serv->create_workspace("foo", "n");
+    my $objs = $serv->list_workspace_objects("foo");
+    # Print out the names of each object in the workspace
+    print map { $_->[0] } @$objs;
+
+=head2 Workspaces
+
+A workspace is a named collection of objects owned by a specific
+user, that may be viewable or editable by other users.
+
+Functions that operate on workspaces take a C<workspace_id> which
+is an alphanumeric string that uniquely identifies a workspace among
+all workspaces.
+
+Most of these functions return C<workspace_metadata> which, in JSON
+form is an array with the following elements:
+
+    [
+        workspace_id,
+        modification_timestamp,
+        number_of_objects,
+        user_permission,
+        global_permission,
+    ]
+
+C<workspace_id> has been covered. C<timestamp> is an ISO8601 datetime
+string, e.g. "2012-10-31T15:13Z". C<number_of_objects> is an integer
+representing the number of objects in the workspace. C<user_permission>
+and C<global_permission> are permission strings.
+
+A permission string must be one of the following single character
+strings, which define specific permission roles:
+
+=over4
+
+=item C<"r">
+
+Read only permissions on a workspace and workspace objects.
+
+=item C<"w">
+
+Read and write permissions on a workspace. The user may add, alter
+or remove objects from a workspace. This implies read permissions
+on the workspace and workspace objects.
+
+=item C<"a">
+
+Administrative permissions on a workspace. The user may alter other
+users permissions on the workspace. This implies write and read
+permissions on the workspace.
+
+=item C<"n">
+
+No permissions on the workspace. This permission is used to clear
+all permissions for a user on the workspace. If the workspaces
+C<global_permission> is set to this, the workspace is cannot be
+seen by outsiders.
+
+=back
+
+C<user_permission> defines what permissions the current user has
+on the workspace.  C<global_permission> defines what permissions
+any user, including unauthenticated users, have on the workspace.
+
+=head3 METHODS
+
+=head4 create_workspace 
+
+Creates a workspace with the given C<workspace_id> and the
+C<default_permission>. Returns the workspace metadata object. If
+the workspace already exists, this dies with an error.
+
+=head4 delete_workspace
+
+Deletes the associated workspace, returning the last C<workspace_metadata>
+object on success. This function dies if it fails for any reason,
+including lack of permissions.
+
+=head4 clone_workspace
+
+    clone_workspace("new_id", "old_id", "n");
+
+Copy an existing workspace with a new C<workspace_id>.
+C<default_permission> will be the default permissions of the new
+workspace. This function dies if the old workspace does not exist
+or if the new workspace already exists.
+
+=head4 list_workspaces
+
+Returns a list of workspace metadata objects for each workspace
+that the current user can see.
+
+=head4 list_workspace_objects
+
+    my ($obj_metas) = $serv->list_workspace_objects(
+        "workspace_id", $options );
+
+List the objects in the workspace. C<options> is an object that
+may contain optional flags to limit or alter the behavior of the
+list operation. Currently only one flag is supported:
+
+=over4
+
+=item type
+
+Type is a string that identifies the type of object to select.
+
+    list_workspace_objects("workspace_id", { type => "Genome" });
+
+This will list objects of the type C<Genome>. See the L</Types>
+section for details on how types are handled.
+
+=back
+
+=head4 set_global_workspace_permissions
+
+    my ($meta) = $s->set_global_workspace_permissions(
+        "workspace_id", "n");
+
+Set the C<global_permission> of the workspace. Returns
+the updated metadata on success. If the current user does
+not have sufficient privileges, dies with an error.
+
+=head4 set_workspace_permissions
+
+    my ($success) = $s->set_workspace_permissions(
+        $users, $new_permission, $workspace_id
+    );
+
+C<users> is a list of usernames. C<new_permission> is a permission
+object. This returns true, e.g. "1" on success or "0" on failure.
+
+=head2 Objects
+
+An object is simply a JSON "object" with one required attribute:
+C<version> which is an integer representing the version of the object.
+
+Objects also have metadata associated with them in the context of
+a L<workspace|/Workspaces>. The C<object_metadata> is a JSON "array"
+with the following elements:
+
+    [
+        object_id,
+        object_type,
+        modification_timestamp,
+        instance,
+        command,
+        last_modifer_username,
+        owner_username,
+    ]
+
+C<object_id> is a string that uniquely identifies an object within
+the context of the workspace. C<object_type> is a string that
+identifies the L<type of the object|/Types>. C<modification_timestamp>
+is an ISO8601 datetime string, e.g. "2012-10-31T15:13Z". C<command>
+is a string indicating the las command executed on the object that
+modified it. C<last_modifier_username> is a username string that
+indicates the last person to create or modify the object.
+C<owner_username> identifies the owner of the object.
+
+=head3 METHODS
+
+=head4 save_object
+
+    my ($meta) = $s->save_object(
+        "object_id", "object_type", $data,
+        "workspace_id", $options,
+    );
+
+Save an object C<$data> into the workspace C<workspace_id> under
+the C<object_id> identifier with the supplied type C<object_type>.
+C<$options> is a JSON "object" with the following supported properties:
+
+=over4
+
+=item command
+
+A command string to save with the object.
+
+=item metadata
+
+A JSON "object" where the values must be strings.  This is any
+arbitrary metadata to be associated with the object, so long
+as the values are strings... :/
+
+=back
+
+=head4 delete_object
+
+    my ($meta) = $s->delete_object(
+        "object_id", "object_type",
+        "workspace_id",
+    );
+
+Removes the object from the workspace C<workspace_id> that
+matches C<object_id> and C<object_type>. Returns the final
+state of the object's metadata, if that exists. Otherwise this
+function dies of errors.
+
+=head4 delete_object_permanently
+
+Same as L</delete_object> but with 20% more filler!
+
+=head4 get_object
+
+    my ($data, $metadata) = $s->get_object(
+        "object_id", "object_type", "workspace_id"
+    );
+
+Returns the C<object_data> and C<object_metadata> for
+the object C<object_id> with type C<object_type> contained
+in the workspace C<workspace_id>.
+
+=head4 get_objectmeta
+
+    my ($metadata) = $s->get_objectmeta(
+        "object_id", "object_type", "workspace_id"
+    );
+
+Returns the C<object_metadata> for the object C<object_id>
+with type C<object_type> contained in the workspace C<workspace_id>.
+11% less fat!
+
+=head4 revert_object
+
+    my ($metadata) = $s->revert_object(
+        "object_id", "object_type", "workspace_id"
+    );
+
+Returns an object to the previous version of the object. Legend has
+it that if you revert an object long enough, you'll get the
+I<Primordial Object> back! Actually it will either start returning
+the same object back (first) or die or randomly choose between the
+two options.
+
+=head4 unrevert_object
+
+    my ($metadata) = $s->unrevert_object(
+        "object_id", "object_type", "workspace_id"
+    );
+
+Does the same thing as C<revert_object> into the future, at 88MPH.
+This steps forward in the revision history. If you get to the end
+of time, you'll probably die. If there are two possible paths to
+take, you take the one where Doc is killed by Libyan terrorists.
+
+=head4 copy_object
+
+    my ($metadata) = $s->copy_object(
+        "new_object_id", "new_workspace_id",
+        "old_object_id", "object_type",
+        "old_workspace_id"
+    );
+
+Copies the object C<old_object_id> with type C<object_type> from
+the C<old_workspace_id> workspace into the C<new_workspace_id>
+workspace.
+
+=head4 move_object
+
+Same arguments as C<copy_object> but this results in the object no longer
+being associated with C<old_object_id> in the workspace C<old_workspace_id>.
+
+=head4 has_object
+
+    my ($present) = $s->has_object(
+        "object_id", "object_type", "workspace_id"
+    );
+
+Returns true, "1" if the object identified by C<object_id> and type
+C<object_type> is present in the workspace C<workspace_id>. Returns
+false, "0" otherwise.
+
+=head2 Types
+
+Currently types are simple strings that represent allowed objects
+within the workspace. While there are plans to institute a rigorous
+type-hierarchy, currently there are a few hard-coded types in the system:
+
+    Genome
+    Unspecified
+    TestData
+    ModelSEED::Biochemistry
+    ModelSEED::Model
+    ModelSEED::Mapping
+    ModelSEED::Annotation
+
+Type strings are case-sensitive. C<Unspecified> is a universal type.
+
+=cut
