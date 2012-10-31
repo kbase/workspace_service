@@ -6,10 +6,10 @@ BIN_PERL = $(addprefix $(BIN_DIR)/,$(basename $(notdir $(SRC_PERL))))
 
 KB_PERL = $(addprefix $(TARGET)/bin/,$(basename $(notdir $(SRC_PERL))))
 
-# SERVER_SPEC :  workspaceService.spec
+# SERVER_SPEC   : workspaceService.spec
 # SERVER_MODULE : workspaceService
 # SERVICE       : workspaceService
-# SERVICE_PORT  : ?? 
+# SERVICE_PORT  : 7058 
 # PSGI_PATH     : lib/workspaceService.psgi
 
 # workspaceService
@@ -17,20 +17,20 @@ SERV_SERVER_SPEC = workspaceService.spec
 SERV_SERVER_MODULE = workspaceService
 SERV_SERVICE = workspaceService
 SERV_PSGI_PATH = lib/workspaceService.psgi
-SERV_SERVICE_PORT = ??
+SERV_SERVICE_PORT = 7058
 SERV_SERVICE_DIR = $(TARGET)/services/$(SERV_SERVICE)
 SERV_TPAGE = $(KB_RUNTIME)/bin/perl $(KB_RUNTIME)/bin/tpage
 SERV_TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(KB_RUNTIME) --define kb_service_name=$(SERV_SERVICE) \
 	--define kb_service_port=$(SERV_SERVICE_PORT) --define kb_service_psgi=$(SERV_PSGI_PATH)
 
-all: bin server
+all: deploy bin
 
 bin: $(BIN_PERL)
 
 $(BIN_DIR)/%: scripts/%.pl 
 	$(TOOLS_DIR)/wrap_perl '$$KB_TOP/modules/$(CURRENT_DIR)/$<' $@
 
-deploy: deploy-service
+deploy: deploy-service deploy-client
 
 deploy-service: deploy-dir deploy-scripts deploy-libs deploy-services
 deploy-client: deploy-dir deploy-scripts deploy-libs  deploy-doc
