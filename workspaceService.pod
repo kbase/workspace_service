@@ -147,6 +147,7 @@ not have sufficient privileges, dies with an error.
 
 C<users> is a list of usernames. C<new_permission> is a permission
 object. This returns true, e.g. "1" on success or "0" on failure.
+If you do not have permissions on an object, this dies.
 
 =head2 Objects
 
@@ -169,12 +170,15 @@ with the following elements:
 
 C<object_id> is a string that uniquely identifies an object within
 the context of the workspace. C<object_type> is a string that
-identifies the L<type of the object|/Types>. C<modification_timestamp>
-is an ISO8601 datetime string, e.g. "2012-10-31T15:13Z". C<command>
-is a string indicating the las command executed on the object that
-modified it. C<last_modifier_username> is a username string that
-indicates the last person to create or modify the object.
-C<owner_username> identifies the owner of the object.
+identifies the L<type of the object|/Types>. C<instance> is an
+integer that is the number ancestors for an object including itself.
+So the minimum value for this is 1 and increases monotonically.
+C<modification_timestamp> is an ISO8601 datetime string, e.g.
+"2012-10-31T15:13Z". C<command> is a string indicating the las
+command executed on the object that modified it. C<last_modifier_username>
+is a username string that indicates the last person to create or
+modify the object.  C<owner_username> identifies the owner of the
+object.
 
 =head3 METHODS
 
@@ -217,7 +221,9 @@ function dies of errors.
 
 =head4 delete_object_permanently
 
-Same as L</delete_object> but with 20% more filler!
+This actually removes the object history from the system. This
+can only be successfully called if C<delete_object> has been called
+already. Otherwise this function dies of errors.
 
 =head4 get_object
 
@@ -235,9 +241,8 @@ in the workspace C<workspace_id>.
         "object_id", "object_type", "workspace_id"
     );
 
-Returns the C<object_metadata> for the object C<object_id>
+Returns the C<object_metadata> for the object C<object_id> 
 with type C<object_type> contained in the workspace C<workspace_id>.
-11% less fat!
 
 =head4 revert_object
 
@@ -245,11 +250,8 @@ with type C<object_type> contained in the workspace C<workspace_id>.
         "object_id", "object_type", "workspace_id"
     );
 
-Returns an object to the previous version of the object. Legend has
-it that if you revert an object long enough, you'll get the
-I<Primordial Object> back! Actually it will either start returning
-the same object back (first) or die or randomly choose between the
-two options.
+Returns an object to the previous version of the object. If there
+is no previous version, this function dies with an error.
 
 =head4 unrevert_object
 
@@ -257,10 +259,10 @@ two options.
         "object_id", "object_type", "workspace_id"
     );
 
-Does the same thing as C<revert_object> into the future, at 88MPH.
-This steps forward in the revision history. If you get to the end
-of time, you'll probably die. If there are two possible paths to
-take, you take the one where Doc is killed by Libyan terrorists.
+If C<revert_object> returns the previous instance of an object,
+C<unrevert_object> returns the next instance. Unrevert reverses
+the operation of revert. If there is no "future" version of an
+object, this function dies with an error.
 
 =head4 copy_object
 
