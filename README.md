@@ -26,6 +26,10 @@ On Magellan instances it is advisable to have this on the
     mkdir -p /mnt/db
     ln -s /mnt/db /data/db
 
+Start the MongoDB service:
+
+    mongod 1>/var/log/mongod.log 2>&1 &
+
 ### Deployment ###
 
 Run `make deploy`.
