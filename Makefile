@@ -1,10 +1,14 @@
+# Set default locations for runtime and deployment
+# if the directories are not already set:
+DEPLOY_RUNTIME ?= /kb/runtime
+TARGET         ?= /kb/deployment
+# Include standard makefile
 TOP_DIR = ../..
 include $(TOP_DIR)/tools/Makefile.common
 
 SRC_PERL = $(wildcard scripts/*.pl)
 BIN_PERL = $(addprefix $(BIN_DIR)/,$(basename $(notdir $(SRC_PERL))))
-
-KB_PERL = $(addprefix $(TARGET)/bin/,$(basename $(notdir $(SRC_PERL))))
+KB_PERL  = $(addprefix $(TARGET)/bin/,$(basename $(notdir $(SRC_PERL))))
 
 # SERVER_SPEC   : workspaceService.spec
 # SERVER_MODULE : workspaceService
@@ -13,11 +17,11 @@ KB_PERL = $(addprefix $(TARGET)/bin/,$(basename $(notdir $(SRC_PERL))))
 # PSGI_PATH     : lib/workspaceService.psgi
 
 # workspaceService
-SERV_SERVER_SPEC = workspaceService.spec
-SERV_SERVER_MODULE = workspaceService
-SERV_SERVICE = workspaceService
-SERV_PSGI_PATH = lib/workspaceService.psgi
-SERV_SERVICE_PORT = 7058
+SERV_SERVER_SPEC 	= workspaceService.spec
+SERV_SERVER_MODULE 	= workspaceService
+SERV_SERVICE 		= workspaceService
+SERV_PSGI_PATH 		= lib/workspaceService.psgi
+SERV_SERVICE_PORT 	= 7058
 SERV_SERVICE_DIR = $(TARGET)/services/$(SERV_SERVICE)
 SERV_TPAGE = $(KB_RUNTIME)/bin/perl $(KB_RUNTIME)/bin/tpage
 SERV_TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(KB_RUNTIME) --define kb_service_name=$(SERV_SERVICE) \
@@ -29,6 +33,17 @@ bin: $(BIN_PERL)
 
 $(BIN_DIR)/%: scripts/%.pl 
 	$(TOOLS_DIR)/wrap_perl '$$KB_TOP/modules/$(CURRENT_DIR)/$<' $@
+
+TESTS = $(wildcard t/*.t)
+
+test:
+	for t in $(TESTS) ; do \
+		echo $$t ; \
+		$(DEPLOY_RUNTIME)/bin/prove $$t ; \
+		if [ $$? -ne 0 ] ; then \
+			exit 1 ; \
+		fi \
+	done
 
 deploy: deploy-service deploy-client
 
