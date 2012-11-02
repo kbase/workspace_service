@@ -39,9 +39,12 @@ module workspaceService {
     funcdef copy_object(object_id new_id,workspace_id new_workspace,object_id source_id,object_type type,workspace_id source_workspace) returns (object_metadata metadata);
     funcdef move_object(object_id new_id,workspace_id new_workspace,object_id source_id,object_type type,workspace_id source_workspace) returns (object_metadata metadata);
     funcdef has_object(object_id id,object_type type,workspace_id workspace) returns (bool object_present);
+    funcdef object_history(object_id id,object_type type,workspace_id workspace) returns (bool object_present);
     
     /*Workspace management routines*/
     funcdef create_workspace(workspace_id name,permission default_permission) returns (workspace_metadata metadata);
+    funcdef get_workspacemeta(workspace_id name) returns (workspace_metadata metadata);
+    funcdef get_workspacepermissions(workspace_id name) returns (mapping<username,permission> user_permissions);
     funcdef delete_workspace(workspace_id name) returns (workspace_metadata metadata);
     funcdef clone_workspace(workspace_id new_workspace,workspace_id current_workspace,permission default_permission) returns (workspace_metadata metadata);
     funcdef list_workspaces() returns (list<workspace_metadata> workspaces);
