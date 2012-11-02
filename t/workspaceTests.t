@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Data::Dumper;
-my $test_count = 33;
+my $test_count = 44;
 
 #Creating new workspace services implementation connected to testdb
 $ENV{MONGODBHOST} = "127.0.0.1";
@@ -26,6 +26,15 @@ my $wsmeta1 = $impl->create_workspace("testworkspace1","n");
 ok(defined $wsmeta1, "workspace defined");
 
 ok($wsmeta1->[0] eq "testworkspace1", "created workspace");
+
+ok($wsmeta1->[1] eq "testuser", "user == testuser");
+
+ok($wsmeta1->[3] eq 0, "ws has no objects");
+
+ok($wsmeta1->[4] eq "a", "ws has a user perms");
+
+ok($wsmeta1->[5] eq "n", "ws has n global perms");
+
 # Is the workspace listed
 
 my $workspace_list = $impl->list_workspaces();
@@ -33,10 +42,10 @@ my $workspace_list = $impl->list_workspaces();
 ok(@{$workspace_list}[0]->[0] eq "testworkspace1", "name matches");
 
 # Create a few more workspaces
-$impl->create_workspace("testworkspace2","n");
-$impl->create_workspace("testworkspace3","n");
-$impl->create_workspace("testworkspace4","n");
-$impl->create_workspace("testworkspace5","n");
+lives_ok { $impl->create_workspace("testworkspace2","r"); } "create read-only ws";
+lives_ok { $impl->create_workspace("testworkspace3","a"); } "create admin ws";
+lives_ok { $impl->create_workspace("testworkspace4","w"); } "create rw ws";
+lives_ok { $impl->create_workspace("testworkspace5","n"); } "create no perm ws";
 
 $workspace_list = $impl->list_workspaces();
 
@@ -59,17 +68,21 @@ dies_ok { $impl->create_workspace("testworkspace1","n") } "create duplicate fail
 
 
 # Can I delete a workspace
-lives_ok { $impl->delete_workspace("testworkspace1","n")  } "delete succeeds";
+lives_ok { $impl->delete_workspace("testworkspace1")  } "delete succeeds";
 # Does deleting a non-existent workspace fail
-dies_ok { $impl->delete_workspace("testworkspace_foo","n")  } "delete for non-existent ws fails";
+dies_ok { $impl->delete_workspace("testworkspace_foo")  } "delete for non-existent ws fails";
 # Does deleting a previously deleted workspace fail
-dies_ok { $impl->delete_workspace("testworkspace1","n")  } "duplicate delete fails";
+dies_ok { $impl->delete_workspace("testworkspace1")  } "duplicate delete fails";
 
-
-$impl->delete_workspace("testworkspace1","n");
 # Can I clone a workspace
+lives_ok{ $impl->clone_workspace("clonetestworkspace2","testworkspace2", "n") } "clone succeeds";
 
-# Does cloning a non-existent workspace fail
+# Does cloning a deleted workspace fail
+dies_ok{ $impl->clone_workspace("clonetestworkspace1","testworkspace1", "n") } "clone a deleted workspace should fail";
+
+# Can I clone a workspace without specifying perms
+lives_ok{ $impl->clone_workspace("clonetestworkspace3","testworkspace3") } "clone without perms argument succeeds";
+
 
 # Does the cloned workspace match the original
 
