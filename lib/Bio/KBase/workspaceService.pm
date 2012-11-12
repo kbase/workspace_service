@@ -40,7 +40,7 @@ sub new
 
 
 
-=head2 $result = save_object(id, type, data, workspace, options)
+=head2 $result = save_object(params)
 
 
 
@@ -50,20 +50,16 @@ sub save_object
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 5)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function save_object (received $n, expecting 5)");
+							       "Invalid argument count for function save_object (received $n, expecting 1)");
     }
     {
-	my($id, $type, $data, $workspace, $options) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($id)) or push(@_bad_arguments, "Invalid type for argument 1 \"id\" (value was \"$id\")");
-        (!ref($type)) or push(@_bad_arguments, "Invalid type for argument 2 \"type\" (value was \"$type\")");
-        (ref($data) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 3 \"data\" (value was \"$data\")");
-        (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument 4 \"workspace\" (value was \"$workspace\")");
-        (ref($options) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 5 \"options\" (value was \"$options\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to save_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -94,7 +90,7 @@ sub save_object
 
 
 
-=head2 $result = delete_object(id, type, workspace)
+=head2 $result = delete_object(params)
 
 
 
@@ -104,18 +100,16 @@ sub delete_object
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 3)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function delete_object (received $n, expecting 3)");
+							       "Invalid argument count for function delete_object (received $n, expecting 1)");
     }
     {
-	my($id, $type, $workspace) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($id)) or push(@_bad_arguments, "Invalid type for argument 1 \"id\" (value was \"$id\")");
-        (!ref($type)) or push(@_bad_arguments, "Invalid type for argument 2 \"type\" (value was \"$type\")");
-        (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument 3 \"workspace\" (value was \"$workspace\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to delete_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -146,7 +140,7 @@ sub delete_object
 
 
 
-=head2 $result = delete_object_permanently(id, type, workspace)
+=head2 $result = delete_object_permanently(params)
 
 
 
@@ -156,18 +150,16 @@ sub delete_object_permanently
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 3)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function delete_object_permanently (received $n, expecting 3)");
+							       "Invalid argument count for function delete_object_permanently (received $n, expecting 1)");
     }
     {
-	my($id, $type, $workspace) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($id)) or push(@_bad_arguments, "Invalid type for argument 1 \"id\" (value was \"$id\")");
-        (!ref($type)) or push(@_bad_arguments, "Invalid type for argument 2 \"type\" (value was \"$type\")");
-        (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument 3 \"workspace\" (value was \"$workspace\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to delete_object_permanently:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -198,7 +190,7 @@ sub delete_object_permanently
 
 
 
-=head2 $result = get_object(id, type, workspace)
+=head2 $result = get_object(params)
 
 
 
@@ -208,18 +200,16 @@ sub get_object
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 3)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_object (received $n, expecting 3)");
+							       "Invalid argument count for function get_object (received $n, expecting 1)");
     }
     {
-	my($id, $type, $workspace) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($id)) or push(@_bad_arguments, "Invalid type for argument 1 \"id\" (value was \"$id\")");
-        (!ref($type)) or push(@_bad_arguments, "Invalid type for argument 2 \"type\" (value was \"$type\")");
-        (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument 3 \"workspace\" (value was \"$workspace\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to get_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -250,7 +240,7 @@ sub get_object
 
 
 
-=head2 $result = get_objectmeta(id, type, workspace)
+=head2 $result = get_objectmeta(params)
 
 
 
@@ -260,18 +250,16 @@ sub get_objectmeta
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 3)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_objectmeta (received $n, expecting 3)");
+							       "Invalid argument count for function get_objectmeta (received $n, expecting 1)");
     }
     {
-	my($id, $type, $workspace) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($id)) or push(@_bad_arguments, "Invalid type for argument 1 \"id\" (value was \"$id\")");
-        (!ref($type)) or push(@_bad_arguments, "Invalid type for argument 2 \"type\" (value was \"$type\")");
-        (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument 3 \"workspace\" (value was \"$workspace\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to get_objectmeta:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -302,7 +290,7 @@ sub get_objectmeta
 
 
 
-=head2 $result = revert_object(id, type, workspace)
+=head2 $result = revert_object(params)
 
 
 
@@ -312,18 +300,16 @@ sub revert_object
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 3)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function revert_object (received $n, expecting 3)");
+							       "Invalid argument count for function revert_object (received $n, expecting 1)");
     }
     {
-	my($id, $type, $workspace) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($id)) or push(@_bad_arguments, "Invalid type for argument 1 \"id\" (value was \"$id\")");
-        (!ref($type)) or push(@_bad_arguments, "Invalid type for argument 2 \"type\" (value was \"$type\")");
-        (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument 3 \"workspace\" (value was \"$workspace\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to revert_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -354,7 +340,7 @@ sub revert_object
 
 
 
-=head2 $result = unrevert_object(id, type, workspace, options)
+=head2 $result = unrevert_object(params)
 
 
 
@@ -364,19 +350,16 @@ sub unrevert_object
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 4)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function unrevert_object (received $n, expecting 4)");
+							       "Invalid argument count for function unrevert_object (received $n, expecting 1)");
     }
     {
-	my($id, $type, $workspace, $options) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($id)) or push(@_bad_arguments, "Invalid type for argument 1 \"id\" (value was \"$id\")");
-        (!ref($type)) or push(@_bad_arguments, "Invalid type for argument 2 \"type\" (value was \"$type\")");
-        (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument 3 \"workspace\" (value was \"$workspace\")");
-        (ref($options) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 4 \"options\" (value was \"$options\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to unrevert_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -407,7 +390,7 @@ sub unrevert_object
 
 
 
-=head2 $result = copy_object(new_id, new_workspace, source_id, type, source_workspace)
+=head2 $result = copy_object(params)
 
 
 
@@ -417,20 +400,16 @@ sub copy_object
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 5)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function copy_object (received $n, expecting 5)");
+							       "Invalid argument count for function copy_object (received $n, expecting 1)");
     }
     {
-	my($new_id, $new_workspace, $source_id, $type, $source_workspace) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($new_id)) or push(@_bad_arguments, "Invalid type for argument 1 \"new_id\" (value was \"$new_id\")");
-        (!ref($new_workspace)) or push(@_bad_arguments, "Invalid type for argument 2 \"new_workspace\" (value was \"$new_workspace\")");
-        (!ref($source_id)) or push(@_bad_arguments, "Invalid type for argument 3 \"source_id\" (value was \"$source_id\")");
-        (!ref($type)) or push(@_bad_arguments, "Invalid type for argument 4 \"type\" (value was \"$type\")");
-        (!ref($source_workspace)) or push(@_bad_arguments, "Invalid type for argument 5 \"source_workspace\" (value was \"$source_workspace\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to copy_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -461,7 +440,7 @@ sub copy_object
 
 
 
-=head2 $result = move_object(new_id, new_workspace, source_id, type, source_workspace)
+=head2 $result = move_object(params)
 
 
 
@@ -471,20 +450,16 @@ sub move_object
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 5)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function move_object (received $n, expecting 5)");
+							       "Invalid argument count for function move_object (received $n, expecting 1)");
     }
     {
-	my($new_id, $new_workspace, $source_id, $type, $source_workspace) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($new_id)) or push(@_bad_arguments, "Invalid type for argument 1 \"new_id\" (value was \"$new_id\")");
-        (!ref($new_workspace)) or push(@_bad_arguments, "Invalid type for argument 2 \"new_workspace\" (value was \"$new_workspace\")");
-        (!ref($source_id)) or push(@_bad_arguments, "Invalid type for argument 3 \"source_id\" (value was \"$source_id\")");
-        (!ref($type)) or push(@_bad_arguments, "Invalid type for argument 4 \"type\" (value was \"$type\")");
-        (!ref($source_workspace)) or push(@_bad_arguments, "Invalid type for argument 5 \"source_workspace\" (value was \"$source_workspace\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to move_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -515,7 +490,7 @@ sub move_object
 
 
 
-=head2 $result = has_object(id, type, workspace)
+=head2 $result = has_object(params)
 
 
 
@@ -525,18 +500,16 @@ sub has_object
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 3)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function has_object (received $n, expecting 3)");
+							       "Invalid argument count for function has_object (received $n, expecting 1)");
     }
     {
-	my($id, $type, $workspace) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($id)) or push(@_bad_arguments, "Invalid type for argument 1 \"id\" (value was \"$id\")");
-        (!ref($type)) or push(@_bad_arguments, "Invalid type for argument 2 \"type\" (value was \"$type\")");
-        (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument 3 \"workspace\" (value was \"$workspace\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to has_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -567,9 +540,59 @@ sub has_object
 
 
 
-=head2 $result = create_workspace(name, default_permission)
+=head2 $result = object_history(params)
 
-Workspace management routines
+
+
+=cut
+
+sub object_history
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function object_history (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to object_history:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'object_history');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "workspaceService.object_history",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'object_history',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method object_history",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'object_history',
+				       );
+    }
+}
+
+
+
+=head2 $result = create_workspace(params)
+
+
 
 =cut
 
@@ -577,17 +600,16 @@ sub create_workspace
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 2)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function create_workspace (received $n, expecting 2)");
+							       "Invalid argument count for function create_workspace (received $n, expecting 1)");
     }
     {
-	my($name, $default_permission) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($name)) or push(@_bad_arguments, "Invalid type for argument 1 \"name\" (value was \"$name\")");
-        (!ref($default_permission)) or push(@_bad_arguments, "Invalid type for argument 2 \"default_permission\" (value was \"$default_permission\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to create_workspace:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -618,7 +640,107 @@ sub create_workspace
 
 
 
-=head2 $result = delete_workspace(name)
+=head2 $result = get_workspacemeta(params)
+
+
+
+=cut
+
+sub get_workspacemeta
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_workspacemeta (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_workspacemeta:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_workspacemeta');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "workspaceService.get_workspacemeta",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_workspacemeta',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_workspacemeta",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_workspacemeta',
+				       );
+    }
+}
+
+
+
+=head2 $result = get_workspacepermissions(params)
+
+
+
+=cut
+
+sub get_workspacepermissions
+{
+    my($self, @args) = @_;
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_workspacepermissions (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_workspacepermissions:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_workspacepermissions');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "workspaceService.get_workspacepermissions",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_workspacepermissions',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_workspacepermissions",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_workspacepermissions',
+				       );
+    }
+}
+
+
+
+=head2 $result = delete_workspace(params)
 
 
 
@@ -634,10 +756,10 @@ sub delete_workspace
 							       "Invalid argument count for function delete_workspace (received $n, expecting 1)");
     }
     {
-	my($name) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($name)) or push(@_bad_arguments, "Invalid type for argument 1 \"name\" (value was \"$name\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to delete_workspace:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -668,7 +790,7 @@ sub delete_workspace
 
 
 
-=head2 $result = clone_workspace(new_workspace, current_workspace, default_permission)
+=head2 $result = clone_workspace(params)
 
 
 
@@ -678,18 +800,16 @@ sub clone_workspace
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 3)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function clone_workspace (received $n, expecting 3)");
+							       "Invalid argument count for function clone_workspace (received $n, expecting 1)");
     }
     {
-	my($new_workspace, $current_workspace, $default_permission) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($new_workspace)) or push(@_bad_arguments, "Invalid type for argument 1 \"new_workspace\" (value was \"$new_workspace\")");
-        (!ref($current_workspace)) or push(@_bad_arguments, "Invalid type for argument 2 \"current_workspace\" (value was \"$current_workspace\")");
-        (!ref($default_permission)) or push(@_bad_arguments, "Invalid type for argument 3 \"default_permission\" (value was \"$default_permission\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to clone_workspace:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -720,7 +840,7 @@ sub clone_workspace
 
 
 
-=head2 $result = list_workspaces()
+=head2 $result = list_workspaces(params)
 
 
 
@@ -730,10 +850,21 @@ sub list_workspaces
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 0)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function list_workspaces (received $n, expecting 0)");
+							       "Invalid argument count for function list_workspaces (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to list_workspaces:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'list_workspaces');
+	}
     }
 
     my $result = $self->{client}->call($self->{url}, {
@@ -759,7 +890,7 @@ sub list_workspaces
 
 
 
-=head2 $result = list_workspace_objects(workspace, options)
+=head2 $result = list_workspace_objects(params)
 
 
 
@@ -769,17 +900,16 @@ sub list_workspace_objects
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 2)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function list_workspace_objects (received $n, expecting 2)");
+							       "Invalid argument count for function list_workspace_objects (received $n, expecting 1)");
     }
     {
-	my($workspace, $options) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument 1 \"workspace\" (value was \"$workspace\")");
-        (ref($options) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 2 \"options\" (value was \"$options\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to list_workspace_objects:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -810,7 +940,7 @@ sub list_workspace_objects
 
 
 
-=head2 $result = set_global_workspace_permissions(new_permission, workspace)
+=head2 $result = set_global_workspace_permissions(params)
 
 
 
@@ -820,17 +950,16 @@ sub set_global_workspace_permissions
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 2)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function set_global_workspace_permissions (received $n, expecting 2)");
+							       "Invalid argument count for function set_global_workspace_permissions (received $n, expecting 1)");
     }
     {
-	my($new_permission, $workspace) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (!ref($new_permission)) or push(@_bad_arguments, "Invalid type for argument 1 \"new_permission\" (value was \"$new_permission\")");
-        (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument 2 \"workspace\" (value was \"$workspace\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to set_global_workspace_permissions:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -861,7 +990,7 @@ sub set_global_workspace_permissions
 
 
 
-=head2 $result = set_workspace_permissions(users, new_permission, workspace)
+=head2 $result = set_workspace_permissions(params)
 
 
 
@@ -871,18 +1000,16 @@ sub set_workspace_permissions
 {
     my($self, @args) = @_;
 
-    if ((my $n = @args) != 3)
+    if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function set_workspace_permissions (received $n, expecting 3)");
+							       "Invalid argument count for function set_workspace_permissions (received $n, expecting 1)");
     }
     {
-	my($users, $new_permission, $workspace) = @args;
+	my($params) = @args;
 
 	my @_bad_arguments;
-        (ref($users) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"users\" (value was \"$users\")");
-        (!ref($new_permission)) or push(@_bad_arguments, "Invalid type for argument 2 \"new_permission\" (value was \"$new_permission\")");
-        (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument 3 \"workspace\" (value was \"$workspace\")");
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to set_workspace_permissions:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,

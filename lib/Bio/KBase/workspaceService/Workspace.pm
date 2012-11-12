@@ -2,6 +2,7 @@ package Bio::KBase::workspaceService::Workspace;
 use strict;
 use Bio::KBase::Exceptions;
 use Data::UUID;
+use Data::Dumper;
 
 our $VERSION = "0";
 
@@ -42,8 +43,15 @@ sub new {
 		_owner => $args->{owner},
 		_moddate => $args->{moddate},
 		_defaultPermissions => $args->{defaultPermissions},
-		_objects => $args->{objects}
+		_objects => {}
 	};
+	foreach my $key (keys(%{$args->{objects}})) {
+		foreach my $keytwo (keys(%{$args->{objects}->{$key}})) {
+			my $newkey = $keytwo;
+			$newkey =~ s/_DOT_/./g;
+			$self->{_objects}->{$key}->{$newkey} = $args->{objects}->{$key}->{$keytwo};
+		}
+	}
 	bless $self;
 	$self->_validateID($args->{id});
 	$self->_validatePermission($args->{defaultPermissions});
@@ -207,10 +215,7 @@ Description:
 sub setDefaultPermissions {
 	my ($self,$perm) = @_;
 	$self->_validatePermission($perm);
-	if ($self->currentPermission() ne "a") {
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "User does not have rights to edit workspace permissions!",
-							       method_name => 'setDefaultPermissions');
-	}
+	$self->checkPermissions(["a"]);
 	$self->{_defaultPermissions} = $perm;
 	$self->parent()->_updateDB("workspaces",{id => $self->id()},{'$set' => {'defaultPermissions' => $perm}});
 }
@@ -226,6 +231,7 @@ Description:
 
 sub getObject {
 	my ($self,$type,$id,$options) = @_;
+	$self->checkPermissions(["r","w","a"]);
 	my $objects = $self->objects();
 	if (!defined($objects->{$type}->{$id})) {
 		if (defined($options->{throwErrorIfMissing}) && $options->{throwErrorIfMissing} == 1) {
@@ -234,8 +240,31 @@ sub getObject {
 		}
 		return undef;
 	}
+	if (defined($options->{instance})) {
+		return $self->parent()->_getObjectByID($id,$type,$self->id(),$options->{instance},{throwErrorIfMissing => 1});
+	}
 	my $uuid = $objects->{$type}->{$id};
 	return $self->parent()->_getObject($uuid,{throwErrorIfMissing => 1});
+}
+
+=head3 getObjectHistory
+
+Definition:
+	Bio::KBase::workspaceService::Object = getObjectHistory(string:type,string:alias)
+Description:
+	Returns an array with complete object history
+
+=cut
+
+sub getObjectHistory {
+	my ($self,$type,$id) = @_;
+	$self->checkPermissions(["r","w","a"]);
+	my $objects = $self->objects();
+	if (!defined($objects->{$type}->{$id})) {
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Specified object not found in the workspace!",
+		method_name => 'getObject');
+	}
+	return $self->parent()->_getObjectsByID($id,$type,$self->id());
 }
 
 =head3 getAllObjects
@@ -249,6 +278,7 @@ Description:
 
 sub getAllObjects {
 	my ($self,$type) = @_;
+	$self->checkPermissions(["r","w","a"]);
 	my $uuids = [];
 	my $objects = $self->objects();
 	if (!defined($type)) {
@@ -276,11 +306,8 @@ Description:
 
 sub saveObject {
 	my ($self,$type,$id,$data,$command,$meta) = @_;
+	$self->checkPermissions(["w","a"]);
 	$self->_validateType($type);
-	if ($self->currentPermission() =~ m/[rn]/) {
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "User does not have rights to save an object in the workspace!",
-							       method_name => 'saveObject');
-	}
 	my $continue = 1;
 	my ($ancestor,$instance,$owner);
 	my $uuid = Data::UUID->new()->create_str();
@@ -309,7 +336,6 @@ sub saveObject {
 		workspace => $self->id(),
 		parent => $self->parent(),
 		ancestor => $ancestor,
-		revertAncestors => [],
 		owner => $owner,
 		lastModifiedBy => $self->currentUser(),
 		command => $command,
@@ -331,19 +357,23 @@ Description:
 =cut
 
 sub revertObject {
-	my ($self,$type,$id) = @_;
-	if ($self->currentPermission() =~ m/[rn]/) {
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "User does not have right to revert an object in the workspace!",
-							       method_name => 'revertObject');
-	}
+	my ($self,$type,$id,$instance) = @_;
+	$self->checkPermissions(["w","a"]);
 	my $obj = $self->getObject($type,$id,{throwErrorIfMissing => 1});
-	if (!defined($obj->ancestor())) {
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Cannot revert an object with no ancestor!",
-							       method_name => 'revertObject');
+	if (!defined($obj)) {
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object not found!",
+		method_name => 'revertObject');
 	}
-	my $ancestor = $self->parent()->_getObject($obj->ancestor(),{throwErrorIfMissing => 1});	
-	my $revertAncestors = $ancestor->revertAncestors();
-	push(@{$revertAncestors},$obj->uuid());
+	my $currInst = $obj->instance();
+	if (defined($instance)) {
+		$obj = $self->_getObjectByID($id,$type,$self->id(),$instance);
+	} else {
+		$obj = $self->parent()->_getObject($obj->ancestor(),{throwErrorIfMissing => 1});
+	} 
+	if (!defined($obj)) {
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Ancestor object not found!",
+		method_name => 'revertObject');
+	}
 	my $uuid = Data::UUID->new()->create_str();
 	if ($self->_updateObjects($type,$id,$uuid,$obj->uuid()) == 0) {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "State of object was altered during revert process. Revert aborted!",
@@ -354,52 +384,16 @@ sub revertObject {
 		type => $type,
 		workspace => $self->id(),
 		parent => $self->parent(),
-		ancestor => $ancestor->ancestor(),
-		revertAncestors => $revertAncestors,
+		ancestor => $obj->ancestor(),
 		owner => $obj->owner(),
 		lastModifiedBy => $self->currentUser(),
-		command => "revert",
+		command => "revert:".$currInst.":".$obj->instance(),
 		id => $id,
-		instance => ($obj->instance()+1),
-		chsum => $ancestor->chsum(),
-		meta => $ancestor->meta()
+		instance => ($currInst+1),
+		chsum => $obj->chsum(),
+		meta => $obj->meta()
 	});
 	return $newObject;
-}
-
-=head3 unrevertObject
-
-Definition:
-	Bio::KBase::workspaceService::Object = unrevertObject(string:type,string:id)
-Description:
-	Undoes the action of the revert command
-
-=cut
-
-sub unrevertObject {
-	my ($self,$type,$id,$index) = @_;
-	if (!defined($index)) {
-		$index = 0;	
-	}
-	if ($self->currentPermission() =~ m/[rn]/) {
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "User does not have right to unrevert an object in the workspace!",
-			method_name => 'unrevertObject');
-	}
-	my $obj = $self->getObject($type,$id,{throwErrorIfMissing => 1});
-	if ($obj->command() ne "revert") {
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Cannot unrevert an object that was not reverted!",
-			method_name => 'unrevertObject');
-	}
-	if (!defined($obj->revertAncestors()->[$index])) {
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Specified reversion ancestor does not exist!",
-			method_name => 'unrevertObject');
-	}
-	if ($self->_updateObjects($type,$id,$obj->revertAncestors()->[$index],$obj->uuid()) == 0) {
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "State of object was altered during unrevert process. Unrevert aborted!",
-			method_name => 'unrevertObject');
-	}
-	my $newobj = $self->parent()->_getObject($obj->revertAncestors()->[$index],{throwErrorIfMissing => 1});	
-	return $newobj;
 }
 
 =head3 deleteObject
@@ -413,10 +407,7 @@ Description:
 
 sub deleteObject {
 	my ($self,$type,$id) = @_;
-	if ($self->currentPermission() =~ m/[rn]/) {
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "User does not have rights to delete an object in the workspace!",
-							       method_name => 'deleteObject');
-	}
+	$self->checkPermissions(["w","a"]);
 	my $obj = $self->getObject($type,$id,{throwErrorIfMissing => 1});
 	if ($obj->command() eq "delete") {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object already in a deleted state!",
@@ -456,11 +447,8 @@ Description:
 
 sub deleteObjectPermanently {
 	my ($self,$type,$id) = @_;
+	$self->checkPermissions(["a"]);
 	my $obj = $self->getObject($type,$id,{throwErrorIfMissing => 1});
-	if ($self->currentPermission() ne "a" && $self->currentUser() ne $obj->owner()) {
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "User does not have rights to permanently delete an object in the workspace!",
-							       method_name => 'deleteObjectPermanently');
-	}
 	if ($obj->command() ne "delete") {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object must be in a deleted state before it can be permanently deleted!",
 							       method_name => 'deleteObjectPermanently');
@@ -485,10 +473,7 @@ Description:
 sub setUserPermissions {
 	my ($self,$users,$perm) = @_;
 	$self->_validatePermission($perm);
-	if ($self->currentPermission() ne "a") {
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "User does not have rights to set user permissions for workspace!",
-							       method_name => 'setUserPermissions');
-	}
+	$self->checkPermissions(["a"]);
 	my $userObjects = $self->parent()->_getWorkspaceUsers($users,{
 		throwErrorIfMissing => 0,
 		createIfMissing => 1
@@ -496,6 +481,26 @@ sub setUserPermissions {
 	for (my $i=0; $i < @{$userObjects}; $i++) {
 		$userObjects->[$i]->setWorkspacePermission($self->id(),$perm);
 	}
+}
+
+=head3 getWorkspaceUserPermissions
+
+Definition:
+	{string:username => string:permission} getWorkspaceUserPermissions()
+Description:
+	Returns a hash of all set user permissions for a workspace
+
+=cut
+
+sub getWorkspaceUserPermissions {
+	my ($self) = @_;
+	$self->checkPermissions(["r","w","a"]);
+	my $output = {"default" => $self->defaultPermissions()};
+	my $wsus = $self->parent()->_getAllWorkspaceUsersByWorkspace($self->id());
+	for (my $i=0; $i < @{$wsus}; $i++) {
+		$output->{$wsus->[$i]->id()} = $wsus->[$i]->workspaces()->{$self->id()};
+	}
+	return $output;
 }
 
 =head3 permanentDelete
@@ -519,6 +524,25 @@ sub permanentDelete {
 	}
 }
 
+=head3 checkPermissions
+
+Definition:
+	void checkPermissions(string:required permissions)
+Description:
+	Throws an exception if the user does not have needed permissions for the workspace
+	
+=cut
+
+sub checkPermissions {
+	my ($self,$perms) = @_;
+	my $permstring = join("",@{$perms});
+	my $currperm = $self->currentPermission();
+	if ($permstring !~ m/$currperm/) {
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "User lacks permissions for the specified activity!",
+		method_name => 'checkPermissions');
+	}
+}
+
 =head3 _updateObjects
 
 Definition:
@@ -532,13 +556,15 @@ Description:
 sub _updateObjects {
 	my ($self,$type,$id,$uuid,$olduuid) = @_;
 	my $result;
+	my $saveid = $id;
+	$saveid =~ s/\./_DOT_/g;
 	if (!defined($uuid)) {
-		if ($self->parent()->_updateDB("workspaces",{id => $self->id(),'objects.'.$type.'.'.$id => $olduuid},{'$unset' => {'objects.'.$type.'.'.$id => $olduuid}}) == 0) {
+		if ($self->parent()->_updateDB("workspaces",{id => $self->id(),'objects.'.$type.'.'.$saveid => $olduuid},{'$unset' => {'objects.'.$type.'.'.$saveid => $olduuid}}) == 0) {
 			return 0;
 		}
 		delete $self->objects()->{$type}->{$id};
 	} else {
-		if ($self->parent()->_updateDB("workspaces",{id => $self->id(),'objects.'.$type.'.'.$id => $olduuid},{'$set' => {'objects.'.$type.'.'.$id => $uuid}}) == 0) {
+		if ($self->parent()->_updateDB("workspaces",{id => $self->id(),'objects.'.$type.'.'.$saveid => $olduuid},{'$set' => {'objects.'.$type.'.'.$saveid => $uuid}}) == 0) {
 			return 0;
 		}
 		$self->objects()->{$type}->{$id} = $uuid;
