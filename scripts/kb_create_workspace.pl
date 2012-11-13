@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Bio::KBase::workspaceService::Helpers qw(auth get_client);
-my $usage = "Usage: kb_create_workspace <workspace_name>";
+my $usage = "Usage: kb_create_workspace <workspace_name>\n";
 my $workspace = shift @ARGV;
 unless(defined ($workspace)){
     print $usage;
