@@ -928,7 +928,7 @@ sub new
         if (defined($ENV{MONGODBDB})) {
     		$self->{_db} = $ENV{MONGODBDB};
     	} else {
-        	$self->{_db} = "modelObjectStore";
+        	$self->{_db} = "workspace_service";
     	}
         warn "\tfalling back to ".$self->{_db}." for collection\n";
     } 
