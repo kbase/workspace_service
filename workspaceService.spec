@@ -56,7 +56,11 @@ module workspaceService {
 		int instance;
 		string authentication;
     } get_object_params;
-    funcdef get_object(get_object_params params) returns (ObjectData data,object_metadata metadata);    
+    typedef structure { 
+		ObjectData data;
+		object_metadata metadata;
+    } get_object_output;
+    funcdef get_object(get_object_params params) returns (get_object_output output);    
     
     typedef structure { 
 		object_id id;

@@ -75,7 +75,7 @@ class workspaceService:
         resp = json.loads(resp_str)
 
         if 'result' in resp:
-            return resp['result']
+            return resp['result'][0]
         else:
             return None
 
