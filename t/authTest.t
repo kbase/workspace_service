@@ -1,9 +1,9 @@
-use Bio::KBase::workspaceService::Impl;
-use Bio::KBase::AuthToken;
 use strict;
 use warnings;
+use Bio::KBase::workspaceService::Impl;
+use Bio::KBase::AuthToken;
 use Test::More;
-use Data::Dumper;
+use Test::Exception;
 my $test_count = 0;
 
 $ENV{MONGODBHOST} = "127.0.0.1";
@@ -35,7 +35,15 @@ my ($meta2) = $impl->create_workspace({
 isnt $meta2->[0], $meta->[0];
 isnt $meta2->[1], $meta->[1];
 $test_count += 4;
+# Now check that list_workspaces returns only one workspace
+# with each auth type (none and $tokeN)
+my ($metas) = $impl->list_workspaces({});
+is scalar @$metas, 1;
+($metas) = $impl->list_workspaces({authentication => $token});
+is scalar @$metas, 1;
+$test_count += 2;
+# Now test workspace listing with invalid auth token
+dies_ok sub { $impl->list_workspaces({authentication => "bad" }) };
+$test_count += 1;
 
 done_testing($test_count);
-
-
