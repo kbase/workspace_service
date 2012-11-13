@@ -19,7 +19,7 @@ my $conf = {
     command => "save_object",
 };
 my $auth = auth();
-$conf->{authorization} = $auth if defined $auth;
+$conf->{authentication} = $auth if defined $auth;
 $serv->save_object($conf);
 
 sub get_data {

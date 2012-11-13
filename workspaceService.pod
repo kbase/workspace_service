@@ -45,6 +45,7 @@ form is an array with the following elements:
 
     [
         workspace_id,
+        owner
         modification_timestamp,
         number_of_objects,
         user_permission,
