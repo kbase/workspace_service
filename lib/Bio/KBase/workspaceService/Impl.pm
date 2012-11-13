@@ -25,7 +25,7 @@ use FileHandle;
 use DateTime;
 use Data::Dumper;
 use Bio::KBase::AuthUser;
-use Bio::KBase::AuthClient;
+use Bio::KBase::AuthToken;
 use Bio::KBase::workspaceService::Object;
 use Bio::KBase::workspaceService::Workspace;
 use Bio::KBase::workspaceService::WorkspaceUser;
