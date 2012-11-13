@@ -51,8 +51,8 @@ deploy-service: deploy-dir deploy-scripts deploy-libs deploy-services
 deploy-client: deploy-dir deploy-scripts deploy-libs  deploy-doc
 
 deploy-dir:
-	if [ ! -d $(SERV_SERVICE_DIR) ] ; then mkdir $(SERV_SERVICE_DIR) ; fi
-	if [ ! -d $(SERV_SERVICE_DIR)/webroot ] ; then mkdir $(SERV_SERVICE_DIR)/webroot ; fi
+	if [ ! -d $(SERV_SERVICE_DIR) ] ; then mkdir -p $(SERV_SERVICE_DIR) ; fi
+	if [ ! -d $(SERV_SERVICE_DIR)/webroot ] ; then mkdir -p $(SERV_SERVICE_DIR)/webroot ; fi
 
 deploy-scripts:
 	export KB_TOP=$(TARGET); \
@@ -80,7 +80,7 @@ deploy-basic-service:
 	chmod +x $(TARGET)/services/$(SERV_SERVICE)/process.$(SERV_SERVICE); 
 
 deploy-doc:
-	if [ ! -d doc ] ; then mkdir doc ; fi
+	if [ ! -d doc ] ; then mkdir -p doc ; fi
 	#$(KB_RUNTIME)/bin/pod2html -t "workspaceService" lib/Bio/KBase/workspaceService/Impl.pm > doc/workspaceService.html
 	$(KB_RUNTIME)/bin/pod2html -t "workspaceService" workspaceService.pod > doc/workspaceService.html
 	cp doc/*html $(SERV_SERVICE_DIR)/webroot/.

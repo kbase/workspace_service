@@ -2,7 +2,7 @@ package Bio::KBase::workspaceService::Impl;
 use strict;
 use Bio::KBase::Exceptions;
 # Use Semantic Versioning (2.0.0-rc.1)
-# http://semver.org 
+# http://semver.org
 our $VERSION = "0.1.0";
 
 =head1 NAME
@@ -24,6 +24,8 @@ use Tie::IxHash;
 use FileHandle;
 use DateTime;
 use Data::Dumper;
+use Bio::KBase::AuthUser;
+use Bio::KBase::AuthClient;
 use Bio::KBase::workspaceService::Object;
 use Bio::KBase::workspaceService::Workspace;
 use Bio::KBase::workspaceService::WorkspaceUser;
@@ -66,6 +68,17 @@ sub _getCurrentUserObj {
 
 sub _setContext {
 	my ($self,$context,$params) = @_;
+    if ( defined $params->{authentication} ) {
+        my $token = Bio::KBase::AuthToken->new(
+            token => $params->{authentication},
+        );
+        if ($token->validate()) {
+            $self->{_currentUser} = $token->user_id;
+        } else {
+            Bio::KBase::Exceptions::KBaseException->throw(error => "Invalid authorization token!",
+                method_name => 'workspaceDocument::_setContext');
+        }
+    }
 	$self->{_authentication} = $params->{authentication};
 	$self->{_context} = $context;
 }
@@ -77,6 +90,9 @@ sub _getContext {
 
 sub _clearContext {
 	my ($self) = @_;
+    delete $self->{_currentUserObj};
+    delete $self->{_currentUser};
+    delete $self->{_authentication};
 	delete $self->{_context};
 }
 
@@ -912,13 +928,13 @@ sub new
         if (defined($ENV{MONGODBDB})) {
     		$self->{_db} = $ENV{MONGODBDB};
     	} else {
-        	$self->{_db} = "modelObjectStore";
+        	$self->{_db} = "workspace_service";
     	}
         warn "\tfalling back to ".$self->{_db}." for collection\n";
     } 
-    if (defined($ENV{CURRENTUSER})) {
-    	$self->{_currentUser} = $ENV{CURRENTUSER};
-    }
+    #if (defined($ENV{CURRENTUSER})) {
+    #	$self->{_currentUser} = $ENV{CURRENTUSER};
+    #}
     #END_CONSTRUCTOR
 
     if ($self->can('_init_instance'))
