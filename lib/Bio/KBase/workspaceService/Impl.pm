@@ -53,7 +53,12 @@ sub _args {
 sub _getUsername {
 	my ($self) = @_;
 	if (!defined($self->{_currentUser})) {
-		$self->{_currentUser} = "KBase";
+		if (defined($self->{_testuser})) {
+			$self->{_currentUser} = $self->{_testuser};
+		} else {
+			$self->{_currentUser} = "public";
+		}
+		
 	}
 	return $self->{_currentUser};
 }
@@ -858,7 +863,8 @@ sub _validateObjectType {
 		Biochemistry => 1,
 		Model => 1,
 		Mapping => 1,
-		Annotation => 1
+		Annotation => 1,
+		FBA => 1
 	};
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Specified type not valid!",
 		method_name => '_validateObjectType') if (!defined($types->{$type}));
@@ -908,6 +914,10 @@ sub new
     };
     bless $self, $class;
     #BEGIN_CONSTRUCTOR
+    my $options = $args[0];
+    if (defined($options->{testuser})) {
+    	$self->{_testuser} = $options->{testuser};
+    }
     if (my $e = $ENV{KB_DEPLOYMENT_CONFIG}) {
         my $service = $ENV{KB_SERVICE_NAME};
         my $c = new Config::Simple($e);
@@ -931,10 +941,7 @@ sub new
         	$self->{_db} = "workspace_service";
     	}
         warn "\tfalling back to ".$self->{_db}." for collection\n";
-    } 
-    #if (defined($ENV{CURRENTUSER})) {
-    #	$self->{_currentUser} = $ENV{CURRENTUSER};
-    #}
+    }
     #END_CONSTRUCTOR
 
     if ($self->can('_init_instance'))
