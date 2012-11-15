@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use JSON;
 use Getopt::Long::Descriptive;
-use Data::Dumper;
+use Try::Tiny;
 use Bio::KBase::workspaceService::Helpers qw(workspace get_client auth);
 my ($opts, $usage) = describe_options(
     'kb_put %o <type> <id>',
@@ -13,7 +13,7 @@ my ($opts, $usage) = describe_options(
     [ 'help|h|?',     'Print this usage information' ],
 );
 my ($type, $id)  = @ARGV;
-my $data = get_data($opts);
+my $data = try_decode_data(get_data($opts));
 print($usage->text), exit if $opts->help;
 print($usage->text), exit unless defined $type && defined $id;
 print($usage->text), exit unless defined $data;
@@ -30,6 +30,17 @@ $conf->{authentication} = $auth if defined $auth;
 # Populate the metadata if the user provided a file containing that
 $conf->{metadata} = decode_json get_from_file($opts->metadata) if defined $opts->metadata;
 $serv->save_object($conf);
+
+# Try to decode data as JSON, otherwise return the string
+sub try_decode_data {
+    my $str = shift;
+    my $json;
+    try {
+        $json = decode_json $str;
+    };
+    return $json if defined $json;
+    return $str;
+}
 
 sub get_data {
     my $opts = shift;
