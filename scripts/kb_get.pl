@@ -2,7 +2,6 @@
 # List the contents of the current workspace
 use strict;
 use warnings;
-use Data::Dumper;
 use JSON;
 use Getopt::Long::Descriptive;
 use Text::Table;
@@ -25,7 +24,6 @@ my $conf = {
 my $auth = auth();
 $conf->{authentication} = $auth if defined $auth;
 my ($rtv) = $serv->get_object($conf);
-print Dumper $rtv;
 # If we haven't printed data or metadata to a file
 # print the data to STDOUT
 my $done = 0;
@@ -38,17 +36,24 @@ if ($opts->filename) {
 #    $done = 1;
 #}
 unless($done) {
-    print STDOUT $rtv->{data} if defined $rtv->{data};
+    print STDOUT encode_data($rtv->{data}) if defined $rtv->{data};
 }
 
 sub print_file {
     my ($str, $file) = @_;
     return unless defined $str;
+    $str = encode_data($str);
     # If the $str is a ref, encode as JSON
-    if (ref($str)) {
-        $str = encode_json $str;
-    }
-    open(my $fh, "<", $file) || die "Could not open $file: $!";
+    open(my $fh, ">", $file) || die "Could not open $file: $!";
     print $fh $str;
     close($fh);
 }
+
+sub encode_data {
+    my ($str) = @_;
+    if (ref($str)) {
+        $str = encode_json $str;
+    }
+    return $str;
+}
+

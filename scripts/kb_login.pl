@@ -5,7 +5,6 @@ use strict;
 use warnings;
 use Bio::KBase::AuthToken;
 use Term::ReadKey;
-use Data::Dumper;
 
 my $usage    = "Usage: kb_login <username>";
 my $username = shift @ARGV; 
