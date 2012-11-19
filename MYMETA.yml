@@ -1,0 +1,60 @@
+---
+abstract: 'Implementation, client libraries and CLI client for workspace services'
+author:
+  - unknown
+build_requires: {}
+dynamic_config: 0
+generated_by: 'Module::Build version 0.3901, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bio-KBase-workspaceService
+provides:
+  Bio::KBase::Exceptions:
+    file: lib/Bio/KBase/Exceptions.pm
+    version: 0
+  Bio::KBase::Exceptions::HTTP:
+    file: lib/Bio/KBase/Exceptions.pm
+    version: 0
+  Bio::KBase::Exceptions::JSONRPC:
+    file: lib/Bio/KBase/Exceptions.pm
+    version: 0
+  Bio::KBase::workspaceService:
+    file: lib/Bio/KBase/workspaceService.pm
+    version: v0.1.0
+  Bio::KBase::workspaceService::DataObject:
+    file: lib/Bio/KBase/workspaceService/DataObject.pm
+    version: 0
+  Bio::KBase::workspaceService::Helpers:
+    file: lib/Bio/KBase/workspaceService/Helpers.pm
+    version: 0
+  Bio::KBase::workspaceService::Impl:
+    file: lib/Bio/KBase/workspaceService/Impl.pm
+    version: v0.1.0
+  Bio::KBase::workspaceService::Object:
+    file: lib/Bio/KBase/workspaceService/Object.pm
+    version: 0
+  Bio::KBase::workspaceService::RpcClient:
+    file: lib/Bio/KBase/workspaceService.pm
+    version: 0
+  Bio::KBase::workspaceService::Service:
+    file: lib/Bio/KBase/workspaceService/Service.pm
+    version: 0
+  Bio::KBase::workspaceService::ServiceContext:
+    file: lib/Bio/KBase/workspaceService/Service.pm
+    version: 0
+  Bio::KBase::workspaceService::Workspace:
+    file: lib/Bio/KBase/workspaceService/Workspace.pm
+    version: 0
+  Bio::KBase::workspaceService::WorkspaceUser:
+    file: lib/Bio/KBase/workspaceService/WorkspaceUser.pm
+    version: 0
+requires:
+  Data::UUID: 0
+  Getopt::Long::Descriptive: 0
+  Term::ReadKey: 0
+  Text::Table: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.1.0

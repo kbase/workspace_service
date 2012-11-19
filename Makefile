@@ -48,8 +48,13 @@ test:
 deploy: deploy-service deploy-client
 
 deploy-service: deploy-dir deploy-scripts deploy-libs deploy-services
-deploy-client: deploy-dir deploy-scripts deploy-libs  deploy-doc
+deploy-client: install-client-libs deploy-dir deploy-scripts deploy-libs  deploy-doc
 
+
+install-client-libs:
+	perl ./Build.PL ;\
+	./Build installdeps --cpan_client `which cpanm` --install_path lib=$(KB_PERL_PATH);
+	
 deploy-dir:
 	if [ ! -d $(SERV_SERVICE_DIR) ] ; then mkdir -p $(SERV_SERVICE_DIR) ; fi
 	if [ ! -d $(SERV_SERVICE_DIR)/webroot ] ; then mkdir -p $(SERV_SERVICE_DIR)/webroot ; fi
