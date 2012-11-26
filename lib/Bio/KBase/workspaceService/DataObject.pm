@@ -186,7 +186,8 @@ sub retrieveRawData {
 	}
 	if ($self->json() == 1) {
 		my $temp = $outdata;
-		my $JSON = JSON::XS->new->utf8(1);
+		#my $JSON = JSON::XS->new->utf8(1);
+		my $JSON = JSON::XS->new();
     	$outdata = $JSON->decode($temp);
 	}
 	return $outdata;
