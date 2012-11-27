@@ -870,7 +870,8 @@ sub _validateObjectType {
         PhenotypeSimulationSet => 1,
         FBAJob => 1,
         GapFill => 1,
-        GapGen => 1
+        GapGen => 1,
+        PROMModel => 1
 	};
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Specified type not valid!",
 		method_name => '_validateObjectType') if (!defined($types->{$type}));
