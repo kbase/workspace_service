@@ -16,10 +16,20 @@ I<Note: This document is a early draft and should not be taken seriously.>
 
     my $serv = Bio::KBase::workspaceService->new;
     # Create a private workspace called "foo"
-    my $ws   = $serv->create_workspace("foo", "n");
+    my $ws   = $serv->create_workspace({
+       workspace => "foo",
+       default_permission => "n"
+    );
     my $objs = $serv->list_workspace_objects("foo");
     # Print out the names of each object in the workspace
     print map { $_->[0] } @$objs;
+
+=head2 Authentication
+
+Each and every function in this service takes a hash reference as
+its single argument. This hash reference may contain a key
+C<authentication> whose value is a bearer token for the user making
+the request. If this is not provided a default user is assumed.
 
 =head2 Workspaces
 
@@ -35,6 +45,7 @@ form is an array with the following elements:
 
     [
         workspace_id,
+        owner
         modification_timestamp,
         number_of_objects,
         user_permission,
@@ -84,9 +95,13 @@ any user, including unauthenticated users, have on the workspace.
 
 =head4 create_workspace 
 
-Creates a workspace with the given C<workspace_id> and the
-C<default_permission>. Returns the workspace metadata object. If
-the workspace already exists, this dies with an error.
+    my ($meta) = $serv->create_workspace(\%config);
+
+Creates a workspace. This takes a hash reference containing:
+C<workspace> the string ID of the workspace, C<default_permission>
+the default permissions for new users added to the workspace.
+Returns the workspace metadata object. If the workspace already
+exists, this dies with an error.
 
 =head4 delete_workspace
 
@@ -96,7 +111,11 @@ including lack of permissions.
 
 =head4 clone_workspace
 
-    clone_workspace("new_id", "old_id", "n");
+    my ($meta) = $serv->clone_workspace({
+        new_workspace => "new_id",
+        current_workspace => "old_id",
+        default_permission => "n"
+    });
 
 Copy an existing workspace with a new C<workspace_id>.
 C<default_permission> will be the default permissions of the new
@@ -105,35 +124,34 @@ or if the new workspace already exists.
 
 =head4 list_workspaces
 
+    my (\@metas) = $serv->list_workspaces(\%conf);
+
 Returns a list of workspace metadata objects for each workspace
-that the current user can see.
+that the current user can see. The only allowed argument is an
+C<authorization> parameter.
 
 =head4 list_workspace_objects
 
-    my ($obj_metas) = $serv->list_workspace_objects(
-        "workspace_id", $options );
+    my ($obj_metas) = $serv->list_workspace_objects(\%conf);
 
-List the objects in the workspace. C<options> is an object that
-may contain optional flags to limit or alter the behavior of the
-list operation. Currently only one flag is supported:
+    $conf = {
+        workspace => "workspace_id",
+        type => "Genome",
+        showDeletedObject => 0,
+    };
 
-=over 4
-
-=item type
-
-Type is a string that identifies the type of object to select.
-
-    list_workspace_objects("workspace_id", { type => "Genome" });
-
-This will list objects of the type C<Genome>. See the L</Types>
-section for details on how types are handled.
-
-=back
+List the objects in the workspace. C<workspace> is required; type
+will limit results to objects of that type, see the L</Types> section
+for details. C<showDeletedObject> will return deleted objects.
 
 =head4 set_global_workspace_permissions
 
-    my ($meta) = $s->set_global_workspace_permissions(
-        "workspace_id", "n");
+    my ($meta) = $s->set_global_workspace_permissions(\%conf)
+
+    $conf = {
+        workspace => "workspace_id",
+        new_permission => "n",
+    };
 
 Set the C<global_permission> of the workspace. Returns
 the updated metadata on success. If the current user does
@@ -141,9 +159,11 @@ not have sufficient privileges, dies with an error.
 
 =head4 set_workspace_permissions
 
-    my ($success) = $s->set_workspace_permissions(
-        $users, $new_permission, $workspace_id
-    );
+    $conf = {
+        workspace => "workspace_id",
+        new_permission => "n",
+    };
+    my ($success) = $s->set_workspace_permissions($conf);
 
 C<users> is a list of usernames. C<new_permission> is a permission
 object. This returns true, e.g. "1" on success or "0" on failure.
@@ -184,14 +204,19 @@ object.
 
 =head4 save_object
 
-    my ($meta) = $s->save_object(
-        "object_id", "object_type", $data,
-        "workspace_id", $options,
-    );
+    my $conf = {
+        id => "object_id",
+        type => "Genome",
+        data => $data,
+        workspace => "workspace_id",
+        command => "string",
+        metadata => \%metadata,
+    };
+    my ($meta) = $s->save_object($conf);
 
 Save an object C<$data> into the workspace C<workspace_id> under
 the C<object_id> identifier with the supplied type C<object_type>.
-C<$options> is a JSON "object" with the following supported properties:
+Other optional values:
 
 =over 4
 
@@ -209,10 +234,12 @@ as the values are strings... :/
 
 =head4 delete_object
 
-    my ($meta) = $s->delete_object(
-        "object_id", "object_type",
-        "workspace_id",
-    );
+    my $conf = {
+        workspace => "workspace_id",
+        id => "object_id",
+        type => "Genome",
+    };
+    my ($meta) = $s->delete_object($conf);
 
 Removes the object from the workspace C<workspace_id> that
 matches C<object_id> and C<object_type>. Returns the final
@@ -227,9 +254,12 @@ already. Otherwise this function dies of errors.
 
 =head4 get_object
 
-    my ($data, $metadata) = $s->get_object(
-        "object_id", "object_type", "workspace_id"
-    );
+    my $conf = {
+        workspace => "workspace_id",
+        id => "object_id",
+        type => "Genome",
+    };
+    my ($data, $metadata) = $s->get_object($conf);
 
 Returns the C<object_data> and C<object_metadata> for
 the object C<object_id> with type C<object_type> contained
@@ -237,27 +267,37 @@ in the workspace C<workspace_id>.
 
 =head4 get_objectmeta
 
-    my ($metadata) = $s->get_objectmeta(
-        "object_id", "object_type", "workspace_id"
-    );
+    my $conf = {
+        workspace => "workspace_id",
+        id => "object_id",
+        type => "Genome",
+    };
+    my ($metadata) = $s->get_objectmeta($conf);
 
 Returns the C<object_metadata> for the object C<object_id> 
 with type C<object_type> contained in the workspace C<workspace_id>.
 
 =head4 revert_object
 
-    my ($metadata) = $s->revert_object(
-        "object_id", "object_type", "workspace_id"
-    );
+    my $conf = {
+        workspace => "workspace_id",
+        id => "object_id",
+        type => "Genome",
+        instance => 42,
+    };
+    my ($metadata) = $s->revert_object($conf);
 
 Returns an object to the previous version of the object. If there
 is no previous version, this function dies with an error.
 
 =head4 unrevert_object
 
-    my ($metadata) = $s->unrevert_object(
-        "object_id", "object_type", "workspace_id"
-    );
+    my $conf = {
+        workspace => "workspace_id",
+        id => "object_id",
+        type => "Genome",
+    };
+    my ($metadata) = $s->unrevert_object($conf);
 
 If C<revert_object> returns the previous instance of an object,
 C<unrevert_object> returns the next instance. Unrevert reverses
@@ -266,11 +306,15 @@ object, this function dies with an error.
 
 =head4 copy_object
 
-    my ($metadata) = $s->copy_object(
-        "new_object_id", "new_workspace_id",
-        "old_object_id", "object_type",
-        "old_workspace_id"
-    );
+    my $conf = {
+        new_id => "object_id_2",
+        new_workspace => "workspace_2",
+        source_id => "object_id",
+        instance => 42,
+        type => "Genome",
+        source_workspace => "workspace",
+    };
+    my ($metadata) = $s->copy_object($conf);
 
 Copies the object C<old_object_id> with type C<object_type> from
 the C<old_workspace_id> workspace into the C<new_workspace_id>
@@ -278,14 +322,26 @@ workspace.
 
 =head4 move_object
 
+    my $conf = {
+        new_id => "object_id_2",
+        new_workspace => "workspace_2",
+        source_id => "object_id",
+        type => "Genome",
+        source_workspace => "workspace",
+    };
+
 Same arguments as C<copy_object> but this results in the object no longer
 being associated with C<old_object_id> in the workspace C<old_workspace_id>.
 
 =head4 has_object
 
-    my ($present) = $s->has_object(
-        "object_id", "object_type", "workspace_id"
-    );
+    my $conf = {
+        id => "object_id",
+        instance => 42,
+        type => "Genome",
+        workspace => "workspace_id",
+    };
+    my ($present) = $s->has_object($conf);
 
 Returns true, "1" if the object identified by C<object_id> and type
 C<object_type> is present in the workspace C<workspace_id>. Returns

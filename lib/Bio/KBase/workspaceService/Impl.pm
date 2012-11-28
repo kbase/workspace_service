@@ -2,7 +2,7 @@ package Bio::KBase::workspaceService::Impl;
 use strict;
 use Bio::KBase::Exceptions;
 # Use Semantic Versioning (2.0.0-rc.1)
-# http://semver.org 
+# http://semver.org
 our $VERSION = "0.1.0";
 
 =head1 NAME
@@ -24,6 +24,8 @@ use Tie::IxHash;
 use FileHandle;
 use DateTime;
 use Data::Dumper;
+use Bio::KBase::AuthUser;
+use Bio::KBase::AuthToken;
 use Bio::KBase::workspaceService::Object;
 use Bio::KBase::workspaceService::Workspace;
 use Bio::KBase::workspaceService::WorkspaceUser;
@@ -51,7 +53,12 @@ sub _args {
 sub _getUsername {
 	my ($self) = @_;
 	if (!defined($self->{_currentUser})) {
-		$self->{_currentUser} = "KBase";
+		if (defined($self->{_testuser})) {
+			$self->{_currentUser} = $self->{_testuser};
+		} else {
+			$self->{_currentUser} = "public";
+		}
+		
 	}
 	return $self->{_currentUser};
 }
@@ -65,7 +72,19 @@ sub _getCurrentUserObj {
 }
 
 sub _setContext {
-	my ($self,$context) = @_;
+	my ($self,$context,$params) = @_;
+    if ( defined $params->{authentication} ) {
+        my $token = Bio::KBase::AuthToken->new(
+            token => $params->{authentication},
+        );
+        if ($token->validate()) {
+            $self->{_currentUser} = $token->user_id;
+        } else {
+            Bio::KBase::Exceptions::KBaseException->throw(error => "Invalid authorization token!",
+                method_name => 'workspaceDocument::_setContext');
+        }
+    }
+	$self->{_authentication} = $params->{authentication};
 	$self->{_context} = $context;
 }
 
@@ -76,6 +95,9 @@ sub _getContext {
 
 sub _clearContext {
 	my ($self) = @_;
+    delete $self->{_currentUserObj};
+    delete $self->{_currentUser};
+    delete $self->{_authentication};
 	delete $self->{_context};
 }
 
@@ -451,6 +473,32 @@ sub _getWorkspaceUsers {
 	return $objects;
 }
 
+=head3 _getAllWorkspaceUsersByWorkspace
+
+Definition:
+	[Bio::KBase::workspaceService::WorkspaceUser] =  _getAllWorkspaceUsersByWorkspace(string:workspace);
+Description:
+	Returns list of all workspace users with specific permissions set for a workspace
+
+=cut
+
+sub _getAllWorkspaceUsersByWorkspace {
+	my ($self,$id) = @_;
+	my $key = "workspaces.".$id;
+    my $cursor = $self->_mongodb()->workspaceUsers->find({$key => {'$in' => ["a","w","r","n"]} });
+	my $objects = [];
+	while (my $object = $cursor->next) {
+        my $newObject = Bio::KBase::workspaceService::WorkspaceUser->new({
+			parent => $self,
+			id => $object->{id},
+			workspaces => $object->{workspaces},
+			moddate => $object->{moddate},
+		});
+        push(@{$objects},$newObject);
+    }
+	return $objects;
+}
+
 =head3 _getWorkspace
 
 Definition:
@@ -643,6 +691,87 @@ sub _getObjects {
 	return $objects;
 }
 
+=head3 _getObjectByID
+
+Definition:
+	Bio::KBase::workspaceService::Object = _getObjectByID(string:id,string:type,string:workspace,int:instance,{}:options);
+Description:
+	Retrieves specified Objects from database by ID, type, and instance
+
+=cut
+
+sub _getObjectByID {
+	my ($self,$id,$type,$workspace,$instance,$options) = @_;
+    my $cursor = $self->_mongodb()->workspaceObjects->find({
+    	id => $id,
+    	type => $type,
+    	workspace => $workspace,
+    	instance => $instance
+    });
+	while (my $object = $cursor->next) {
+        my $newObject = Bio::KBase::workspaceService::Object->new({
+			parent => $self,
+			uuid => $object->{uuid},
+			id => $object->{id},
+			workspace => $object->{workspace},
+			type => $object->{type},
+			ancestor => $object->{ancestor},
+			revertAncestors => $object->{revertAncestors},
+			owner => $object->{owner},
+			lastModifiedBy => $object->{lastModifiedBy},
+			command => $object->{command},
+			instance => $object->{instance},
+			chsum => $object->{chsum},
+			meta => $object->{meta},
+			moddate => $object->{moddate}
+        });
+        return $newObject;
+    }
+    if ($options->{throwErrorIfMissing} == 1) {
+    	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object not found with specified ".$id.", ".$type.", ".$workspace.", ".$instance."!",method_name => '_getObjectByID');
+    }
+	return undef;
+}
+
+=head3 _getObjectsByID
+
+Definition:
+	[Bio::KBase::workspaceService::Object] = _getObjectsByID(string:id,string:type,string:workspace,{}:options);
+Description:
+	Retrieves objects from database by ID and type
+
+=cut
+
+sub _getObjectsByID {
+	my ($self,$id,$type,$workspace,$options) = @_;
+    my $cursor = $self->_mongodb()->workspaceObjects->find({
+    	id => $id,
+    	type => $type,
+    	workspace => $workspace
+    });
+    my $objects = [];
+	while (my $object = $cursor->next) {
+        my $newObject = Bio::KBase::workspaceService::Object->new({
+			parent => $self,
+			uuid => $object->{uuid},
+			id => $object->{id},
+			workspace => $object->{workspace},
+			type => $object->{type},
+			ancestor => $object->{ancestor},
+			revertAncestors => $object->{revertAncestors},
+			owner => $object->{owner},
+			lastModifiedBy => $object->{lastModifiedBy},
+			command => $object->{command},
+			instance => $object->{instance},
+			chsum => $object->{chsum},
+			meta => $object->{meta},
+			moddate => $object->{moddate}
+        });
+        $objects->[$newObject->instance()] = $newObject;
+    }
+	return $objects;
+}
+
 =head3 _getDataObject
 
 Definition:
@@ -715,8 +844,8 @@ sub _validateUserID {
 
 sub _validateObjectID {
 	my ($self,$id) = @_;
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Username must contain only alphanumeric characters!",
-		method_name => '_validateUserID') if ($id !~ m/^\w+$/);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object ID failed validation!",
+		method_name => '_validateUserID') if ($id !~ m/^.+$/);
 }
 
 sub _validatePermission {
@@ -731,13 +860,56 @@ sub _validateObjectType {
 		Genome => 1,
 		Unspecified => 1,
 		TestData => 1,
-		"ModelSEED::Biochemistry" => 1,
-		"ModelSEED::Model" => 1,
-		"ModelSEED::Mapping" => 1,
-		"ModelSEED::Annotation" => 1
+		Biochemistry => 1,
+		Model => 1,
+		Mapping => 1,
+		Annotation => 1,
+        FBA => 1,
+        Media => 1,
+        PhenotypeSet => 1,
+        PhenotypeSimulationSet => 1,
+        FBAJob => 1,
+        GapFill => 1,
+        GapGen => 1,
+        PROMModel => 1
 	};
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Specified type not valid!",
 		method_name => '_validateObjectType') if (!defined($types->{$type}));
+}
+
+sub _validateargs {
+	my ($self,$args,$mandatoryArguments,$optionalArguments,$substitutions) = @_;
+	if (!defined($args)) {
+	    $args = {};
+	}
+	if (ref($args) ne "HASH") {
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Arguments not hash",
+		method_name => '_validateargs');	
+	}
+	if (defined($substitutions) && ref($substitutions) eq "HASH") {
+		foreach my $original (keys(%{$substitutions})) {
+			$args->{$original} = $args->{$substitutions->{$original}};
+		}
+	}
+	if (defined($mandatoryArguments)) {
+		for (my $i=0; $i < @{$mandatoryArguments}; $i++) {
+			if (!defined($args->{$mandatoryArguments->[$i]})) {
+				push(@{$args->{_error}},$mandatoryArguments->[$i]);
+			}
+		}
+	}
+	if (defined($args->{_error})) {
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Mandatory arguments ".join("; ",@{$args->{_error}})." missing.",
+		method_name => '_validateargs');
+	}
+	if (defined($optionalArguments)) {
+		foreach my $argument (keys(%{$optionalArguments})) {
+			if (!defined($args->{$argument})) {
+				$args->{$argument} = $optionalArguments->{$argument};
+			}
+		}	
+	}
+	return $args;
 }
 
 #END_HEADER
@@ -749,6 +921,10 @@ sub new
     };
     bless $self, $class;
     #BEGIN_CONSTRUCTOR
+    my $options = $args[0];
+    if (defined($options->{testuser})) {
+    	$self->{_testuser} = $options->{testuser};
+    }
     if (my $e = $ENV{KB_DEPLOYMENT_CONFIG}) {
         my $service = $ENV{KB_SERVICE_NAME};
         my $c = new Config::Simple($e);
@@ -769,12 +945,9 @@ sub new
         if (defined($ENV{MONGODBDB})) {
     		$self->{_db} = $ENV{MONGODBDB};
     	} else {
-        	$self->{_db} = "modelObjectStore";
+        	$self->{_db} = "workspace_service";
     	}
         warn "\tfalling back to ".$self->{_db}." for collection\n";
-    } 
-    if (defined($ENV{CURRENTUSER})) {
-    	$self->{_currentUser} = $ENV{CURRENTUSER};
     }
     #END_CONSTRUCTOR
 
@@ -791,7 +964,7 @@ sub new
 
 =head2 save_object
 
-  $metadata = $obj->save_object($id, $type, $data, $workspace, $options)
+  $metadata = $obj->save_object($params)
 
 =over 4
 
@@ -800,20 +973,21 @@ sub new
 =begin html
 
 <pre>
-$id is an object_id
-$type is an object_type
-$data is an ObjectData
-$workspace is a workspace_id
-$options is a save_object_options
+$params is a save_object_params
 $metadata is an object_metadata
+save_object_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	data has a value which is an ObjectData
+	workspace has a value which is a workspace_id
+	command has a value which is a string
+	metadata has a value which is a reference to a hash where the key is a string and the value is a string
+	authentication has a value which is a string
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
 workspace_id is a string
-save_object_options is a reference to a hash where the following keys are defined:
-	command has a value which is a string
-	metadata has a value which is a reference to a hash where the key is a string and the value is a string
 object_metadata is a reference to a list containing 7 items:
 	0: an object_id
 	1: an object_type
@@ -831,20 +1005,21 @@ username is a string
 
 =begin text
 
-$id is an object_id
-$type is an object_type
-$data is an ObjectData
-$workspace is a workspace_id
-$options is a save_object_options
+$params is a save_object_params
 $metadata is an object_metadata
+save_object_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	data has a value which is an ObjectData
+	workspace has a value which is a workspace_id
+	command has a value which is a string
+	metadata has a value which is a reference to a hash where the key is a string and the value is a string
+	authentication has a value which is a string
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
 workspace_id is a string
-save_object_options is a reference to a hash where the following keys are defined:
-	command has a value which is a string
-	metadata has a value which is a reference to a hash where the key is a string and the value is a string
 object_metadata is a reference to a list containing 7 items:
 	0: an object_id
 	1: an object_type
@@ -872,14 +1047,10 @@ username is a string
 sub save_object
 {
     my $self = shift;
-    my($id, $type, $data, $workspace, $options) = @_;
+    my($params) = @_;
 
     my @_bad_arguments;
-    (!ref($id)) or push(@_bad_arguments, "Invalid type for argument \"id\" (value was \"$id\")");
-    (!ref($type)) or push(@_bad_arguments, "Invalid type for argument \"type\" (value was \"$type\")");
-    (ref($data) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"data\" (value was \"$data\")");
-    (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument \"workspace\" (value was \"$workspace\")");
-    (ref($options) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"options\" (value was \"$options\")");
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to save_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -889,15 +1060,13 @@ sub save_object
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN save_object
-    $self->_setContext($ctx);
-    my $ws = $self->_getWorkspace($workspace,{throwErrorIfMissing => 1});
-    if (!defined($options->{command})) {
-    	$options->{command} = undef;
-    }
-    if (!defined($options->{metadata})) {
-    	$options->{metadata} = {};
-    }
-    my $obj = $ws->saveObject($type,$id,$data,$options->{command},$options->{metadata});
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["id","type","data","workspace"],{
+    	command => undef,
+    	metadata => {}
+    });
+    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
+    my $obj = $ws->saveObject($params->{type},$params->{id},$params->{data},$params->{command},$params->{metadata});
     $metadata = $obj->metadata();
 	$self->_clearContext();
     #END save_object
@@ -916,7 +1085,7 @@ sub save_object
 
 =head2 delete_object
 
-  $metadata = $obj->delete_object($id, $type, $workspace)
+  $metadata = $obj->delete_object($params)
 
 =over 4
 
@@ -925,10 +1094,13 @@ sub save_object
 =begin html
 
 <pre>
-$id is an object_id
-$type is an object_type
-$workspace is a workspace_id
+$params is a delete_object_params
 $metadata is an object_metadata
+delete_object_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -949,10 +1121,13 @@ username is a string
 
 =begin text
 
-$id is an object_id
-$type is an object_type
-$workspace is a workspace_id
+$params is a delete_object_params
 $metadata is an object_metadata
+delete_object_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -983,12 +1158,10 @@ username is a string
 sub delete_object
 {
     my $self = shift;
-    my($id, $type, $workspace) = @_;
+    my($params) = @_;
 
     my @_bad_arguments;
-    (!ref($id)) or push(@_bad_arguments, "Invalid type for argument \"id\" (value was \"$id\")");
-    (!ref($type)) or push(@_bad_arguments, "Invalid type for argument \"type\" (value was \"$type\")");
-    (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument \"workspace\" (value was \"$workspace\")");
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to delete_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -998,9 +1171,10 @@ sub delete_object
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN delete_object
-    $self->_setContext($ctx);
-    my $ws = $self->_getWorkspace($workspace,{throwErrorIfMissing => 1});
-    my $obj = $ws->deleteObject($type,$id);
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["id","type","workspace"],{});
+    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
+    my $obj = $ws->deleteObject($params->{type},$params->{id});
     $metadata = $obj->metadata();
     $self->_clearContext();
     #END delete_object
@@ -1019,7 +1193,7 @@ sub delete_object
 
 =head2 delete_object_permanently
 
-  $metadata = $obj->delete_object_permanently($id, $type, $workspace)
+  $metadata = $obj->delete_object_permanently($params)
 
 =over 4
 
@@ -1028,10 +1202,13 @@ sub delete_object
 =begin html
 
 <pre>
-$id is an object_id
-$type is an object_type
-$workspace is a workspace_id
+$params is a delete_object_permanently_params
 $metadata is an object_metadata
+delete_object_permanently_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1052,10 +1229,13 @@ username is a string
 
 =begin text
 
-$id is an object_id
-$type is an object_type
-$workspace is a workspace_id
+$params is a delete_object_permanently_params
 $metadata is an object_metadata
+delete_object_permanently_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1086,12 +1266,10 @@ username is a string
 sub delete_object_permanently
 {
     my $self = shift;
-    my($id, $type, $workspace) = @_;
+    my($params) = @_;
 
     my @_bad_arguments;
-    (!ref($id)) or push(@_bad_arguments, "Invalid type for argument \"id\" (value was \"$id\")");
-    (!ref($type)) or push(@_bad_arguments, "Invalid type for argument \"type\" (value was \"$type\")");
-    (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument \"workspace\" (value was \"$workspace\")");
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to delete_object_permanently:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -1101,9 +1279,10 @@ sub delete_object_permanently
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN delete_object_permanently
-    $self->_setContext($ctx);
-    my $ws = $self->_getWorkspace($workspace,{throwErrorIfMissing => 1});
-    my $obj = $ws->deleteObjectPermanently($type,$id);
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["id","type","workspace"],{});
+    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
+    my $obj = $ws->deleteObjectPermanently($params->{type},$params->{id});
     $metadata = $obj->metadata();
     $self->_clearContext();
     #END delete_object_permanently
@@ -1122,7 +1301,7 @@ sub delete_object_permanently
 
 =head2 get_object
 
-  $data, $metadata = $obj->get_object($id, $type, $workspace)
+  $output = $obj->get_object($params)
 
 =over 4
 
@@ -1131,14 +1310,20 @@ sub delete_object_permanently
 =begin html
 
 <pre>
-$id is an object_id
-$type is an object_type
-$workspace is a workspace_id
-$data is an ObjectData
-$metadata is an object_metadata
+$params is a get_object_params
+$output is a get_object_output
+get_object_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
+	instance has a value which is an int
+	authentication has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
+get_object_output is a reference to a hash where the following keys are defined:
+	data has a value which is an ObjectData
+	metadata has a value which is an object_metadata
 ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
 object_metadata is a reference to a list containing 7 items:
@@ -1158,14 +1343,20 @@ username is a string
 
 =begin text
 
-$id is an object_id
-$type is an object_type
-$workspace is a workspace_id
-$data is an ObjectData
-$metadata is an object_metadata
+$params is a get_object_params
+$output is a get_object_output
+get_object_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
+	instance has a value which is an int
+	authentication has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
+get_object_output is a reference to a hash where the following keys are defined:
+	data has a value which is an ObjectData
+	metadata has a value which is an object_metadata
 ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
 object_metadata is a reference to a list containing 7 items:
@@ -1195,12 +1386,10 @@ username is a string
 sub get_object
 {
     my $self = shift;
-    my($id, $type, $workspace) = @_;
+    my($params) = @_;
 
     my @_bad_arguments;
-    (!ref($id)) or push(@_bad_arguments, "Invalid type for argument \"id\" (value was \"$id\")");
-    (!ref($type)) or push(@_bad_arguments, "Invalid type for argument \"type\" (value was \"$type\")");
-    (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument \"workspace\" (value was \"$workspace\")");
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -1208,24 +1397,31 @@ sub get_object
     }
 
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
-    my($data, $metadata);
+    my($output);
     #BEGIN get_object
-    $self->_setContext($ctx);
-    my $ws = $self->_getWorkspace($workspace,{throwErrorIfMissing => 1});
-    my $obj = $ws->getObject($type,$id,{throwErrorIfMissing => 1});
-    $metadata = $obj->metadata();
-    $data = $obj->data();
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["id","type","workspace"],{
+    	instance => undef
+    });
+    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
+    my $obj = $ws->getObject($params->{type},$params->{id},{
+    	throwErrorIfMissing => 1,
+    	instance => $params->{instance}
+    });
+    $output = {
+    	data => $obj->data(),
+    	metadata => $obj->metadata()
+    };
     $self->_clearContext();
     #END get_object
     my @_bad_returns;
-    (ref($data) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"data\" (value was \"$data\")");
-    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_object:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_object');
     }
-    return($data, $metadata);
+    return($output);
 }
 
 
@@ -1233,7 +1429,7 @@ sub get_object
 
 =head2 get_objectmeta
 
-  $metadata = $obj->get_objectmeta($id, $type, $workspace)
+  $metadata = $obj->get_objectmeta($params)
 
 =over 4
 
@@ -1242,10 +1438,14 @@ sub get_object
 =begin html
 
 <pre>
-$id is an object_id
-$type is an object_type
-$workspace is a workspace_id
+$params is a get_objectmeta_params
 $metadata is an object_metadata
+get_objectmeta_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
+	instance has a value which is an int
+	authentication has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1266,10 +1466,14 @@ username is a string
 
 =begin text
 
-$id is an object_id
-$type is an object_type
-$workspace is a workspace_id
+$params is a get_objectmeta_params
 $metadata is an object_metadata
+get_objectmeta_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
+	instance has a value which is an int
+	authentication has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1300,12 +1504,10 @@ username is a string
 sub get_objectmeta
 {
     my $self = shift;
-    my($id, $type, $workspace) = @_;
+    my($params) = @_;
 
     my @_bad_arguments;
-    (!ref($id)) or push(@_bad_arguments, "Invalid type for argument \"id\" (value was \"$id\")");
-    (!ref($type)) or push(@_bad_arguments, "Invalid type for argument \"type\" (value was \"$type\")");
-    (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument \"workspace\" (value was \"$workspace\")");
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_objectmeta:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -1315,9 +1517,15 @@ sub get_objectmeta
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN get_objectmeta
-    $self->_setContext($ctx);
-    my $ws = $self->_getWorkspace($workspace,{throwErrorIfMissing => 1});
-    my $obj = $ws->getObject($type,$id,{throwErrorIfMissing => 1});
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["id","type","workspace"],{
+    	instance => undef
+    });
+    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
+    my $obj = $ws->getObject($params->{type},$params->{id},{
+    	throwErrorIfMissing => 1,
+    	instance => $params->{instance}
+    });
     $metadata = $obj->metadata();
     $self->_clearContext();
     #END get_objectmeta
@@ -1336,7 +1544,7 @@ sub get_objectmeta
 
 =head2 revert_object
 
-  $metadata = $obj->revert_object($id, $type, $workspace)
+  $metadata = $obj->revert_object($params)
 
 =over 4
 
@@ -1345,10 +1553,14 @@ sub get_objectmeta
 =begin html
 
 <pre>
-$id is an object_id
-$type is an object_type
-$workspace is a workspace_id
+$params is a revert_object_params
 $metadata is an object_metadata
+revert_object_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
+	instance has a value which is an int
+	authentication has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1369,10 +1581,14 @@ username is a string
 
 =begin text
 
-$id is an object_id
-$type is an object_type
-$workspace is a workspace_id
+$params is a revert_object_params
 $metadata is an object_metadata
+revert_object_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
+	instance has a value which is an int
+	authentication has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1403,12 +1619,10 @@ username is a string
 sub revert_object
 {
     my $self = shift;
-    my($id, $type, $workspace) = @_;
+    my($params) = @_;
 
     my @_bad_arguments;
-    (!ref($id)) or push(@_bad_arguments, "Invalid type for argument \"id\" (value was \"$id\")");
-    (!ref($type)) or push(@_bad_arguments, "Invalid type for argument \"type\" (value was \"$type\")");
-    (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument \"workspace\" (value was \"$workspace\")");
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to revert_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -1418,9 +1632,12 @@ sub revert_object
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN revert_object
-    $self->_setContext($ctx);
-    my $ws = $self->_getWorkspace($workspace,{throwErrorIfMissing => 1});
-    my $obj = $ws->revertObject($type,$id);
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["id","type","workspace"],{
+    	instance => undef
+    });
+    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
+    my $obj = $ws->revertObject($params->{type},$params->{id},$params->{instance});
     $metadata = $obj->metadata();
     $self->_clearContext();
     #END revert_object
@@ -1439,7 +1656,7 @@ sub revert_object
 
 =head2 unrevert_object
 
-  $metadata = $obj->unrevert_object($id, $type, $workspace, $options)
+  $metadata = $obj->unrevert_object($params)
 
 =over 4
 
@@ -1448,16 +1665,16 @@ sub revert_object
 =begin html
 
 <pre>
-$id is an object_id
-$type is an object_type
-$workspace is a workspace_id
-$options is an unrevert_object_options
+$params is an unrevert_object_params
 $metadata is an object_metadata
+unrevert_object_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
-unrevert_object_options is a reference to a hash where the following keys are defined:
-	index has a value which is an int
 object_metadata is a reference to a list containing 7 items:
 	0: an object_id
 	1: an object_type
@@ -1475,16 +1692,16 @@ username is a string
 
 =begin text
 
-$id is an object_id
-$type is an object_type
-$workspace is a workspace_id
-$options is an unrevert_object_options
+$params is an unrevert_object_params
 $metadata is an object_metadata
+unrevert_object_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
-unrevert_object_options is a reference to a hash where the following keys are defined:
-	index has a value which is an int
 object_metadata is a reference to a list containing 7 items:
 	0: an object_id
 	1: an object_type
@@ -1512,13 +1729,10 @@ username is a string
 sub unrevert_object
 {
     my $self = shift;
-    my($id, $type, $workspace, $options) = @_;
+    my($params) = @_;
 
     my @_bad_arguments;
-    (!ref($id)) or push(@_bad_arguments, "Invalid type for argument \"id\" (value was \"$id\")");
-    (!ref($type)) or push(@_bad_arguments, "Invalid type for argument \"type\" (value was \"$type\")");
-    (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument \"workspace\" (value was \"$workspace\")");
-    (ref($options) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"options\" (value was \"$options\")");
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to unrevert_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -1528,12 +1742,10 @@ sub unrevert_object
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN unrevert_object
-    $self->_setContext($ctx);
-    my $ws = $self->_getWorkspace($workspace,{throwErrorIfMissing => 1});
-    if (!defined($options->{"index"})) {
-    	$options->{"index"} = 0;
-    }
-    my $obj = $ws->unrevertObject($type,$id,$options->{"index"});
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["id","type","workspace"],{});
+    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
+    my $obj = $ws->unrevertObject($params->{type},$params->{id});
     $metadata = $obj->metadata();
     $self->_clearContext();
     #END unrevert_object
@@ -1552,7 +1764,7 @@ sub unrevert_object
 
 =head2 copy_object
 
-  $metadata = $obj->copy_object($new_id, $new_workspace, $source_id, $type, $source_workspace)
+  $metadata = $obj->copy_object($params)
 
 =over 4
 
@@ -1561,12 +1773,16 @@ sub unrevert_object
 =begin html
 
 <pre>
-$new_id is an object_id
-$new_workspace is a workspace_id
-$source_id is an object_id
-$type is an object_type
-$source_workspace is a workspace_id
+$params is a copy_object_params
 $metadata is an object_metadata
+copy_object_params is a reference to a hash where the following keys are defined:
+	new_id has a value which is an object_id
+	new_workspace has a value which is a workspace_id
+	source_id has a value which is an object_id
+	instance has a value which is an int
+	type has a value which is an object_type
+	source_workspace has a value which is a workspace_id
+	authentication has a value which is a string
 object_id is a string
 workspace_id is a string
 object_type is a string
@@ -1587,12 +1803,16 @@ username is a string
 
 =begin text
 
-$new_id is an object_id
-$new_workspace is a workspace_id
-$source_id is an object_id
-$type is an object_type
-$source_workspace is a workspace_id
+$params is a copy_object_params
 $metadata is an object_metadata
+copy_object_params is a reference to a hash where the following keys are defined:
+	new_id has a value which is an object_id
+	new_workspace has a value which is a workspace_id
+	source_id has a value which is an object_id
+	instance has a value which is an int
+	type has a value which is an object_type
+	source_workspace has a value which is a workspace_id
+	authentication has a value which is a string
 object_id is a string
 workspace_id is a string
 object_type is a string
@@ -1623,14 +1843,10 @@ username is a string
 sub copy_object
 {
     my $self = shift;
-    my($new_id, $new_workspace, $source_id, $type, $source_workspace) = @_;
+    my($params) = @_;
 
     my @_bad_arguments;
-    (!ref($new_id)) or push(@_bad_arguments, "Invalid type for argument \"new_id\" (value was \"$new_id\")");
-    (!ref($new_workspace)) or push(@_bad_arguments, "Invalid type for argument \"new_workspace\" (value was \"$new_workspace\")");
-    (!ref($source_id)) or push(@_bad_arguments, "Invalid type for argument \"source_id\" (value was \"$source_id\")");
-    (!ref($type)) or push(@_bad_arguments, "Invalid type for argument \"type\" (value was \"$type\")");
-    (!ref($source_workspace)) or push(@_bad_arguments, "Invalid type for argument \"source_workspace\" (value was \"$source_workspace\")");
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to copy_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -1640,17 +1856,23 @@ sub copy_object
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN copy_object
-    $self->_setContext($ctx);
-    my $ws = $self->_getWorkspace($source_workspace,{throwErrorIfMissing => 1});
-    my $obj = $ws->getObject($type,$source_id,{throwErrorIfMissing => 1});
-    if ($new_workspace ne $source_workspace) {
-    	$ws = $self->_getWorkspace($new_workspace,{throwErrorIfMissing => 1});
-    	$obj = $ws->saveObject($type,$new_id,$obj->data(),"copy_object",$obj->meta());
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["new_id","new_workspace","source_id","type","source_workspace"],{
+    	instance => undef
+    });
+    my $ws = $self->_getWorkspace($params->{source_workspace},{throwErrorIfMissing => 1});
+    my $obj = $ws->getObject($params->{type},$params->{source_id},{
+    	throwErrorIfMissing => 1,
+    	instance => $params->{instance}
+    });
+    if ($params->{new_workspace} ne $params->{source_workspace}) {
+    	$ws = $self->_getWorkspace($params->{new_workspace},{throwErrorIfMissing => 1});
+    	$obj = $ws->saveObject($params->{type},$params->{new_id},$obj->data(),"copy_object",$obj->meta());
     	$metadata = $obj->metadata();
-    } elsif ($new_id eq $source_id) {
+    } elsif ($params->{new_id} eq $params->{source_id}) {
     	$metadata = $obj->metadata();
     } else {
-    	$obj = $ws->saveObject($type,$new_id,$obj->data(),"copy_object",$obj->meta());
+    	$obj = $ws->saveObject($params->{type},$params->{new_id},$obj->data(),"copy_object",$obj->meta());
     	$metadata = $obj->metadata();
     }
     $self->_clearContext();
@@ -1670,7 +1892,7 @@ sub copy_object
 
 =head2 move_object
 
-  $metadata = $obj->move_object($new_id, $new_workspace, $source_id, $type, $source_workspace)
+  $metadata = $obj->move_object($params)
 
 =over 4
 
@@ -1679,12 +1901,15 @@ sub copy_object
 =begin html
 
 <pre>
-$new_id is an object_id
-$new_workspace is a workspace_id
-$source_id is an object_id
-$type is an object_type
-$source_workspace is a workspace_id
+$params is a move_object_params
 $metadata is an object_metadata
+move_object_params is a reference to a hash where the following keys are defined:
+	new_id has a value which is an object_id
+	new_workspace has a value which is a workspace_id
+	source_id has a value which is an object_id
+	type has a value which is an object_type
+	source_workspace has a value which is a workspace_id
+	authentication has a value which is a string
 object_id is a string
 workspace_id is a string
 object_type is a string
@@ -1705,12 +1930,15 @@ username is a string
 
 =begin text
 
-$new_id is an object_id
-$new_workspace is a workspace_id
-$source_id is an object_id
-$type is an object_type
-$source_workspace is a workspace_id
+$params is a move_object_params
 $metadata is an object_metadata
+move_object_params is a reference to a hash where the following keys are defined:
+	new_id has a value which is an object_id
+	new_workspace has a value which is a workspace_id
+	source_id has a value which is an object_id
+	type has a value which is an object_type
+	source_workspace has a value which is a workspace_id
+	authentication has a value which is a string
 object_id is a string
 workspace_id is a string
 object_type is a string
@@ -1741,14 +1969,10 @@ username is a string
 sub move_object
 {
     my $self = shift;
-    my($new_id, $new_workspace, $source_id, $type, $source_workspace) = @_;
+    my($params) = @_;
 
     my @_bad_arguments;
-    (!ref($new_id)) or push(@_bad_arguments, "Invalid type for argument \"new_id\" (value was \"$new_id\")");
-    (!ref($new_workspace)) or push(@_bad_arguments, "Invalid type for argument \"new_workspace\" (value was \"$new_workspace\")");
-    (!ref($source_id)) or push(@_bad_arguments, "Invalid type for argument \"source_id\" (value was \"$source_id\")");
-    (!ref($type)) or push(@_bad_arguments, "Invalid type for argument \"type\" (value was \"$type\")");
-    (!ref($source_workspace)) or push(@_bad_arguments, "Invalid type for argument \"source_workspace\" (value was \"$source_workspace\")");
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to move_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -1758,19 +1982,22 @@ sub move_object
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN move_object
-    $self->_setContext($ctx);
-    my $ws = $self->_getWorkspace($source_workspace,{throwErrorIfMissing => 1});
-    my $obj = $ws->getObject($type,$source_id,{throwErrorIfMissing => 1});
-    if ($new_workspace ne $source_workspace) {
-    	$ws->deleteObject($type,$source_id);
-    	$ws = $self->_getWorkspace($new_workspace,{throwErrorIfMissing => 1});
-    	$obj = $ws->saveObject($type,$new_id,$obj->data(),"move_object",$obj->meta());
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["new_id","new_workspace","source_id","type","source_workspace"],{});
+    my $ws = $self->_getWorkspace($params->{source_workspace},{throwErrorIfMissing => 1});
+    my $obj = $ws->getObject($params->{type},$params->{source_id},{
+    	throwErrorIfMissing => 1
+    });
+    if ($params->{new_workspace} ne $params->{source_workspace}) {
+    	$ws->deleteObject($params->{type},$params->{source_id});
+    	$ws = $self->_getWorkspace($params->{new_workspace},{throwErrorIfMissing => 1});
+    	$obj = $ws->saveObject($params->{type},$params->{new_id},$obj->data(),"move_object",$obj->meta());
     	$metadata = $obj->metadata();
-    } elsif ($new_id eq $source_id) {
+    } elsif ($params->{new_id} eq $params->{source_id}) {
     	$metadata = $obj->metadata();
     } else {
-    	$ws->deleteObject($type,$source_id);
-    	$obj = $ws->saveObject($type,$new_id,$obj->data(),"move_object",$obj->meta());
+    	$ws->deleteObject($params->{type},$params->{source_id});
+    	$obj = $ws->saveObject($params->{type},$params->{new_id},$obj->data(),"move_object",$obj->meta());
     	$metadata = $obj->metadata();
     }
     $self->_clearContext();
@@ -1790,7 +2017,7 @@ sub move_object
 
 =head2 has_object
 
-  $object_present = $obj->has_object($id, $type, $workspace)
+  $object_present = $obj->has_object($params)
 
 =over 4
 
@@ -1799,10 +2026,14 @@ sub move_object
 =begin html
 
 <pre>
-$id is an object_id
-$type is an object_type
-$workspace is a workspace_id
+$params is a has_object_params
 $object_present is a bool
+has_object_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	instance has a value which is an int
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1814,10 +2045,14 @@ bool is an int
 
 =begin text
 
-$id is an object_id
-$type is an object_type
-$workspace is a workspace_id
+$params is a has_object_params
 $object_present is a bool
+has_object_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	instance has a value which is an int
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1839,12 +2074,10 @@ bool is an int
 sub has_object
 {
     my $self = shift;
-    my($id, $type, $workspace) = @_;
+    my($params) = @_;
 
     my @_bad_arguments;
-    (!ref($id)) or push(@_bad_arguments, "Invalid type for argument \"id\" (value was \"$id\")");
-    (!ref($type)) or push(@_bad_arguments, "Invalid type for argument \"type\" (value was \"$type\")");
-    (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument \"workspace\" (value was \"$workspace\")");
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to has_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -1854,9 +2087,15 @@ sub has_object
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($object_present);
     #BEGIN has_object
-    $self->_setContext($ctx);
-    my $ws = $self->_getWorkspace($workspace,{throwErrorIfMissing => 1});
-    my $obj = $ws->getObject($type,$id);
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["id","type","workspace"],{
+    	instance => undef
+    });
+    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
+    my $obj = $ws->getObject($params->{type},$params->{id},{
+    	throwErrorIfMissing => 1,
+    	instance => $params->{instance}
+    });
     $object_present = 1;
     if (!defined($obj)) {
     	$object_present = 0;
@@ -1876,9 +2115,9 @@ sub has_object
 
 
 
-=head2 create_workspace
+=head2 object_history
 
-  $metadata = $obj->create_workspace($name, $default_permission)
+  $metadatas = $obj->object_history($params)
 
 =over 4
 
@@ -1887,9 +2126,122 @@ sub has_object
 =begin html
 
 <pre>
-$name is a workspace_id
-$default_permission is a permission
+$params is an object_history_params
+$metadatas is a reference to a list where each element is an object_metadata
+object_history_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
+object_id is a string
+object_type is a string
+workspace_id is a string
+object_metadata is a reference to a list containing 7 items:
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+timestamp is a string
+username is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is an object_history_params
+$metadatas is a reference to a list where each element is an object_metadata
+object_history_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
+object_id is a string
+object_type is a string
+workspace_id is a string
+object_metadata is a reference to a list containing 7 items:
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+timestamp is a string
+username is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub object_history
+{
+    my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to object_history:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'object_history');
+    }
+
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my($metadatas);
+    #BEGIN object_history
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["id","type","workspace"],{});
+    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
+    my $history = $ws->getObjectHistory($params->{type},$params->{id});
+    for (my $i=0; $i < @{$history}; $i++) {
+    	$metadatas->[$history->[$i]->instance()] = $history->[$i]->metadata();
+    }
+    $self->_clearContext();
+    #END object_history
+    my @_bad_returns;
+    (ref($metadatas) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadatas\" (value was \"$metadatas\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to object_history:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'object_history');
+    }
+    return($metadatas);
+}
+
+
+
+
+=head2 create_workspace
+
+  $metadata = $obj->create_workspace($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a create_workspace_params
 $metadata is a workspace_metadata
+create_workspace_params is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
+	default_permission has a value which is a permission
+	authentication has a value which is a string
 workspace_id is a string
 permission is a string
 workspace_metadata is a reference to a list containing 6 items:
@@ -1908,9 +2260,12 @@ timestamp is a string
 
 =begin text
 
-$name is a workspace_id
-$default_permission is a permission
+$params is a create_workspace_params
 $metadata is a workspace_metadata
+create_workspace_params is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
+	default_permission has a value which is a permission
+	authentication has a value which is a string
 workspace_id is a string
 permission is a string
 workspace_metadata is a reference to a list containing 6 items:
@@ -1930,7 +2285,7 @@ timestamp is a string
 
 =item Description
 
-Workspace management routines
+
 
 =back
 
@@ -1939,11 +2294,10 @@ Workspace management routines
 sub create_workspace
 {
     my $self = shift;
-    my($name, $default_permission) = @_;
+    my($params) = @_;
 
     my @_bad_arguments;
-    (!ref($name)) or push(@_bad_arguments, "Invalid type for argument \"name\" (value was \"$name\")");
-    (!ref($default_permission)) or push(@_bad_arguments, "Invalid type for argument \"default_permission\" (value was \"$default_permission\")");
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to create_workspace:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -1953,13 +2307,16 @@ sub create_workspace
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN create_workspace
-    $self->_setContext($ctx);
-    my $ws = $self->_getWorkspace($name);
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["workspace"],{
+    	default_permission => "n"
+    });
+    my $ws = $self->_getWorkspace($params->{workspace});
     if (defined($ws)) {
     	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Cannot create workspace because workspace already exists!",
 		method_name => 'create_workspace');
     }
-    $ws = $self->_createWorkspace($name,$default_permission);
+    $ws = $self->_createWorkspace($params->{workspace},$params->{default_permission});
     $metadata = $ws->metadata();
     $self->_clearContext();
     #END create_workspace
@@ -1976,9 +2333,9 @@ sub create_workspace
 
 
 
-=head2 delete_workspace
+=head2 get_workspacemeta
 
-  $metadata = $obj->delete_workspace($name)
+  $metadata = $obj->get_workspacemeta($params)
 
 =over 4
 
@@ -1987,8 +2344,11 @@ sub create_workspace
 =begin html
 
 <pre>
-$name is a workspace_id
+$params is a get_workspacemeta_params
 $metadata is a workspace_metadata
+get_workspacemeta_params is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
 workspace_id is a string
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
@@ -2007,8 +2367,193 @@ permission is a string
 
 =begin text
 
-$name is a workspace_id
+$params is a get_workspacemeta_params
 $metadata is a workspace_metadata
+get_workspacemeta_params is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
+workspace_id is a string
+workspace_metadata is a reference to a list containing 6 items:
+	0: a workspace_id
+	1: a username
+	2: a timestamp
+	3: an int
+	4: a permission
+	5: a permission
+username is a string
+timestamp is a string
+permission is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_workspacemeta
+{
+    my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_workspacemeta:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_workspacemeta');
+    }
+
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my($metadata);
+    #BEGIN get_workspacemeta
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["workspace"],{});
+    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
+	$metadata = $ws->metadata();
+    $self->_clearContext();
+    #END get_workspacemeta
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_workspacemeta:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_workspacemeta');
+    }
+    return($metadata);
+}
+
+
+
+
+=head2 get_workspacepermissions
+
+  $user_permissions = $obj->get_workspacepermissions($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a get_workspacepermissions_params
+$user_permissions is a reference to a hash where the key is a username and the value is a permission
+get_workspacepermissions_params is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
+workspace_id is a string
+username is a string
+permission is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a get_workspacepermissions_params
+$user_permissions is a reference to a hash where the key is a username and the value is a permission
+get_workspacepermissions_params is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
+workspace_id is a string
+username is a string
+permission is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_workspacepermissions
+{
+    my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_workspacepermissions:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_workspacepermissions');
+    }
+
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my($user_permissions);
+    #BEGIN get_workspacepermissions
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["workspace"],{});
+    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
+	$user_permissions = $ws->getWorkspaceUserPermissions();
+    $self->_clearContext();
+    #END get_workspacepermissions
+    my @_bad_returns;
+    (ref($user_permissions) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"user_permissions\" (value was \"$user_permissions\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_workspacepermissions:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_workspacepermissions');
+    }
+    return($user_permissions);
+}
+
+
+
+
+=head2 delete_workspace
+
+  $metadata = $obj->delete_workspace($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a delete_workspace_params
+$metadata is a workspace_metadata
+delete_workspace_params is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
+workspace_id is a string
+workspace_metadata is a reference to a list containing 6 items:
+	0: a workspace_id
+	1: a username
+	2: a timestamp
+	3: an int
+	4: a permission
+	5: a permission
+username is a string
+timestamp is a string
+permission is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a delete_workspace_params
+$metadata is a workspace_metadata
+delete_workspace_params is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
 workspace_id is a string
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
@@ -2037,10 +2582,10 @@ permission is a string
 sub delete_workspace
 {
     my $self = shift;
-    my($name) = @_;
+    my($params) = @_;
 
     my @_bad_arguments;
-    (!ref($name)) or push(@_bad_arguments, "Invalid type for argument \"name\" (value was \"$name\")");
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to delete_workspace:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -2050,8 +2595,9 @@ sub delete_workspace
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN delete_workspace
-    $self->_setContext($ctx);
-    my $ws = $self->_getWorkspace($name,{throwErrorIfMissing => 1});
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["workspace"],{});
+    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
     $ws->permanentDelete();
     $metadata = $ws->metadata();
     $self->_clearContext();
@@ -2071,7 +2617,7 @@ sub delete_workspace
 
 =head2 clone_workspace
 
-  $metadata = $obj->clone_workspace($new_workspace, $current_workspace, $default_permission)
+  $metadata = $obj->clone_workspace($params)
 
 =over 4
 
@@ -2080,10 +2626,13 @@ sub delete_workspace
 =begin html
 
 <pre>
-$new_workspace is a workspace_id
-$current_workspace is a workspace_id
-$default_permission is a permission
+$params is a clone_workspace_params
 $metadata is a workspace_metadata
+clone_workspace_params is a reference to a hash where the following keys are defined:
+	new_workspace has a value which is a workspace_id
+	current_workspace has a value which is a workspace_id
+	default_permission has a value which is a permission
+	authentication has a value which is a string
 workspace_id is a string
 permission is a string
 workspace_metadata is a reference to a list containing 6 items:
@@ -2102,10 +2651,13 @@ timestamp is a string
 
 =begin text
 
-$new_workspace is a workspace_id
-$current_workspace is a workspace_id
-$default_permission is a permission
+$params is a clone_workspace_params
 $metadata is a workspace_metadata
+clone_workspace_params is a reference to a hash where the following keys are defined:
+	new_workspace has a value which is a workspace_id
+	current_workspace has a value which is a workspace_id
+	default_permission has a value which is a permission
+	authentication has a value which is a string
 workspace_id is a string
 permission is a string
 workspace_metadata is a reference to a list containing 6 items:
@@ -2134,12 +2686,10 @@ timestamp is a string
 sub clone_workspace
 {
     my $self = shift;
-    my($new_workspace, $current_workspace, $default_permission) = @_;
+    my($params) = @_;
 
     my @_bad_arguments;
-    (!ref($new_workspace)) or push(@_bad_arguments, "Invalid type for argument \"new_workspace\" (value was \"$new_workspace\")");
-    (!ref($current_workspace)) or push(@_bad_arguments, "Invalid type for argument \"current_workspace\" (value was \"$current_workspace\")");
-    (!ref($default_permission)) or push(@_bad_arguments, "Invalid type for argument \"default_permission\" (value was \"$default_permission\")");
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to clone_workspace:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -2149,12 +2699,15 @@ sub clone_workspace
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN clone_workspace
-    $self->_setContext($ctx);
-    my $ws = $self->_getWorkspace($current_workspace,{throwErrorIfMissing => 1});
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["new_workspace","current_workspace"],{
+    	default_permissions => "n"
+    });
+    my $ws = $self->_getWorkspace($params->{current_workspace},{throwErrorIfMissing => 1});
     my $objs = $ws->getAllObjects();
-    $ws = $self->_getWorkspace($new_workspace);
+    $ws = $self->_getWorkspace($params->{new_workspace});
     if (!defined($ws)) {
-    	$ws = $self->_createWorkspace($new_workspace,$default_permission);
+    	$ws = $self->_createWorkspace($params->{new_workspace},$params->{default_permission});
     }
     for (my $i=0; $i < @{$objs}; $i++) {
     	my $obj = $objs->[$i];
@@ -2178,7 +2731,7 @@ sub clone_workspace
 
 =head2 list_workspaces
 
-  $workspaces = $obj->list_workspaces()
+  $workspaces = $obj->list_workspaces($params)
 
 =over 4
 
@@ -2187,7 +2740,10 @@ sub clone_workspace
 =begin html
 
 <pre>
+$params is a list_workspaces_params
 $workspaces is a reference to a list where each element is a workspace_metadata
+list_workspaces_params is a reference to a hash where the following keys are defined:
+	authentication has a value which is a string
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -2206,7 +2762,10 @@ permission is a string
 
 =begin text
 
+$params is a list_workspaces_params
 $workspaces is a reference to a list where each element is a workspace_metadata
+list_workspaces_params is a reference to a hash where the following keys are defined:
+	authentication has a value which is a string
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -2235,11 +2794,21 @@ permission is a string
 sub list_workspaces
 {
     my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to list_workspaces:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'list_workspaces');
+    }
 
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($workspaces);
     #BEGIN list_workspaces
-    $self->_setContext($ctx);
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,[],{});
     #Getting user-specific permissions
     my $wsu = $self->_getWorkspaceUser($self->_getUsername());
     if (!defined($wsu)) {
@@ -2267,7 +2836,7 @@ sub list_workspaces
 
 =head2 list_workspace_objects
 
-  $objects = $obj->list_workspace_objects($workspace, $options)
+  $objects = $obj->list_workspace_objects($params)
 
 =over 4
 
@@ -2276,12 +2845,15 @@ sub list_workspaces
 =begin html
 
 <pre>
-$workspace is a workspace_id
-$options is a list_workspace_objects_options
+$params is a list_workspace_objects_params
 $objects is a reference to a list where each element is an object_metadata
-workspace_id is a string
-list_workspace_objects_options is a reference to a hash where the following keys are defined:
+list_workspace_objects_params is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
 	type has a value which is a string
+	showDeletedObject has a value which is a bool
+	authentication has a value which is a string
+workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 7 items:
 	0: an object_id
 	1: an object_type
@@ -2301,12 +2873,15 @@ username is a string
 
 =begin text
 
-$workspace is a workspace_id
-$options is a list_workspace_objects_options
+$params is a list_workspace_objects_params
 $objects is a reference to a list where each element is an object_metadata
-workspace_id is a string
-list_workspace_objects_options is a reference to a hash where the following keys are defined:
+list_workspace_objects_params is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
 	type has a value which is a string
+	showDeletedObject has a value which is a bool
+	authentication has a value which is a string
+workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 7 items:
 	0: an object_id
 	1: an object_type
@@ -2336,11 +2911,10 @@ username is a string
 sub list_workspace_objects
 {
     my $self = shift;
-    my($workspace, $options) = @_;
+    my($params) = @_;
 
     my @_bad_arguments;
-    (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument \"workspace\" (value was \"$workspace\")");
-    (ref($options) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"options\" (value was \"$options\")");
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to list_workspace_objects:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -2350,12 +2924,16 @@ sub list_workspace_objects
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($objects);
     #BEGIN list_workspace_objects
-    $self->_setContext($ctx);
-    my $ws = $self->_getWorkspace($workspace,{throwErrorIfMissing => 1});
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["workspace"],{
+    	type => undef,
+    	showDeletedObject => 0
+    });
+    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
 	$objects = [];
-	my $objs = $ws->getAllObjects($options->{type});    
+	my $objs = $ws->getAllObjects($params->{type});    
 	foreach my $obj (@{$objs}) {
-		if ($obj->command() ne "delete" || (defined($options->{showDeletedObject}) && $options->{showDeletedObject} == 1)) {
+		if ($obj->command() ne "delete" || $params->{showDeletedObject} == 1) {
 			push(@{$objects},$obj->metadata());
 		}
 	}
@@ -2376,7 +2954,7 @@ sub list_workspace_objects
 
 =head2 set_global_workspace_permissions
 
-  $metadata = $obj->set_global_workspace_permissions($new_permission, $workspace)
+  $metadata = $obj->set_global_workspace_permissions($params)
 
 =over 4
 
@@ -2385,9 +2963,12 @@ sub list_workspace_objects
 =begin html
 
 <pre>
-$new_permission is a permission
-$workspace is a workspace_id
+$params is a set_global_workspace_permissions_params
 $metadata is a workspace_metadata
+set_global_workspace_permissions_params is a reference to a hash where the following keys are defined:
+	new_permission has a value which is a permission
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
 permission is a string
 workspace_id is a string
 workspace_metadata is a reference to a list containing 6 items:
@@ -2406,9 +2987,12 @@ timestamp is a string
 
 =begin text
 
-$new_permission is a permission
-$workspace is a workspace_id
+$params is a set_global_workspace_permissions_params
 $metadata is a workspace_metadata
+set_global_workspace_permissions_params is a reference to a hash where the following keys are defined:
+	new_permission has a value which is a permission
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
 permission is a string
 workspace_id is a string
 workspace_metadata is a reference to a list containing 6 items:
@@ -2437,11 +3021,10 @@ timestamp is a string
 sub set_global_workspace_permissions
 {
     my $self = shift;
-    my($new_permission, $workspace) = @_;
+    my($params) = @_;
 
     my @_bad_arguments;
-    (!ref($new_permission)) or push(@_bad_arguments, "Invalid type for argument \"new_permission\" (value was \"$new_permission\")");
-    (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument \"workspace\" (value was \"$workspace\")");
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to set_global_workspace_permissions:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -2451,9 +3034,10 @@ sub set_global_workspace_permissions
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN set_global_workspace_permissions
-    $self->_setContext($ctx);
-    my $ws = $self->_getWorkspace($workspace,{throwErrorIfMissing => 1});
-    $ws->setDefaultPermissions($new_permission);
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["new_permission","workspace"],{});
+    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
+    $ws->setDefaultPermissions($params->{new_permission});
     $metadata = $ws->metadata();
     $self->_clearContext();
     #END set_global_workspace_permissions
@@ -2472,7 +3056,7 @@ sub set_global_workspace_permissions
 
 =head2 set_workspace_permissions
 
-  $success = $obj->set_workspace_permissions($users, $new_permission, $workspace)
+  $success = $obj->set_workspace_permissions($params)
 
 =over 4
 
@@ -2481,10 +3065,13 @@ sub set_global_workspace_permissions
 =begin html
 
 <pre>
-$users is a reference to a list where each element is a username
-$new_permission is a permission
-$workspace is a workspace_id
+$params is a set_workspace_permissions_params
 $success is a bool
+set_workspace_permissions_params is a reference to a hash where the following keys are defined:
+	users has a value which is a reference to a list where each element is a username
+	new_permission has a value which is a permission
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
 username is a string
 permission is a string
 workspace_id is a string
@@ -2496,10 +3083,13 @@ bool is an int
 
 =begin text
 
-$users is a reference to a list where each element is a username
-$new_permission is a permission
-$workspace is a workspace_id
+$params is a set_workspace_permissions_params
 $success is a bool
+set_workspace_permissions_params is a reference to a hash where the following keys are defined:
+	users has a value which is a reference to a list where each element is a username
+	new_permission has a value which is a permission
+	workspace has a value which is a workspace_id
+	authentication has a value which is a string
 username is a string
 permission is a string
 workspace_id is a string
@@ -2521,12 +3111,10 @@ bool is an int
 sub set_workspace_permissions
 {
     my $self = shift;
-    my($users, $new_permission, $workspace) = @_;
+    my($params) = @_;
 
     my @_bad_arguments;
-    (ref($users) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"users\" (value was \"$users\")");
-    (!ref($new_permission)) or push(@_bad_arguments, "Invalid type for argument \"new_permission\" (value was \"$new_permission\")");
-    (!ref($workspace)) or push(@_bad_arguments, "Invalid type for argument \"workspace\" (value was \"$workspace\")");
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to set_workspace_permissions:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -2536,9 +3124,10 @@ sub set_workspace_permissions
     my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($success);
     #BEGIN set_workspace_permissions
-    $self->_setContext($ctx);
-    my $ws = $self->_getWorkspace($workspace,{throwErrorIfMissing => 1});
-    $ws->setUserPermissions($users,$new_permission);
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["users","new_permission","workspace"],{});
+    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
+    $ws->setUserPermissions($params->{users},$params->{new_permission});
 	$success = 1;
 	$self->_clearContext();  
     #END set_workspace_permissions
@@ -2917,7 +3506,7 @@ a reference to a list containing 6 items:
 
 
 
-=head2 save_object_options
+=head2 save_object_params
 
 =over 4
 
@@ -2934,8 +3523,13 @@ Object management routines
 
 <pre>
 a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+type has a value which is an object_type
+data has a value which is an ObjectData
+workspace has a value which is a workspace_id
 command has a value which is a string
 metadata has a value which is a reference to a hash where the key is a string and the value is a string
+authentication has a value which is a string
 
 </pre>
 
@@ -2944,8 +3538,13 @@ metadata has a value which is a reference to a hash where the key is a string an
 =begin text
 
 a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+type has a value which is an object_type
+data has a value which is an ObjectData
+workspace has a value which is a workspace_id
 command has a value which is a string
 metadata has a value which is a reference to a hash where the key is a string and the value is a string
+authentication has a value which is a string
 
 
 =end text
@@ -2954,7 +3553,7 @@ metadata has a value which is a reference to a hash where the key is a string an
 
 
 
-=head2 unrevert_object_options
+=head2 delete_object_params
 
 =over 4
 
@@ -2966,7 +3565,10 @@ metadata has a value which is a reference to a hash where the key is a string an
 
 <pre>
 a reference to a hash where the following keys are defined:
-index has a value which is an int
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
+authentication has a value which is a string
 
 </pre>
 
@@ -2975,7 +3577,10 @@ index has a value which is an int
 =begin text
 
 a reference to a hash where the following keys are defined:
-index has a value which is an int
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
+authentication has a value which is a string
 
 
 =end text
@@ -2984,7 +3589,7 @@ index has a value which is an int
 
 
 
-=head2 list_workspace_objects_options
+=head2 delete_object_permanently_params
 
 =over 4
 
@@ -2996,7 +3601,10 @@ index has a value which is an int
 
 <pre>
 a reference to a hash where the following keys are defined:
-type has a value which is a string
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
+authentication has a value which is a string
 
 </pre>
 
@@ -3005,7 +3613,655 @@ type has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 get_object_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
+instance has a value which is an int
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
+instance has a value which is an int
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 get_object_output
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+data has a value which is an ObjectData
+metadata has a value which is an object_metadata
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+data has a value which is an ObjectData
+metadata has a value which is an object_metadata
+
+
+=end text
+
+=back
+
+
+
+=head2 get_objectmeta_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
+instance has a value which is an int
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
+instance has a value which is an int
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 revert_object_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
+instance has a value which is an int
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
+instance has a value which is an int
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 unrevert_object_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 copy_object_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+new_id has a value which is an object_id
+new_workspace has a value which is a workspace_id
+source_id has a value which is an object_id
+instance has a value which is an int
+type has a value which is an object_type
+source_workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+new_id has a value which is an object_id
+new_workspace has a value which is a workspace_id
+source_id has a value which is an object_id
+instance has a value which is an int
+type has a value which is an object_type
+source_workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 move_object_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+new_id has a value which is an object_id
+new_workspace has a value which is a workspace_id
+source_id has a value which is an object_id
+type has a value which is an object_type
+source_workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+new_id has a value which is an object_id
+new_workspace has a value which is a workspace_id
+source_id has a value which is an object_id
+type has a value which is an object_type
+source_workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 has_object_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+instance has a value which is an int
+type has a value which is an object_type
+workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+instance has a value which is an int
+type has a value which is an object_type
+workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 object_history_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 create_workspace_params
+
+=over 4
+
+
+
+=item Description
+
+Workspace management routines
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+workspace has a value which is a workspace_id
+default_permission has a value which is a permission
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+workspace has a value which is a workspace_id
+default_permission has a value which is a permission
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 get_workspacemeta_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 get_workspacepermissions_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 delete_workspace_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 clone_workspace_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+new_workspace has a value which is a workspace_id
+current_workspace has a value which is a workspace_id
+default_permission has a value which is a permission
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+new_workspace has a value which is a workspace_id
+current_workspace has a value which is a workspace_id
+default_permission has a value which is a permission
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 list_workspaces_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 list_workspace_objects_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+workspace has a value which is a workspace_id
 type has a value which is a string
+showDeletedObject has a value which is a bool
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+workspace has a value which is a workspace_id
+type has a value which is a string
+showDeletedObject has a value which is a bool
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 set_global_workspace_permissions_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+new_permission has a value which is a permission
+workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+new_permission has a value which is a permission
+workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 set_workspace_permissions_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+users has a value which is a reference to a list where each element is a username
+new_permission has a value which is a permission
+workspace has a value which is a workspace_id
+authentication has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+users has a value which is a reference to a list where each element is a username
+new_permission has a value which is a permission
+workspace has a value which is a workspace_id
+authentication has a value which is a string
 
 
 =end text

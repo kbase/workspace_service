@@ -22,34 +22,169 @@ module workspaceService {
 	typedef tuple<workspace_id id,username owner,timestamp moddate,int objects,permission user_permission,permission global_permission> workspace_metadata;
 	
 	/*Object management routines*/
-	typedef structure { 
-       string command;
-       mapping<string,string> metadata;
-    } save_object_options;
-    funcdef save_object(object_id id,object_type type,ObjectData data,workspace_id workspace,save_object_options options) returns (object_metadata metadata);
-    funcdef delete_object(object_id id,object_type type,workspace_id workspace) returns (object_metadata metadata);
-    funcdef delete_object_permanently(object_id id,object_type type,workspace_id workspace) returns (object_metadata metadata);
-    funcdef get_object(object_id id,object_type type,workspace_id workspace) returns (ObjectData data,object_metadata metadata);    
-    funcdef get_objectmeta(object_id id,object_type type,workspace_id workspace) returns (object_metadata metadata); 
-    funcdef revert_object(object_id id,object_type type,workspace_id workspace) returns (object_metadata metadata);
     typedef structure { 
-       int index;
-    } unrevert_object_options;
-    funcdef unrevert_object(object_id id,object_type type,workspace_id workspace,unrevert_object_options options) returns (object_metadata metadata);
-    funcdef copy_object(object_id new_id,workspace_id new_workspace,object_id source_id,object_type type,workspace_id source_workspace) returns (object_metadata metadata);
-    funcdef move_object(object_id new_id,workspace_id new_workspace,object_id source_id,object_type type,workspace_id source_workspace) returns (object_metadata metadata);
-    funcdef has_object(object_id id,object_type type,workspace_id workspace) returns (bool object_present);
+		object_id id;
+		object_type type;
+		ObjectData data;
+		workspace_id workspace;
+		string command;
+		mapping<string,string> metadata;
+		string authentication;
+    } save_object_params;
+    funcdef save_object(save_object_params params) returns (object_metadata metadata);
     
-    /*Workspace management routines*/
-    funcdef create_workspace(workspace_id name,permission default_permission) returns (workspace_metadata metadata);
-    funcdef delete_workspace(workspace_id name) returns (workspace_metadata metadata);
-    funcdef clone_workspace(workspace_id new_workspace,workspace_id current_workspace,permission default_permission) returns (workspace_metadata metadata);
-    funcdef list_workspaces() returns (list<workspace_metadata> workspaces);
     typedef structure { 
+		object_id id;
+		object_type type;
+		workspace_id workspace;
+		string authentication;
+    } delete_object_params;
+    funcdef delete_object(delete_object_params params) returns (object_metadata metadata);
+    
+    typedef structure { 
+		object_id id;
+		object_type type;
+		workspace_id workspace;
+		string authentication;
+    } delete_object_permanently_params;
+    funcdef delete_object_permanently(delete_object_permanently_params params) returns (object_metadata metadata);
+    
+    typedef structure { 
+		object_id id;
+		object_type type;
+		workspace_id workspace;
+		int instance;
+		string authentication;
+    } get_object_params;
+    typedef structure { 
+		ObjectData data;
+		object_metadata metadata;
+    } get_object_output;
+    funcdef get_object(get_object_params params) returns (get_object_output output);    
+    
+    typedef structure { 
+		object_id id;
+		object_type type;
+		workspace_id workspace;
+		int instance;
+		string authentication;
+    } get_objectmeta_params;
+    funcdef get_objectmeta(get_objectmeta_params params) returns (object_metadata metadata); 
+    
+    typedef structure { 
+		object_id id;
+		object_type type;
+		workspace_id workspace;
+		int instance;
+		string authentication;
+    } revert_object_params;
+    funcdef revert_object(revert_object_params params) returns (object_metadata metadata);
+    
+    typedef structure { 
+		object_id id;
+		object_type type;
+		workspace_id workspace;
+		string authentication;
+    } unrevert_object_params;
+    funcdef unrevert_object(unrevert_object_params params) returns (object_metadata metadata);
+    
+    typedef structure { 
+		object_id new_id;
+		workspace_id new_workspace;
+		object_id source_id;
+		int instance;
+		object_type type;
+		workspace_id source_workspace;
+		string authentication;
+    } copy_object_params;
+    funcdef copy_object(copy_object_params params) returns (object_metadata metadata);
+    
+    typedef structure { 
+		object_id new_id;
+		workspace_id new_workspace;
+		object_id source_id;
+		object_type type;
+		workspace_id source_workspace;
+		string authentication;
+    } move_object_params;
+    funcdef move_object(move_object_params params) returns (object_metadata metadata);
+    
+    typedef structure { 
+		object_id id;
+		int instance;
+		object_type type;
+		workspace_id workspace;
+		string authentication;
+    } has_object_params;
+    funcdef has_object(has_object_params params) returns (bool object_present);
+    
+    typedef structure { 
+		object_id id;
+		object_type type;
+		workspace_id workspace;
+		string authentication;
+    } object_history_params;
+    funcdef object_history(object_history_params params) returns (list<object_metadata> metadatas);
+    
+    /*Workspace management routines*/ 
+    typedef structure { 
+		workspace_id workspace;
+		permission default_permission;
+		string authentication;
+    } create_workspace_params;
+    funcdef create_workspace(create_workspace_params params) returns (workspace_metadata metadata);
+    
+    typedef structure { 
+		workspace_id workspace;
+		string authentication;
+    } get_workspacemeta_params;
+    funcdef get_workspacemeta(get_workspacemeta_params params) returns (workspace_metadata metadata);
+    
+    typedef structure { 
+		workspace_id workspace;
+		string authentication;
+    } get_workspacepermissions_params;
+    funcdef get_workspacepermissions(get_workspacepermissions_params params) returns (mapping<username,permission> user_permissions);
+    
+    typedef structure { 
+		workspace_id workspace;
+		string authentication;
+    } delete_workspace_params;
+    funcdef delete_workspace(delete_workspace_params params) returns (workspace_metadata metadata);
+    
+    typedef structure { 
+		workspace_id new_workspace;
+		workspace_id current_workspace;
+		permission default_permission;
+		string authentication;
+    } clone_workspace_params;
+    funcdef clone_workspace(clone_workspace_params params) returns (workspace_metadata metadata);
+    
+    typedef structure { 
+		string authentication;
+    } list_workspaces_params;
+    funcdef list_workspaces(list_workspaces_params params) returns (list<workspace_metadata> workspaces);
+    
+    typedef structure { 
+       workspace_id workspace;
        string type;
-    } list_workspace_objects_options;
-    funcdef list_workspace_objects(workspace_id workspace,list_workspace_objects_options options) returns (list<object_metadata> objects);
-    funcdef set_global_workspace_permissions(permission new_permission,workspace_id workspace) returns (workspace_metadata metadata);
-    funcdef set_workspace_permissions(list<username> users,permission new_permission,workspace_id workspace) returns (bool success);
+       bool showDeletedObject;
+       string authentication;
+    } list_workspace_objects_params;
+    funcdef list_workspace_objects(list_workspace_objects_params params) returns (list<object_metadata> objects);
 
+    typedef structure { 
+       permission new_permission;
+       workspace_id workspace;
+       string authentication;
+    } set_global_workspace_permissions_params;
+    funcdef set_global_workspace_permissions(set_global_workspace_permissions_params params) returns (workspace_metadata metadata);
+    
+    typedef structure { 
+       list<username> users;
+       permission new_permission;
+       workspace_id workspace;
+       string authentication;
+    } set_workspace_permissions_params;
+    funcdef set_workspace_permissions(set_workspace_permissions_params params) returns (bool success);
 };
