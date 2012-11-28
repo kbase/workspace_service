@@ -28,7 +28,7 @@ On Magellan instances it is advisable to have this on the
 
 Start the MongoDB service:
 
-    mongod 1>/var/log/mongod.log 2>&1 &
+    mongod --dbpath /data/db 1>/var/log/mongod.log 2>&1 &
 
 ### Deployment ###
 
