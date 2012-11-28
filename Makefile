@@ -85,7 +85,7 @@ deploy-basic-service:
 	chmod +x $(TARGET)/services/$(SERV_SERVICE)/process.$(SERV_SERVICE); 
 
 deploy-docs:
-	if [ ! -d doc ] ; then mkdir -p doc ; fi
-	#$(KB_RUNTIME)/bin/pod2html -t "workspaceService" lib/Bio/KBase/workspaceService/Impl.pm > doc/workspaceService.html
-	$(KB_RUNTIME)/bin/pod2html -t "workspaceService" workspaceService.pod > doc/workspaceService.html
-	cp doc/*html $(SERV_SERVICE_DIR)/webroot/.
+	if [ ! -d docs ] ; then mkdir -p docs ; fi
+	#$(KB_RUNTIME)/bin/pod2html -t "workspaceService" lib/Bio/KBase/workspaceService/Impl.pm > docs/workspaceService.html
+	$(KB_RUNTIME)/bin/pod2html -t "workspaceService" workspaceService.pod > docs/workspaceService.html
+	cp docs/*html $(SERV_SERVICE_DIR)/webroot/.
