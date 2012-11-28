@@ -48,7 +48,7 @@ test:
 deploy: deploy-service deploy-client
 
 deploy-service: deploy-dir deploy-scripts deploy-libs deploy-services
-deploy-client: install-client-libs deploy-dir deploy-scripts deploy-libs  deploy-doc
+deploy-client: install-client-libs deploy-dir deploy-scripts deploy-libs  deploy-docs
 
 
 install-client-libs:
@@ -84,7 +84,7 @@ deploy-basic-service:
 	tpage $(SERV_TPAGE_ARGS) service/process.tt > $(TARGET)/services/$(SERV_SERVICE)/process.$(SERV_SERVICE); \
 	chmod +x $(TARGET)/services/$(SERV_SERVICE)/process.$(SERV_SERVICE); 
 
-deploy-doc:
+deploy-docs:
 	if [ ! -d doc ] ; then mkdir -p doc ; fi
 	#$(KB_RUNTIME)/bin/pod2html -t "workspaceService" lib/Bio/KBase/workspaceService/Impl.pm > doc/workspaceService.html
 	$(KB_RUNTIME)/bin/pod2html -t "workspaceService" workspaceService.pod > doc/workspaceService.html
