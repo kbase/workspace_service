@@ -4,8 +4,9 @@ use Bio::KBase::workspaceService::Impl;
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
 use Data::Dumper;
-my $test_count = 42;
+my $test_count = 22;
 
 #  Test 1 - Can a new impl object be created without parameters? 
 #Creating new workspace services implementation connected to testdb
@@ -65,7 +66,7 @@ ok(scalar(@{$workspace_list}) eq 5, "length matches");
 my $idhash={};
 my $ws;
 foreach $ws (@{$workspace_list}) {
-	$idhash->{$ws->[0]} = 1;
+    $idhash->{$ws->[0]} = 1;
 }
 
 ok(defined($idhash->{testworkspace3}),
@@ -77,24 +78,41 @@ dies_ok { $impl->create_workspace({workspace=>"testworkspace1",default_permissio
 
 
 # Can I delete a workspace
-lives_ok { $impl->delete_workspace("testworkspace1")  } "delete succeeds";
+lives_ok { $impl->delete_workspace({workspace=>"testworkspace1",auth=>$oauth_token})  } "delete succeeds";
 # Does deleting a non-existent workspace fail
-dies_ok { $impl->delete_workspace("testworkspace_foo")  } "delete for non-existent ws fails";
+dies_ok { $impl->delete_workspace({workspace=>"testworkspace_foo",auth=>$oauth_token})  } "delete for non-existent ws fails";
 # Does deleting a previously deleted workspace fail
-dies_ok { $impl->delete_workspace("testworkspace1")  } "duplicate delete fails";
+dies_ok { $impl->delete_workspace({workspace=>"testworkspace1",auth=>$oauth_token})  } "duplicate delete fails";
 
 # Can I clone a workspace
-lives_ok{ $impl->clone_workspace("clonetestworkspace2","testworkspace2", "n") } "clone succeeds";
-$impl->delete_workspace("clonetestworkspace2");
+lives_ok{ $impl->clone_workspace({
+            new_workspace => "clonetestworkspace2",
+            current_workspace => "testworkspace2",
+            default_permission => "n",
+            auth => $oauth_token
+          }); 
+        } "clone succeeds";
+$impl->delete_workspace({workspace=>"clonetestworkspace2", auth=>$oauth_token});
 
 
 # Does cloning a deleted workspace fail
-dies_ok{ $impl->clone_workspace("clonetestworkspace1","testworkspace1", "n") } "clone a deleted workspace should fail";
+dies_ok{ $impl->clone_workspace({
+            new_workspace => "clonetestworkspace1",
+            current_workspace => "testworkspace1",
+            default_permission => "n",
+            auth => $oauth_token
+          }); 
+        } "clone a deleted workspace should fail";
 
-# Can I clone a workspace without specifying perms
-lives_ok{ $impl->clone_workspace("clonetestworkspace3","testworkspace3") } "clone without perms argument succeeds";
-$impl->delete_workspace("clonetestworkspace3");
 
+# Does cloning a non-existent workspace fail
+dies_ok{ $impl->clone_workspace({
+            new_workspace => "clonetestworkspace3",
+            current_workspace => "testworkspace_foo",
+            default_permission => "n",
+            auth => $oauth_token
+          }); 
+        } "clone a non-existent workspace should fail";
 
 # Does the cloned workspace match the original
 
@@ -107,16 +125,18 @@ $impl->delete_workspace("clonetestworkspace3");
 # Test multiple users
 
 # Clean up
-$impl->delete_workspace("testworkspace2");
-$impl->delete_workspace("testworkspace3");
-$impl->delete_workspace("testworkspace4");
-$impl->delete_workspace("testworkspace5");
+$impl->delete_workspace({workspace=>"testworkspace2", auth=>$oauth_token});
+$impl->delete_workspace({workspace=>"testworkspace3", auth=>$oauth_token});
+$impl->delete_workspace({workspace=>"testworkspace4", auth=>$oauth_token});
+$impl->delete_workspace({workspace=>"testworkspace5", auth=>$oauth_token});
 
-
-
-#Deleting test objects
-$impl->delete_workspace("testworkspace");
 
 $impl->_deleteWorkspaceUser("kbasetest");
+
+#Deleting test objects
+$impl->_clearAllWorkspaces();
+$impl->_clearAllWorkspaceObjects();
+$impl->_clearAllWorkspaceUsers();
+$impl->_clearAllWorkspaceDataObjects();
 
 done_testing($test_count);
