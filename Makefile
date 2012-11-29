@@ -45,10 +45,11 @@ test:
 		fi \
 	done
 
-deploy: deploy-service deploy-client
+deploy: deploy-client
+deploy-all: deploy-client deploy-service
 
-deploy-service: deploy-dir deploy-scripts deploy-libs deploy-services
-deploy-client: install-client-libs deploy-dir deploy-scripts deploy-libs  deploy-docs
+deploy-service: deploy-dir deploy-libs deploy-scripts deploy-services
+deploy-client: install-client-libs deploy-dir deploy-libs deploy-scripts deploy-docs
 
 
 install-client-libs:
