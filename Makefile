@@ -45,10 +45,11 @@ test:
 		fi \
 	done
 
-deploy: deploy-service deploy-client
+deploy: deploy-client
+deploy-all: deploy-client deploy-service
 
-deploy-service: deploy-dir deploy-scripts deploy-libs deploy-services
-deploy-client: install-client-libs deploy-dir deploy-scripts deploy-libs  deploy-docs
+deploy-service: deploy-dir deploy-libs deploy-scripts deploy-services
+deploy-client: install-client-libs deploy-dir deploy-libs deploy-scripts deploy-docs
 
 
 install-client-libs:
@@ -89,3 +90,13 @@ deploy-docs:
 	#$(KB_RUNTIME)/bin/pod2html -t "workspaceService" lib/Bio/KBase/workspaceService/Impl.pm > docs/workspaceService.html
 	$(KB_RUNTIME)/bin/pod2html -t "workspaceService" workspaceService.pod > docs/workspaceService.html
 	cp docs/*html $(SERV_SERVICE_DIR)/webroot/.
+
+compile-typespec:
+	compile_typespec \
+	-impl Bio::KBase::workspaceService::Impl \
+	-service Bio::KBase::workspaceService::Server \
+	-psgi workspaceService.psgi \
+	-client Bio::KBase::workspaceService::Client \
+	-js javascript/workspaceService/Client \
+	-py biokbase/workspaceService/Client \
+	workspaceService.spec lib
