@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 use Data::Dumper;
-my $test_count = 24;
+my $test_count = 42;
 
 #  Test 1 - Can a new impl object be created without parameters? 
 #Creating new workspace services implementation connected to testdb
