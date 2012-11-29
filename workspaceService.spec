@@ -29,15 +29,15 @@ module workspaceService {
 		workspace_id workspace;
 		string command;
 		mapping<string,string> metadata;
-		string authentication;
-    } save_object_params;
+		string auth;
+	} save_object_params;
     funcdef save_object(save_object_params params) returns (object_metadata metadata);
     
     typedef structure { 
 		object_id id;
 		object_type type;
 		workspace_id workspace;
-		string authentication;
+		string auth;
     } delete_object_params;
     funcdef delete_object(delete_object_params params) returns (object_metadata metadata);
     
@@ -45,7 +45,7 @@ module workspaceService {
 		object_id id;
 		object_type type;
 		workspace_id workspace;
-		string authentication;
+		string auth;
     } delete_object_permanently_params;
     funcdef delete_object_permanently(delete_object_permanently_params params) returns (object_metadata metadata);
     
@@ -54,7 +54,7 @@ module workspaceService {
 		object_type type;
 		workspace_id workspace;
 		int instance;
-		string authentication;
+		string auth;
     } get_object_params;
     typedef structure { 
 		ObjectData data;
@@ -67,7 +67,7 @@ module workspaceService {
 		object_type type;
 		workspace_id workspace;
 		int instance;
-		string authentication;
+		string auth;
     } get_objectmeta_params;
     funcdef get_objectmeta(get_objectmeta_params params) returns (object_metadata metadata); 
     
@@ -76,18 +76,10 @@ module workspaceService {
 		object_type type;
 		workspace_id workspace;
 		int instance;
-		string authentication;
+		string auth;
     } revert_object_params;
     funcdef revert_object(revert_object_params params) returns (object_metadata metadata);
-    
-    typedef structure { 
-		object_id id;
-		object_type type;
-		workspace_id workspace;
-		string authentication;
-    } unrevert_object_params;
-    funcdef unrevert_object(unrevert_object_params params) returns (object_metadata metadata);
-    
+      
     typedef structure { 
 		object_id new_id;
 		workspace_id new_workspace;
@@ -95,7 +87,7 @@ module workspaceService {
 		int instance;
 		object_type type;
 		workspace_id source_workspace;
-		string authentication;
+		string auth;
     } copy_object_params;
     funcdef copy_object(copy_object_params params) returns (object_metadata metadata);
     
@@ -105,7 +97,7 @@ module workspaceService {
 		object_id source_id;
 		object_type type;
 		workspace_id source_workspace;
-		string authentication;
+		string auth;
     } move_object_params;
     funcdef move_object(move_object_params params) returns (object_metadata metadata);
     
@@ -114,7 +106,7 @@ module workspaceService {
 		int instance;
 		object_type type;
 		workspace_id workspace;
-		string authentication;
+		string auth;
     } has_object_params;
     funcdef has_object(has_object_params params) returns (bool object_present);
     
@@ -122,7 +114,7 @@ module workspaceService {
 		object_id id;
 		object_type type;
 		workspace_id workspace;
-		string authentication;
+		string auth;
     } object_history_params;
     funcdef object_history(object_history_params params) returns (list<object_metadata> metadatas);
     
@@ -130,25 +122,25 @@ module workspaceService {
     typedef structure { 
 		workspace_id workspace;
 		permission default_permission;
-		string authentication;
+		string auth;
     } create_workspace_params;
     funcdef create_workspace(create_workspace_params params) returns (workspace_metadata metadata);
     
     typedef structure { 
 		workspace_id workspace;
-		string authentication;
+		string auth;
     } get_workspacemeta_params;
     funcdef get_workspacemeta(get_workspacemeta_params params) returns (workspace_metadata metadata);
     
     typedef structure { 
 		workspace_id workspace;
-		string authentication;
+		string auth;
     } get_workspacepermissions_params;
     funcdef get_workspacepermissions(get_workspacepermissions_params params) returns (mapping<username,permission> user_permissions);
     
     typedef structure { 
 		workspace_id workspace;
-		string authentication;
+		string auth;
     } delete_workspace_params;
     funcdef delete_workspace(delete_workspace_params params) returns (workspace_metadata metadata);
     
@@ -156,12 +148,12 @@ module workspaceService {
 		workspace_id new_workspace;
 		workspace_id current_workspace;
 		permission default_permission;
-		string authentication;
+		string auth;
     } clone_workspace_params;
     funcdef clone_workspace(clone_workspace_params params) returns (workspace_metadata metadata);
     
     typedef structure { 
-		string authentication;
+		string auth;
     } list_workspaces_params;
     funcdef list_workspaces(list_workspaces_params params) returns (list<workspace_metadata> workspaces);
     
@@ -169,14 +161,14 @@ module workspaceService {
        workspace_id workspace;
        string type;
        bool showDeletedObject;
-       string authentication;
+       string auth;
     } list_workspace_objects_params;
     funcdef list_workspace_objects(list_workspace_objects_params params) returns (list<object_metadata> objects);
 
     typedef structure { 
        permission new_permission;
        workspace_id workspace;
-       string authentication;
+       string auth;
     } set_global_workspace_permissions_params;
     funcdef set_global_workspace_permissions(set_global_workspace_permissions_params params) returns (workspace_metadata metadata);
     
@@ -184,7 +176,7 @@ module workspaceService {
        list<username> users;
        permission new_permission;
        workspace_id workspace;
-       string authentication;
+       string auth;
     } set_workspace_permissions_params;
     funcdef set_workspace_permissions(set_workspace_permissions_params params) returns (bool success);
 };

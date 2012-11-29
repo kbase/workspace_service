@@ -2,7 +2,7 @@ package Bio::KBase::workspaceService::Impl;
 use strict;
 use Bio::KBase::Exceptions;
 # Use Semantic Versioning (2.0.0-rc.1)
-# http://semver.org
+# http://semver.org 
 our $VERSION = "0.1.0";
 
 =head1 NAME
@@ -73,9 +73,9 @@ sub _getCurrentUserObj {
 
 sub _setContext {
 	my ($self,$context,$params) = @_;
-    if ( defined $params->{authentication} ) {
+    if ( defined $params->{auth} ) {
         my $token = Bio::KBase::AuthToken->new(
-            token => $params->{authentication},
+            token => $params->{auth},
         );
         if ($token->validate()) {
             $self->{_currentUser} = $token->user_id;
@@ -84,7 +84,7 @@ sub _setContext {
                 method_name => 'workspaceDocument::_setContext');
         }
     }
-	$self->{_authentication} = $params->{authentication};
+	$self->{_authentication} = $params->{auth};
 	$self->{_context} = $context;
 }
 
@@ -982,7 +982,7 @@ save_object_params is a reference to a hash where the following keys are defined
 	workspace has a value which is a workspace_id
 	command has a value which is a string
 	metadata has a value which is a reference to a hash where the key is a string and the value is a string
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -1014,7 +1014,7 @@ save_object_params is a reference to a hash where the following keys are defined
 	workspace has a value which is a workspace_id
 	command has a value which is a string
 	metadata has a value which is a reference to a hash where the key is a string and the value is a string
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -1057,7 +1057,7 @@ sub save_object
 							       method_name => 'save_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN save_object
     $self->_setContext($ctx,$params);
@@ -1100,7 +1100,7 @@ delete_object_params is a reference to a hash where the following keys are defin
 	id has a value which is an object_id
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1127,7 +1127,7 @@ delete_object_params is a reference to a hash where the following keys are defin
 	id has a value which is an object_id
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1168,7 +1168,7 @@ sub delete_object
 							       method_name => 'delete_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN delete_object
     $self->_setContext($ctx,$params);
@@ -1208,7 +1208,7 @@ delete_object_permanently_params is a reference to a hash where the following ke
 	id has a value which is an object_id
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1235,7 +1235,7 @@ delete_object_permanently_params is a reference to a hash where the following ke
 	id has a value which is an object_id
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1276,7 +1276,7 @@ sub delete_object_permanently
 							       method_name => 'delete_object_permanently');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN delete_object_permanently
     $self->_setContext($ctx,$params);
@@ -1317,7 +1317,7 @@ get_object_params is a reference to a hash where the following keys are defined:
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1350,7 +1350,7 @@ get_object_params is a reference to a hash where the following keys are defined:
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1396,7 +1396,7 @@ sub get_object
 							       method_name => 'get_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($output);
     #BEGIN get_object
     $self->_setContext($ctx,$params);
@@ -1445,7 +1445,7 @@ get_objectmeta_params is a reference to a hash where the following keys are defi
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1473,7 +1473,7 @@ get_objectmeta_params is a reference to a hash where the following keys are defi
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1514,7 +1514,7 @@ sub get_objectmeta
 							       method_name => 'get_objectmeta');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN get_objectmeta
     $self->_setContext($ctx,$params);
@@ -1560,7 +1560,7 @@ revert_object_params is a reference to a hash where the following keys are defin
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1588,7 +1588,7 @@ revert_object_params is a reference to a hash where the following keys are defin
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -1629,7 +1629,7 @@ sub revert_object
 							       method_name => 'revert_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN revert_object
     $self->_setContext($ctx,$params);
@@ -1647,114 +1647,6 @@ sub revert_object
 	my $msg = "Invalid returns passed to revert_object:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'revert_object');
-    }
-    return($metadata);
-}
-
-
-
-
-=head2 unrevert_object
-
-  $metadata = $obj->unrevert_object($params)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$params is an unrevert_object_params
-$metadata is an object_metadata
-unrevert_object_params is a reference to a hash where the following keys are defined:
-	id has a value which is an object_id
-	type has a value which is an object_type
-	workspace has a value which is a workspace_id
-	authentication has a value which is a string
-object_id is a string
-object_type is a string
-workspace_id is a string
-object_metadata is a reference to a list containing 7 items:
-	0: an object_id
-	1: an object_type
-	2: a timestamp
-	3: an int
-	4: a string
-	5: a username
-	6: a username
-timestamp is a string
-username is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$params is an unrevert_object_params
-$metadata is an object_metadata
-unrevert_object_params is a reference to a hash where the following keys are defined:
-	id has a value which is an object_id
-	type has a value which is an object_type
-	workspace has a value which is a workspace_id
-	authentication has a value which is a string
-object_id is a string
-object_type is a string
-workspace_id is a string
-object_metadata is a reference to a list containing 7 items:
-	0: an object_id
-	1: an object_type
-	2: a timestamp
-	3: an int
-	4: a string
-	5: a username
-	6: a username
-timestamp is a string
-username is a string
-
-
-=end text
-
-
-
-=item Description
-
-
-
-=back
-
-=cut
-
-sub unrevert_object
-{
-    my $self = shift;
-    my($params) = @_;
-
-    my @_bad_arguments;
-    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to unrevert_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'unrevert_object');
-    }
-
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
-    my($metadata);
-    #BEGIN unrevert_object
-    $self->_setContext($ctx,$params);
-    $self->_validateargs($params,["id","type","workspace"],{});
-    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
-    my $obj = $ws->unrevertObject($params->{type},$params->{id});
-    $metadata = $obj->metadata();
-    $self->_clearContext();
-    #END unrevert_object
-    my @_bad_returns;
-    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to unrevert_object:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'unrevert_object');
     }
     return($metadata);
 }
@@ -1782,7 +1674,7 @@ copy_object_params is a reference to a hash where the following keys are defined
 	instance has a value which is an int
 	type has a value which is an object_type
 	source_workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 workspace_id is a string
 object_type is a string
@@ -1812,7 +1704,7 @@ copy_object_params is a reference to a hash where the following keys are defined
 	instance has a value which is an int
 	type has a value which is an object_type
 	source_workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 workspace_id is a string
 object_type is a string
@@ -1853,7 +1745,7 @@ sub copy_object
 							       method_name => 'copy_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN copy_object
     $self->_setContext($ctx,$params);
@@ -1909,7 +1801,7 @@ move_object_params is a reference to a hash where the following keys are defined
 	source_id has a value which is an object_id
 	type has a value which is an object_type
 	source_workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 workspace_id is a string
 object_type is a string
@@ -1938,7 +1830,7 @@ move_object_params is a reference to a hash where the following keys are defined
 	source_id has a value which is an object_id
 	type has a value which is an object_type
 	source_workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 workspace_id is a string
 object_type is a string
@@ -1979,7 +1871,7 @@ sub move_object
 							       method_name => 'move_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN move_object
     $self->_setContext($ctx,$params);
@@ -2033,7 +1925,7 @@ has_object_params is a reference to a hash where the following keys are defined:
 	instance has a value which is an int
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -2052,7 +1944,7 @@ has_object_params is a reference to a hash where the following keys are defined:
 	instance has a value which is an int
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -2084,7 +1976,7 @@ sub has_object
 							       method_name => 'has_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($object_present);
     #BEGIN has_object
     $self->_setContext($ctx,$params);
@@ -2132,7 +2024,7 @@ object_history_params is a reference to a hash where the following keys are defi
 	id has a value which is an object_id
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -2159,7 +2051,7 @@ object_history_params is a reference to a hash where the following keys are defi
 	id has a value which is an object_id
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 object_id is a string
 object_type is a string
 workspace_id is a string
@@ -2200,7 +2092,7 @@ sub object_history
 							       method_name => 'object_history');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadatas);
     #BEGIN object_history
     $self->_setContext($ctx,$params);
@@ -2241,7 +2133,7 @@ $metadata is a workspace_metadata
 create_workspace_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
 	default_permission has a value which is a permission
-	authentication has a value which is a string
+	auth has a value which is a string
 workspace_id is a string
 permission is a string
 workspace_metadata is a reference to a list containing 6 items:
@@ -2265,7 +2157,7 @@ $metadata is a workspace_metadata
 create_workspace_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
 	default_permission has a value which is a permission
-	authentication has a value which is a string
+	auth has a value which is a string
 workspace_id is a string
 permission is a string
 workspace_metadata is a reference to a list containing 6 items:
@@ -2304,7 +2196,7 @@ sub create_workspace
 							       method_name => 'create_workspace');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN create_workspace
     $self->_setContext($ctx,$params);
@@ -2348,7 +2240,7 @@ $params is a get_workspacemeta_params
 $metadata is a workspace_metadata
 get_workspacemeta_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 workspace_id is a string
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
@@ -2371,7 +2263,7 @@ $params is a get_workspacemeta_params
 $metadata is a workspace_metadata
 get_workspacemeta_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 workspace_id is a string
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
@@ -2410,7 +2302,7 @@ sub get_workspacemeta
 							       method_name => 'get_workspacemeta');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN get_workspacemeta
     $self->_setContext($ctx,$params);
@@ -2447,7 +2339,7 @@ $params is a get_workspacepermissions_params
 $user_permissions is a reference to a hash where the key is a username and the value is a permission
 get_workspacepermissions_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 workspace_id is a string
 username is a string
 permission is a string
@@ -2462,7 +2354,7 @@ $params is a get_workspacepermissions_params
 $user_permissions is a reference to a hash where the key is a username and the value is a permission
 get_workspacepermissions_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 workspace_id is a string
 username is a string
 permission is a string
@@ -2493,7 +2385,7 @@ sub get_workspacepermissions
 							       method_name => 'get_workspacepermissions');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($user_permissions);
     #BEGIN get_workspacepermissions
     $self->_setContext($ctx,$params);
@@ -2530,7 +2422,7 @@ $params is a delete_workspace_params
 $metadata is a workspace_metadata
 delete_workspace_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 workspace_id is a string
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
@@ -2553,7 +2445,7 @@ $params is a delete_workspace_params
 $metadata is a workspace_metadata
 delete_workspace_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 workspace_id is a string
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
@@ -2592,7 +2484,7 @@ sub delete_workspace
 							       method_name => 'delete_workspace');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN delete_workspace
     $self->_setContext($ctx,$params);
@@ -2632,7 +2524,7 @@ clone_workspace_params is a reference to a hash where the following keys are def
 	new_workspace has a value which is a workspace_id
 	current_workspace has a value which is a workspace_id
 	default_permission has a value which is a permission
-	authentication has a value which is a string
+	auth has a value which is a string
 workspace_id is a string
 permission is a string
 workspace_metadata is a reference to a list containing 6 items:
@@ -2657,7 +2549,7 @@ clone_workspace_params is a reference to a hash where the following keys are def
 	new_workspace has a value which is a workspace_id
 	current_workspace has a value which is a workspace_id
 	default_permission has a value which is a permission
-	authentication has a value which is a string
+	auth has a value which is a string
 workspace_id is a string
 permission is a string
 workspace_metadata is a reference to a list containing 6 items:
@@ -2696,7 +2588,7 @@ sub clone_workspace
 							       method_name => 'clone_workspace');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN clone_workspace
     $self->_setContext($ctx,$params);
@@ -2743,7 +2635,7 @@ sub clone_workspace
 $params is a list_workspaces_params
 $workspaces is a reference to a list where each element is a workspace_metadata
 list_workspaces_params is a reference to a hash where the following keys are defined:
-	authentication has a value which is a string
+	auth has a value which is a string
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -2765,7 +2657,7 @@ permission is a string
 $params is a list_workspaces_params
 $workspaces is a reference to a list where each element is a workspace_metadata
 list_workspaces_params is a reference to a hash where the following keys are defined:
-	authentication has a value which is a string
+	auth has a value which is a string
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -2804,7 +2696,7 @@ sub list_workspaces
 							       method_name => 'list_workspaces');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($workspaces);
     #BEGIN list_workspaces
     $self->_setContext($ctx,$params);
@@ -2851,7 +2743,7 @@ list_workspace_objects_params is a reference to a hash where the following keys 
 	workspace has a value which is a workspace_id
 	type has a value which is a string
 	showDeletedObject has a value which is a bool
-	authentication has a value which is a string
+	auth has a value which is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 7 items:
@@ -2879,7 +2771,7 @@ list_workspace_objects_params is a reference to a hash where the following keys 
 	workspace has a value which is a workspace_id
 	type has a value which is a string
 	showDeletedObject has a value which is a bool
-	authentication has a value which is a string
+	auth has a value which is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 7 items:
@@ -2921,7 +2813,7 @@ sub list_workspace_objects
 							       method_name => 'list_workspace_objects');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($objects);
     #BEGIN list_workspace_objects
     $self->_setContext($ctx,$params);
@@ -2968,7 +2860,7 @@ $metadata is a workspace_metadata
 set_global_workspace_permissions_params is a reference to a hash where the following keys are defined:
 	new_permission has a value which is a permission
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 permission is a string
 workspace_id is a string
 workspace_metadata is a reference to a list containing 6 items:
@@ -2992,7 +2884,7 @@ $metadata is a workspace_metadata
 set_global_workspace_permissions_params is a reference to a hash where the following keys are defined:
 	new_permission has a value which is a permission
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 permission is a string
 workspace_id is a string
 workspace_metadata is a reference to a list containing 6 items:
@@ -3031,7 +2923,7 @@ sub set_global_workspace_permissions
 							       method_name => 'set_global_workspace_permissions');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN set_global_workspace_permissions
     $self->_setContext($ctx,$params);
@@ -3071,7 +2963,7 @@ set_workspace_permissions_params is a reference to a hash where the following ke
 	users has a value which is a reference to a list where each element is a username
 	new_permission has a value which is a permission
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 username is a string
 permission is a string
 workspace_id is a string
@@ -3089,7 +2981,7 @@ set_workspace_permissions_params is a reference to a hash where the following ke
 	users has a value which is a reference to a list where each element is a username
 	new_permission has a value which is a permission
 	workspace has a value which is a workspace_id
-	authentication has a value which is a string
+	auth has a value which is a string
 username is a string
 permission is a string
 workspace_id is a string
@@ -3121,7 +3013,7 @@ sub set_workspace_permissions
 							       method_name => 'set_workspace_permissions');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($success);
     #BEGIN set_workspace_permissions
     $self->_setContext($ctx,$params);
@@ -3529,7 +3421,7 @@ data has a value which is an ObjectData
 workspace has a value which is a workspace_id
 command has a value which is a string
 metadata has a value which is a reference to a hash where the key is a string and the value is a string
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -3544,7 +3436,7 @@ data has a value which is an ObjectData
 workspace has a value which is a workspace_id
 command has a value which is a string
 metadata has a value which is a reference to a hash where the key is a string and the value is a string
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -3568,7 +3460,7 @@ a reference to a hash where the following keys are defined:
 id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -3580,7 +3472,7 @@ a reference to a hash where the following keys are defined:
 id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -3604,7 +3496,7 @@ a reference to a hash where the following keys are defined:
 id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -3616,7 +3508,7 @@ a reference to a hash where the following keys are defined:
 id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -3641,7 +3533,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -3654,7 +3546,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -3711,7 +3603,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -3724,7 +3616,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -3749,7 +3641,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -3762,43 +3654,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
-authentication has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 unrevert_object_params
-
-=over 4
-
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-id has a value which is an object_id
-type has a value which is an object_type
-workspace has a value which is a workspace_id
-authentication has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-id has a value which is an object_id
-type has a value which is an object_type
-workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -3825,7 +3681,7 @@ source_id has a value which is an object_id
 instance has a value which is an int
 type has a value which is an object_type
 source_workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -3840,7 +3696,7 @@ source_id has a value which is an object_id
 instance has a value which is an int
 type has a value which is an object_type
 source_workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -3866,7 +3722,7 @@ new_workspace has a value which is a workspace_id
 source_id has a value which is an object_id
 type has a value which is an object_type
 source_workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -3880,7 +3736,7 @@ new_workspace has a value which is a workspace_id
 source_id has a value which is an object_id
 type has a value which is an object_type
 source_workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -3905,7 +3761,7 @@ id has a value which is an object_id
 instance has a value which is an int
 type has a value which is an object_type
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -3918,7 +3774,7 @@ id has a value which is an object_id
 instance has a value which is an int
 type has a value which is an object_type
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -3942,7 +3798,7 @@ a reference to a hash where the following keys are defined:
 id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -3954,7 +3810,7 @@ a reference to a hash where the following keys are defined:
 id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -3982,7 +3838,7 @@ Workspace management routines
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
 default_permission has a value which is a permission
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -3993,7 +3849,7 @@ authentication has a value which is a string
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
 default_permission has a value which is a permission
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -4015,7 +3871,7 @@ authentication has a value which is a string
 <pre>
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -4025,7 +3881,7 @@ authentication has a value which is a string
 
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -4047,7 +3903,7 @@ authentication has a value which is a string
 <pre>
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -4057,7 +3913,7 @@ authentication has a value which is a string
 
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -4079,7 +3935,7 @@ authentication has a value which is a string
 <pre>
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -4089,7 +3945,7 @@ authentication has a value which is a string
 
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -4113,7 +3969,7 @@ a reference to a hash where the following keys are defined:
 new_workspace has a value which is a workspace_id
 current_workspace has a value which is a workspace_id
 default_permission has a value which is a permission
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -4125,7 +3981,7 @@ a reference to a hash where the following keys are defined:
 new_workspace has a value which is a workspace_id
 current_workspace has a value which is a workspace_id
 default_permission has a value which is a permission
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -4146,7 +4002,7 @@ authentication has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -4155,7 +4011,7 @@ authentication has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -4179,7 +4035,7 @@ a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
 type has a value which is a string
 showDeletedObject has a value which is a bool
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -4191,7 +4047,7 @@ a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
 type has a value which is a string
 showDeletedObject has a value which is a bool
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -4214,7 +4070,7 @@ authentication has a value which is a string
 a reference to a hash where the following keys are defined:
 new_permission has a value which is a permission
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -4225,7 +4081,7 @@ authentication has a value which is a string
 a reference to a hash where the following keys are defined:
 new_permission has a value which is a permission
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
@@ -4249,7 +4105,7 @@ a reference to a hash where the following keys are defined:
 users has a value which is a reference to a list where each element is a username
 new_permission has a value which is a permission
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 </pre>
 
@@ -4261,7 +4117,7 @@ a reference to a hash where the following keys are defined:
 users has a value which is a reference to a list where each element is a username
 new_permission has a value which is a permission
 workspace has a value which is a workspace_id
-authentication has a value which is a string
+auth has a value which is a string
 
 
 =end text
