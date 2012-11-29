@@ -4,30 +4,39 @@ use Bio::KBase::workspaceService::Impl;
 use strict;
 use warnings;
 use Test::More;
-use Test::Exception;
 use Data::Dumper;
-my $test_count = 44;
+my $test_count = 42;
 
+#  Test 1 - Can a new impl object be created without parameters? 
 #Creating new workspace services implementation connected to testdb
 $ENV{MONGODBHOST} = "127.0.0.1";
 $ENV{MONGODBDB} = "testObjectStore";
-$ENV{CURRENTUSER} = "testuser";
+# Create an authorization token
+my $token = Bio::KBase::AuthToken->new(
+    user_id => 'kbasetest', password => '@Suite525'
+);
 my $impl = Bio::KBase::workspaceService::Impl->new();
+ok( defined $impl, "Did an impl object get defined" );    
+
+#  Test 2 - Is the impl object in the right class?
+isa_ok( $impl, 'Bio::KBase::workspaceService::Impl', "Is it in the right class" );   
+
+
 #Deleting test objects
 $impl->_clearAllWorkspaces();
 $impl->_clearAllWorkspaceObjects();
 $impl->_clearAllWorkspaceUsers();
 $impl->_clearAllWorkspaceDataObjects();
 
-
+my $oauth_token = $token->token();
 # Can I create a test workspace
-my $wsmeta1 = $impl->create_workspace("testworkspace1","n");
+my $wsmeta1 = $impl->create_workspace({workspace=>"testworkspace1",default_permission=>"n",auth=>$oauth_token});
 
 ok(defined $wsmeta1, "workspace defined");
 
 ok($wsmeta1->[0] eq "testworkspace1", "created workspace");
 
-ok($wsmeta1->[1] eq "testuser", "user == testuser");
+ok($wsmeta1->[1] eq "kbasetest", "user == kbasetest");
 
 ok($wsmeta1->[3] eq 0, "ws has no objects");
 
@@ -37,17 +46,17 @@ ok($wsmeta1->[5] eq "n", "ws has n global perms");
 
 # Is the workspace listed
 
-my $workspace_list = $impl->list_workspaces();
+my $workspace_list = $impl->list_workspaces({auth=>$oauth_token});
 
 ok(@{$workspace_list}[0]->[0] eq "testworkspace1", "name matches");
 
 # Create a few more workspaces
-lives_ok { $impl->create_workspace("testworkspace2","r"); } "create read-only ws";
-lives_ok { $impl->create_workspace("testworkspace3","a"); } "create admin ws";
-lives_ok { $impl->create_workspace("testworkspace4","w"); } "create rw ws";
-lives_ok { $impl->create_workspace("testworkspace5","n"); } "create no perm ws";
+lives_ok { $impl->create_workspace({workspace=>"testworkspace2",default_permission=>"r",auth=>$oauth_token}); } "create read-only ws";
+lives_ok { $impl->create_workspace({workspace=>"testworkspace3",default_permission=>"a",auth=>$oauth_token}); } "create admin ws";
+lives_ok { $impl->create_workspace({workspace=>"testworkspace4",default_permission=>"w",auth=>$oauth_token}); } "create rw ws";
+lives_ok { $impl->create_workspace({workspace=>"testworkspace5",default_permission=>"n",auth=>$oauth_token}); } "create no perm ws";
 
-$workspace_list = $impl->list_workspaces();
+$workspace_list = $impl->list_workspaces({auth=>$oauth_token});
 
 # Makes sure the length matches
 ok(scalar(@{$workspace_list}) eq 5, "length matches");
@@ -64,7 +73,7 @@ ok(defined($idhash->{testworkspace3}),
     
 # Does creating a duplicate workspace fail
 
-dies_ok { $impl->create_workspace("testworkspace1","n") } "create duplicate fails";
+dies_ok { $impl->create_workspace({workspace=>"testworkspace1",default_permission=>"n",auth=>$oauth_token}) } "create duplicate fails";
 
 
 # Can I delete a workspace
@@ -76,12 +85,15 @@ dies_ok { $impl->delete_workspace("testworkspace1")  } "duplicate delete fails";
 
 # Can I clone a workspace
 lives_ok{ $impl->clone_workspace("clonetestworkspace2","testworkspace2", "n") } "clone succeeds";
+$impl->delete_workspace("clonetestworkspace2");
+
 
 # Does cloning a deleted workspace fail
 dies_ok{ $impl->clone_workspace("clonetestworkspace1","testworkspace1", "n") } "clone a deleted workspace should fail";
 
 # Can I clone a workspace without specifying perms
 lives_ok{ $impl->clone_workspace("clonetestworkspace3","testworkspace3") } "clone without perms argument succeeds";
+$impl->delete_workspace("clonetestworkspace3");
 
 
 # Does the cloned workspace match the original
@@ -93,131 +105,18 @@ lives_ok{ $impl->clone_workspace("clonetestworkspace3","testworkspace3") } "clon
 # Can I write to a read only workspace?
 
 # Test multiple users
+
+# Clean up
 $impl->delete_workspace("testworkspace2");
 $impl->delete_workspace("testworkspace3");
 $impl->delete_workspace("testworkspace4");
 $impl->delete_workspace("testworkspace5");
 
 
-#######
-# TODO: Will Delete  stuff below this line later
-# Keeping the existing tests for reference as I build out suite 
-# -Shreyas
-########
 
-#Creating a workspace called "testworkspace"
-my $wsmeta = $impl->create_workspace("testworkspace","n");
-ok $wsmeta->[0] eq "testworkspace",
-	"create_workspace creates new workspace testworkspace!";
-#Listing workspaces that user testuser has access to
-my $wsmetas = $impl->list_workspaces();
-my $idhash = {};
-foreach $wsmeta (@{$wsmetas}) {
-	$idhash->{$wsmeta->[0]} = 1;
-}
-ok defined($idhash->{testworkspace}),
-	"list_workspaces returns newly created workspace testworkspace!";
-#Adding new test object to database
-my $objmeta = $impl->save_object("Test1", "TestData", {a=>1,b=>2,c=>3}, "testworkspace", {
-	command => "testcommand"
-});
-ok $objmeta->[0] eq "Test1",
-	"save_object ran and returned Test1 object with correct ID!";
-#Checking if test object is present
-ok $impl->has_object("Test1","TestData","testworkspace") == 1,
-	"has_object successfully determined object Test1 exists!";
-ok $impl->has_object("Test2","TestData","testworkspace") == 0,
-	"has_object successfully determined object Test2 does not exist";
-#Retrieving test object metadata from database
-$objmeta = $impl->get_objectmeta("Test1","TestData","testworkspace"); 
-ok $objmeta->[0] eq "Test1",
-	"get_objectmeta successfully retrieved metadata for Test1!";
-#Retrieving test object data from database
-(my $objdata,$objmeta) = $impl->get_object("Test1","TestData","testworkspace"); 
-ok $objmeta->[0] eq "Test1",
-	"get_object successfully retrieved metadata for Test1!";
-ok $objdata->{a} == 1,
-	"get_object successfully retrieved data for Test1!";
-#Copying object
-$objmeta = $impl->copy_object("TestCopy","testworkspace","Test1","TestData","testworkspace");
-ok $objmeta->[0] eq "TestCopy",
-	"copy_object successfully returned metadata for TestCopy!";
-$objmeta = $impl->move_object("TestMove","testworkspace","TestCopy","TestData","testworkspace");
-ok $objmeta->[0] eq "TestMove",
-	"move_object successfully returned metadata for TestMove!";
-#Deleting object
-$objmeta = $impl->delete_object("Test1","TestData","testworkspace");
-ok $objmeta->[4] eq "delete",
-	"delete_object successfully returned metadata for deleted object!";
-my $objmetas = $impl->list_workspace_objects("testworkspace",{});
-my $objidhash = {};
-foreach $objmeta (@{$objmetas}) {
-	$objidhash->{$objmeta->[0]} = 1;
-}
-ok !defined($objidhash->{Test1}),
-	"list_workspace_objects returned object list without deleted object Test1!";
-#Checking that the copied objects still exist
-ok !defined($objidhash->{TestCopy}),
-	"list_workspace_objects returned object list without moved object TestCopy!";
-ok defined($objidhash->{TestMove}),
-	"list_workspace_objects returned object list with moved result object TestMove!";
-#Reverting deleted object
-$objmeta = $impl->revert_object("Test1","TestData","testworkspace");
-ok $objmeta->[4] eq "revert",
-	"revert_object successfully undeleted Test1!";
-$objmetas = $impl->list_workspace_objects("testworkspace",{});
-$objidhash = {};
-foreach $objmeta (@{$objmetas}) {
-	$objidhash->{$objmeta->[0]} = 1;
-}
-ok defined($objidhash->{Test1}),
-	"list_workspace_objects now returns undeleted object Test1!";
-#Unreverted deleted object
-$objmeta = $impl->unrevert_object("Test1","TestData","testworkspace",{});
-ok $objmeta->[4] eq "delete",
-	"unrevert_object returns Test1 to a deleted state!";
-$objmetas = $impl->list_workspace_objects("testworkspace",{});
-$objidhash = {};
-foreach $objmeta (@{$objmetas}) {
-	$objidhash->{$objmeta->[0]} = 1;
-}
-ok !defined($objidhash->{Test1}),
-	"list_workspace_objects now fails to return deleted object Test1!";
-#Cloning workspace
-$wsmeta = $impl->clone_workspace("clonetestworkspace","testworkspace","n");
-$objmetas = $impl->list_workspace_objects("clonetestworkspace",{});
-$objidhash = {};
-foreach $objmeta (@{$objmetas}) {
-	$objidhash->{$objmeta->[0]} = 1;
-}
-ok defined($objidhash->{TestMove}),
-	"clone_workspace successfully recreates workspace with identical objects!";
-#Changing workspace global permissions
-$wsmeta = $impl->set_global_workspace_permissions("r","testworkspace");
-ok $wsmeta->[5] eq "r",
-	"set_global_workspace_permissions changes global permissions on testworkspace to read only!";
-#Changing workspace user permissions global permissions
-$impl->set_workspace_permissions(["testuser1"],"w","clonetestworkspace");
-#Logging as testuser1 to check permissions
-$ENV{CURRENTUSER} = "testuser1";
-my $implTwo = Bio::KBase::workspaceService::Impl->new();
-$wsmetas = $implTwo->list_workspaces();
-$idhash = {};
-foreach $wsmeta (@{$wsmetas}) {
-	$idhash->{$wsmeta->[0]} = $wsmeta->[4];
-}
-ok defined($idhash->{testworkspace}),
-	"list_workspaces reveals read oly workspace testworkspace to testuser1!";
-ok defined($idhash->{clonetestworkspace}),
-	"list_workspaces reveals nonreadable workspace clonetestworkspace with write privelages granted to testuser1!";
-ok $idhash->{testworkspace} eq "r",
-	"list_workspaces says testuser1 has read only privelages to testworkspace!";
-ok $idhash->{clonetestworkspace} eq "w",
-	"list_workspaces says testuser1 has write privelages to clonetestworkspace!";
 #Deleting test objects
 $impl->delete_workspace("testworkspace");
-$impl->delete_workspace("clonetestworkspace");
-$impl->_deleteWorkspaceUser("testuser1");
-$impl->_deleteWorkspaceUser("testuser");
+
+$impl->_deleteWorkspaceUser("kbasetest");
 
 done_testing($test_count);
