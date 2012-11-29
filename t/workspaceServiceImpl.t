@@ -36,7 +36,6 @@ my @impl_methods = qw(
   get_object
   get_objectmeta
   revert_object
-  unrevert_object
   copy_object
   move_object
   has_object
@@ -189,7 +188,7 @@ ok $objmeta->[4] eq "delete",
 #Reverting deleted object
 $objmeta = $impl->revert_object($conf2);
 print Dumper($objmeta);
-ok $objmeta->[4] eq "revert",
+ok $objmeta->[4] =~ m/^revert/,
 #	"revert_object successfully undeleted TestCopy!";
 my $objmetas = $impl->list_workspace_objects( { workspace=>"testworkspace2"});
 my $objidhash = {};
@@ -224,7 +223,7 @@ foreach $objmeta (@{$objmetas}) {
 ok !defined($objidhash->{Test1}),
 	"list_workspace_objects returned object list without deleted object Test1!";
 #Checking that the copied objects still exist
-ok !defined($objidhash->{TestCopy}),
+ok defined($objidhash->{TestCopy}),
 	"list_workspace_objects returned object list without copied object TestCopy!";
 ok defined($objidhash->{TestMove}),
 	"list_workspace_objects returned object list with moved result object TestMove!";
