@@ -89,3 +89,13 @@ deploy-docs:
 	#$(KB_RUNTIME)/bin/pod2html -t "workspaceService" lib/Bio/KBase/workspaceService/Impl.pm > docs/workspaceService.html
 	$(KB_RUNTIME)/bin/pod2html -t "workspaceService" workspaceService.pod > docs/workspaceService.html
 	cp docs/*html $(SERV_SERVICE_DIR)/webroot/.
+
+compile-typespec:
+	compile_typespec \
+	-impl Bio::KBase::workspaceService::Impl \
+	-service Bio::KBase::workspaceService::Server \
+	-psgi workspaceService.psgi \
+	-client Bio::KBase::workspaceService::Client \
+	-js javascript/workspaceService/Client \
+	-py biokbase/workspaceService/Client \
+	workspaceService.spec lib

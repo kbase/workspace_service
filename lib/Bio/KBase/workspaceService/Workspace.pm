@@ -359,23 +359,24 @@ Description:
 sub revertObject {
 	my ($self,$type,$id,$instance) = @_;
 	$self->checkPermissions(["w","a"]);
-	my $obj = $self->getObject($type,$id,{throwErrorIfMissing => 1});
-	if (!defined($obj)) {
+	my $origObj = $self->getObject($type,$id,{throwErrorIfMissing => 1});
+	if (!defined($origObj)) {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object not found!",
 		method_name => 'revertObject');
 	}
-	my $currInst = $obj->instance();
+	my $currInst = $origObj->instance();
+	my $obj;
 	if (defined($instance)) {
 		$obj = $self->_getObjectByID($id,$type,$self->id(),$instance);
 	} else {
-		$obj = $self->parent()->_getObject($obj->ancestor(),{throwErrorIfMissing => 1});
+		$obj = $self->parent()->_getObject($origObj->ancestor(),{throwErrorIfMissing => 1});
 	} 
 	if (!defined($obj)) {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Ancestor object not found!",
 		method_name => 'revertObject');
 	}
 	my $uuid = Data::UUID->new()->create_str();
-	if ($self->_updateObjects($type,$id,$uuid,$obj->uuid()) == 0) {
+	if ($self->_updateObjects($type,$id,$uuid,$origObj->uuid()) == 0) {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "State of object was altered during revert process. Revert aborted!",
 			method_name => 'revertObject');
 	}

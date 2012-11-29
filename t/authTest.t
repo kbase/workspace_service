@@ -4,6 +4,7 @@ use Bio::KBase::workspaceService::Impl;
 use Bio::KBase::AuthToken;
 use Test::More;
 use Test::Exception;
+use Data::Dumper;
 my $test_count = 0;
 
 $ENV{MONGODBHOST} = "127.0.0.1";
