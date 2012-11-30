@@ -226,9 +226,8 @@ A command string to save with the object.
 
 =item metadata
 
-A JSON "object" where the values must be strings.  This is any
-arbitrary metadata to be associated with the object, so long
-as the values are strings... :/
+A JSON "object".  This is any arbitrary metadata to be associated 
+with the object.
 
 =back
 

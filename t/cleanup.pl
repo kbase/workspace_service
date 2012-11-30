@@ -10,3 +10,5 @@ $impl->_clearAllWorkspaces();
 $impl->_clearAllWorkspaceObjects();
 $impl->_clearAllWorkspaceUsers();
 $impl->_clearAllWorkspaceDataObjects();
+
+print "Clean up complete"
