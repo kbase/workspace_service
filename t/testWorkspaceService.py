@@ -50,6 +50,19 @@ class TestWorkspaces(unittest.TestCase):
         conf = self.conf
         ws_meta = self.ws_meta
 
+
+        test_object1 = {
+            "id": "test_object_id1",
+            "type": "Genome",
+            "data": {"name":"testgenome1", "string":"ACACGATTACA"},
+            "workspace": ws_name,
+            "command": "something",
+            "metadata": {"origin":"shreyas"},
+            "auth": self.__class__.token
+        }
+
+        obj_meta1 = impl.save_object(test_object1)
+
         clone_ws_name = "clone_%s" % ws_name
 
         clone = impl.clone_workspace({
@@ -60,6 +73,12 @@ class TestWorkspaces(unittest.TestCase):
         })
 
         self.assertEquals(clone[0], clone_ws_name)
+        self.assertTrue(impl.has_object({
+            "workspace":clone_ws_name, 
+            "id": "test_object_id1", 
+            "type": "Genome",
+            "auth": self.__class__.token 
+        }))
 
         impl.delete_workspace({"workspace": ws_name, "auth": self.__class__.token})
         impl.delete_workspace({"workspace": clone_ws_name, "auth": self.__class__.token})
@@ -145,6 +164,9 @@ class TestWorkspaces(unittest.TestCase):
         impl.delete_workspace({"workspace": ws_name, "auth": self.__class__.token})
 
     def testSaveObject(self):
+        """
+        Make sure object gets saved
+        """
         impl = self.impl
         ws_name = self.ws_name
         conf = self.conf
@@ -170,11 +192,156 @@ class TestWorkspaces(unittest.TestCase):
         self.assertEquals(obj_meta1[6], 'kbasetest')
 
 
+    def testGetObject(self):
+        """
+        Test Retrieve Object
+        """
+        impl = self.impl
+        ws_name = self.ws_name
+        conf = self.conf
+        ws_meta = self.ws_meta
+
+        test_object3 = {
+            "id": "test_object_id3",
+            "type": "Genome",
+            "data": {"name":"testgenome3", "string":"ACACGATTACA"},
+            "workspace": ws_name,
+            "command": "something",
+            "metadata": {"origin":"shreyas"},
+            "auth": self.__class__.token
+        }
+        obj_meta3 = impl.save_object(test_object3)
+
+        obj = impl.get_object({"workspace":ws_name,"id": "test_object_id3", "type": "Genome","auth": self.__class__.token})
+
+        self.assertEquals(obj['data']['name'],"testgenome3")
+        self.assertEquals(obj['data']['string'], "ACACGATTACA")
+        self.assertIn("test_object_id3", obj['metadata'])
+
+    def testGetObjectMetadata(self):
+        """
+        Test that we can retrieve object metadata
+        """
+        impl = self.impl
+        ws_name = self.ws_name
+        conf = self.conf
+        ws_meta = self.ws_meta
+
+        test_object4 = {
+            "id": "test_object_id4",
+            "type": "Genome",
+            "data": {"name":"testgenome4", "string":"ACACGATTACA"},
+            "workspace": ws_name,
+            "command": "something",
+            "metadata": {"origin":"shreyas"},
+            "auth": self.__class__.token
+        }
+        obj_meta4 = impl.save_object(test_object4)
+
+        obj = impl.get_objectmeta({"workspace":ws_name,"id": "test_object_id4", "type": "Genome","auth": self.__class__.token})
+
+        self.assertIn({"origin":"shreyas"}, obj)
+
+    def testCopy(self):
+        """
+        Test that we can copy object
+        """
+        impl = self.impl
+        ws_name = self.ws_name
+        conf = self.conf
+        ws_meta = self.ws_meta
+
+        test_object5 = {
+            "id": "test_object_id5",
+            "type": "Genome",
+            "data": {"name":"testgenome5", "string":"ACACGATTACA"},
+            "workspace": ws_name,
+            "command": "something",
+            "metadata": {"origin":"shreyas"},
+            "auth": self.__class__.token
+        }
+        obj_meta5 = impl.save_object(test_object5)
+
+
+        ws_name2 = "testWS_%s" % datetime.utcnow().strftime('%s')
+        conf2 = {"workspace": ws_name2,"default_permission": "a", "auth": self.__class__.token }
+        ws_meta2 = self.impl.create_workspace(conf2)
+
+        impl.copy_object({
+            "new_id": "new_object_id5",
+            "new_workspace": ws_name2,
+            "source_id": "test_object_id5",
+            "source_workspace": ws_name,
+            "type": "Genome",
+            "auth": self.__class__.token
+        })
+
+        has_object = impl.has_object({
+            "id": "new_object_id5",
+            "workspace": ws_name2,
+            "type": "Genome",
+            "auth": self.__class__.token
+        })
+        self.assertTrue(has_object)
+
+    def testMove(self):
+        """
+        Test that we can copy object
+        """
+        impl = self.impl
+        ws_name = self.ws_name
+        conf = self.conf
+        ws_meta = self.ws_meta
+
+        test_object5 = {
+            "id": "test_object_id5",
+            "type": "Genome",
+            "data": {"name":"testgenome5", "string":"ACACGATTACA"},
+            "workspace": ws_name,
+            "command": "something",
+            "metadata": {"origin":"shreyas"},
+            "auth": self.__class__.token
+        }
+        obj_meta5 = impl.save_object(test_object5)
+
+
+        ws_name2 = "testWS_%s" % datetime.utcnow().strftime('%s')
+        conf2 = {"workspace": ws_name2,"default_permission": "a", "auth": self.__class__.token }
+        ws_meta2 = self.impl.create_workspace(conf2)
+
+        impl.move_object({
+            "new_id": "new_object_id5",
+            "new_workspace": ws_name2,
+            "source_id": "test_object_id5",
+            "source_workspace": ws_name,
+            "type": "Genome",
+            "auth": self.__class__.token
+        })
+
+        has_object = impl.has_object({
+            "id": "new_object_id5",
+            "workspace": ws_name2,
+            "type": "Genome",
+            "auth": self.__class__.token
+        })
+        self.assertEquals(has_object, 1)
+
+
+        has_orig_object = impl.has_object({
+            "id": "test_object_id5",
+            "workspace": ws_name,
+            "type": "Genome",
+            "auth": self.__class__.token
+        })
+        self.assertEquals(has_orig_object, 0)
+
+
     @classmethod
     def tearDownClass(self):
         test_dir = os.path.dirname(os.path.abspath(__file__))
         cleanup_file = os.path.join(test_dir, 'cleanup.pl')
         subprocess.call(['perl', cleanup_file])
+
 
 
 
