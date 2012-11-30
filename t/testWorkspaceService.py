@@ -15,7 +15,8 @@ class TestWorkspaces(unittest.TestCase):
         impl = workspaceService('http://localhost:7058')
 
         # FIXME: Right now you can't delete so we'll create a new one each time.
-        ws_name = "testworkspace_%s" % datetime.isoformat(datetime.utcnow())
+        # FIXME: The following is too long "testworkspace_1354258955.274313". Document the limits
+        ws_name = "testWS_%s" % datetime.utcnow().strftime('%s')
 
         conf = {"workspace": ws_name,"default_permission": "a", "auth": self.__class__.token }
         ws_meta = impl.create_workspace(conf)
