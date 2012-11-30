@@ -10,12 +10,15 @@ class TestWorkspaces(unittest.TestCase):
     def setUpClass(cls):
         token_obj = get_token(username ='kbasetest', password ='@Suite525')
         cls.token = token_obj['access_token']
+
+
+    def setUp(self):
+        self.impl = workspaceService('http://localhost:7058')
+
     
     def testCreate(self):
-        impl = workspaceService('http://localhost:7058')
-
+        impl = self.impl
         # FIXME: Right now you can't delete so we'll create a new one each time.
-        # FIXME: The following is too long "testworkspace_1354258955.274313". Document the limits.
         ws_name = "testWS_%s" % datetime.utcnow().strftime('%s')
 
         conf = {"workspace": ws_name,"default_permission": "a", "auth": self.__class__.token }
