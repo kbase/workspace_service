@@ -76,9 +76,8 @@ class TestWorkspaces(unittest.TestCase):
         conf2 = {"workspace": ws_name2,"default_permission": "a", "auth": self.__class__.token }
         ws_meta2 = self.impl.create_workspace(conf2)
 
-        ws_list = impl.listWorkspaces({ "auth": self.__class__.token })
-
-        ws_names = [ w[0][0] for w in ws_list ]
+        ws_list = impl.list_workspaces({ "auth": self.__class__.token })
+        ws_names = [ w[0] for w in ws_list ]
 
         self.assertIn(ws_name, ws_names)
         self.assertIn(ws_name2, ws_names)
@@ -86,9 +85,9 @@ class TestWorkspaces(unittest.TestCase):
 
     @classmethod
     def tearDownClass(self):
-        test_dir = os.path.dirname(__file__)
+        test_dir = os.path.dirname(os.path.abspath(__file__))
         cleanup_file = os.path.join(test_dir, 'cleanup.pl')
-        subprocess.call([cleanup_file])
+        subprocess.call(['perl', cleanup_file])
 
 
 
