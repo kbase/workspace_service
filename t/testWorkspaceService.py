@@ -15,7 +15,7 @@ class TestWorkspaces(unittest.TestCase):
         impl = workspaceService('http://localhost:7058')
 
         # FIXME: Right now you can't delete so we'll create a new one each time.
-        ws_name = "testworkspace_%s" % datetime.isoformat(datetime.utcnow()))
+        ws_name = "testworkspace_%s" % datetime.isoformat(datetime.utcnow())
 
         conf = {"workspace": ws_name,"default_permission": "a", "auth": self.class.token }
         ws_meta = impl.create_workspace(conf)
