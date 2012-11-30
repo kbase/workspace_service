@@ -17,7 +17,7 @@ class TestWorkspaces(unittest.TestCase):
         # FIXME: Right now you can't delete so we'll create a new one each time.
         ws_name = "testworkspace_%s" % datetime.isoformat(datetime.utcnow())
 
-        conf = {"workspace": ws_name,"default_permission": "a", "auth": self.class.token }
+        conf = {"workspace": ws_name,"default_permission": "a", "auth": self.__class__.token }
         ws_meta = impl.create_workspace(conf)
         self.assertEquals(wsmeta[0], ws_name)
         self.assertEquals(wsmeta[1], 'kbasetest')
@@ -26,7 +26,7 @@ class TestWorkspaces(unittest.TestCase):
         self.assertEquals(wsmeta[5], 'a')
 
 
-        impl.delete_workspace({"workspace": ws_name, "auth": self.class.token})
+        impl.delete_workspace({"workspace": ws_name, "auth": self.__class__.token})
 
 
 
