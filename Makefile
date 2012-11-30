@@ -92,6 +92,10 @@ deploy-docs:
 	cp docs/*html $(SERV_SERVICE_DIR)/webroot/.
 
 compile-typespec:
+	mkdir -p lib/biokbase/workspaceService
+	touch lib/biokbase/__init__.py
+	touch lib/biokbase/workspaceService/__init__.py
+	mkdir -p lib/javascript/workspaceService
 	compile_typespec \
 	-impl Bio::KBase::workspaceService::Impl \
 	-service Bio::KBase::workspaceService::Server \
