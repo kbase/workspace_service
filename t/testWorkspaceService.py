@@ -3,7 +3,7 @@ from biokbase.auth.auth_token import get_token
 from biokbase.workspaceService.Client import workspaceService
 from datetime import datetime
 import os
-
+import subprocess
 
 class TestWorkspaces(unittest.TestCase):
 
@@ -16,7 +16,7 @@ class TestWorkspaces(unittest.TestCase):
     def setUp(self):
         self.impl = workspaceService('http://localhost:7058')
         # FIXME: Right now you can't delete so we'll create a new one each time.
-        self.ws_name = "testWS_%s" % datetime.utcnow().strftime('%s')
+        self.ws_name = "testWS_%s" % datetime.utcnow().strftime('%s%f')
         self.conf = {"workspace": self.ws_name,"default_permission": "a", "auth": self.__class__.token }
         self.ws_meta = self.impl.create_workspace(self.conf)
     
