@@ -44,6 +44,8 @@ test:
 			exit 1 ; \
 		fi \
 	done
+	@echo running python tests via nose 
+	cd test; nosetests
 
 deploy: deploy-client
 deploy-all: deploy-client deploy-service
