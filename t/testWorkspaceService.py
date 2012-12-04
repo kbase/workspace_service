@@ -41,6 +41,69 @@ class TestWorkspaces(unittest.TestCase):
 
         impl.delete_workspace({"workspace": ws_name, "auth": self.__class__.token})
 
+    def testRevert(self):
+        """
+        Test revert object, and make sure appropriate fields are changed.
+        """
+        impl = self.impl
+        ws_name = self.ws_name
+        conf = self.conf
+        ws_meta = self.ws_meta
+
+        data1 = {"name":"testgenome3", "string":"ACACGATTACA"}
+
+        test_object3 = {
+            "id": "test_object_id3",
+            "type": "Genome",
+            "data": data1,
+            "workspace": ws_name,
+            "command": "something",
+            "metadata": {"origin":"shreyas"},
+            "auth": self.__class__.token
+        }
+
+        # Save test object
+        obj_meta1 = impl.save_object(test_object3)
+        # Get the object version
+        ver = obj_meta1[3]
+
+        obj = impl.get_object({"workspace":ws_name,"id": "test_object_id3", "type": "Genome","auth": self.__class__.token})
+        # Make sure version matches
+        self.assertEquals(obj['metadata'][3], ver)
+
+        data2 = {"bogus": "data"}
+        # Update the data field
+        test_object3['data']=data2
+
+        obj_meta2 = impl.save_object(test_object3)
+        ver += 1
+
+        obj = impl.get_object({"workspace":ws_name,"id": "test_object_id3", "type": "Genome","auth": self.__class__.token})
+        # Make sure version is incremented
+        self.assertEquals(obj['metadata'][3], ver)
+
+        # Make sure new data is stored, and old data is no longer present
+        self.assertEquals(obj['data']['bogus'], 'data')
+        self.assertIn("bogus", obj['data'].keys())
+        self.assertNotIn("name", obj['data'].keys())
+        self.assertNotIn("string", obj['data'].keys())
+
+        impl.revert_object({"workspace":ws_name,"id": "test_object_id3", "type": "Genome","auth": self.__class__.token})
+        obj = impl.get_object({"workspace":ws_name,"id": "test_object_id3", "type": "Genome","auth": self.__class__.token})
+        ver += 1
+
+        # Make sure version is incremented
+        self.assertEquals(obj['metadata'][3], ver)
+
+        # Make sure old data is reverted, and new data is no longer present
+        self.assertEquals(obj['data']['name'], 'testgenome3')
+        self.assertEquals(obj['data']['string'], 'ACACGATTACA')
+        self.assertNotIn("bogus", obj['data'].keys())
+        self.assertIn("name", obj['data'].keys())
+        self.assertIn("string", obj['data'].keys())
+
+
+
     def testClone(self):
         """
         Test Workspace Cloning
