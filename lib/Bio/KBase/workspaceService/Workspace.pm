@@ -523,6 +523,11 @@ sub permanentDelete {
 	for (my $i=0; $i < @{$objs}; $i++) {
 		$objs->[$i]->permanentDelete();
 	}
+	my $wsus = $self->parent()->_getAllWorkspaceUsersByWorkspace($self->id());
+	for (my $i=0; $i < @{$wsus}; $i++) {
+		$wsus->[$i]->setWorkspacePermission($self->id(),"n");
+	}
+	$self->parent()->_deleteWorkspace();
 }
 
 =head3 checkPermissions

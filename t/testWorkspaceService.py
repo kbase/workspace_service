@@ -18,7 +18,6 @@ class TestWorkspaces(unittest.TestCase):
     
     def testCreate(self):
         impl = self.impl
-        # FIXME: Right now you can't delete so we'll create a new one each time.
         ws_name = "testWS_%s" % datetime.utcnow().strftime('%s')
 
         conf = {"workspace": ws_name,"default_permission": "a", "auth": self.__class__.token }

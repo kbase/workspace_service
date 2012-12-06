@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 use Bio::KBase::workspaceService::Helpers qw(auth get_client);
-my $usage = "Usage: kb_create_workspace <workspace_name>\n";
+my $usage = "Usage: kb_create_workspace <workspace_name> <global permission>\n";
 my $workspace = shift @ARGV;
-unless(defined ($workspace)){
+my $permission = shift @ARGV;
+unless(defined ($workspace) && defined ($permission)){
     print $usage;
     exit;
 }
@@ -13,7 +14,7 @@ my $serv  = get_client();
 
 my $conf = {
     workspace => $workspace,
-    default_permission => "n",
+    default_permission => $permission,
 };
 my $auth = auth();
 $conf->{authentication} = $auth if defined($auth);

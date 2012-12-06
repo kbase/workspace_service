@@ -12,13 +12,14 @@ module workspaceService {
 	typedef string permission;
 	typedef string username;
 	typedef string timestamp;
+	typedef string workspace_ref;
 	typedef structure { 
        int version;
     } ObjectData;
     typedef structure { 
        int version;
     } WorkspaceData;
-	typedef tuple<object_id id,object_type type,timestamp moddate,int instance,string command,username lastmodifier,username owner> object_metadata;
+	typedef tuple<object_id id,object_type type,timestamp moddate,int instance,string command,username lastmodifier,username owner,workspace_id workspace,workspace_ref ref> object_metadata;
 	typedef tuple<workspace_id id,username owner,timestamp moddate,int objects,permission user_permission,permission global_permission> workspace_metadata;
 	
 	/*Object management routines*/

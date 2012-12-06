@@ -338,7 +338,9 @@ sub metadata {
 		$self->instance(),
 		$self->command(),
 		$self->lastModifiedBy(),
-		$self->owner()
+		$self->owner(),
+		$self->workspace(),
+		$self->uuid()
 	];
 }
 
@@ -413,19 +415,10 @@ Description:
 
 sub permanentDelete {
 	my ($self) = @_;
-	if (defined($self->{_deleted}) && $self->{_deleted} == 1) {
-		return;
+	my $objs = $self->parent()->_getObjectsByID($self->id(),$self->type(),$self->workspace());
+	for (my $i=0; $i < @{$objs};$i++) {
+		$self->parent()->_deleteObject($objs->uuid(),1);
 	}
-	$self->{_deleted} = 1;
-	my $revertAncestorObjects = $self->revertAncestorObjects();
-	for (my $i=0; $i < @{$revertAncestorObjects}; $i++) {
-		$revertAncestorObjects->[$i]->permanentDelete();
-	}
-	my $ancObj = $self->ancestorObject();
-	if (defined($ancObj)) {
-		$ancObj->permanentDelete();
-	}
-	$self->parent()->_deleteObject($self->uuid(),1);
 }
 
 sub _validateID {

@@ -1,14 +1,15 @@
 package Bio::KBase::workspaceService::Helpers;
 use strict;
 use warnings;
-use Bio::KBase::workspaceService;
+use Bio::KBase::workspaceService::Client;
 use Exporter;
 use parent qw(Exporter);
 our @EXPORT_OK = qw( auth get_client workspace );
-our $SERVICE_URL = "http://140.221.92.150:8080";
+#our $SERVICE_URL = "http://140.221.92.150:8080";
+our $SERVICE_URL = "http://140.221.92.231/services/workspaceService/";
 
 sub get_client {
-    return Bio::KBase::workspaceService->new($SERVICE_URL);
+    return Bio::KBase::workspaceService::Client->new($SERVICE_URL);
 }
 
 sub auth {

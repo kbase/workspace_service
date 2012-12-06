@@ -113,7 +113,11 @@ sub setWorkspacePermission {
 	my ($self,$workspace,$perm) = @_;
 	$self->_validatePermission($perm);
 	$self->workspaces()->{$workspace} = $perm;
-	$self->parent()->_updateDB("workspaceUsers",{id => $self->id()},{'$set' => {'workspaces.'.$workspace => $perm}});
+	if ($perm eq "n" && defined($self->workspaces()->{$workspace})) {
+		$self->parent()->_updateDB("workspaceUsers",{id => $self->id()},{'$unset' => {'workspaces.'.$workspace => $self->workspaces()->{$workspace}}});
+	} else {
+		$self->parent()->_updateDB("workspaceUsers",{id => $self->id()},{'$set' => {'workspaces.'.$workspace => $perm}});
+	}
 }
 
 =head3 getWorkspacePermission
