@@ -150,7 +150,7 @@ sub _updateDB {
     	query => $query,
     	update => $update
     });
-    if (!defined($data->{value})) {
+    if (ref($data) ne "HASH" && !defined($data->{value})) {
     	return 0;
     }
     return 1;
