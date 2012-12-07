@@ -22,7 +22,7 @@ my $conf = {
     workspace => workspace(),
 };
 my $auth = auth();
-$conf->{authentication} = $auth if defined $auth;
+$conf->{auth} = $auth if defined $auth;
 my ($rtv) = $serv->get_object($conf);
 # If we haven't printed data or metadata to a file
 # print the data to STDOUT

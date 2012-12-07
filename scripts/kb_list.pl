@@ -18,7 +18,7 @@ my $conf = {
     workspace => workspace(),
 };
 my $auth = auth();
-$conf->{authentication} = $auth if defined $auth;
+$conf->{auth} = $auth if defined $auth;
 $conf->{type} = $opts->type if defined $opts->type;
 my ($metas) = $serv->list_workspace_objects($conf);
 if ($opts->verbose) {

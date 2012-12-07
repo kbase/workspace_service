@@ -26,7 +26,7 @@ my $conf = {
     command => "save_object",
 };
 my $auth = auth();
-$conf->{authentication} = $auth if defined $auth;
+$conf->{auth} = $auth if defined $auth;
 # Populate the metadata if the user provided a file containing that
 $conf->{metadata} = decode_json get_from_file($opts->metadata) if defined $opts->metadata;
 $serv->save_object($conf);

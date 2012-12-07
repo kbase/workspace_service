@@ -17,5 +17,5 @@ my $conf = {
     default_permission => $permission,
 };
 my $auth = auth();
-$conf->{authentication} = $auth if defined($auth);
+$conf->{auth} = $auth if defined($auth);
 $serv->create_workspace($conf);

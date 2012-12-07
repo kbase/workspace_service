@@ -14,7 +14,7 @@ print($usage->text), exit if $opt->help;
 my $serv  = get_client();
 my $conf = {};
 my $auth = auth();
-$conf->{authentication} = $auth if defined($auth);
+$conf->{auth} = $auth if defined($auth);
 my ($ws_metas) = $serv->list_workspaces($conf);
 if ($opt->verbose) {
     _verbose($ws_metas);

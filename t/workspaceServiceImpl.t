@@ -123,11 +123,11 @@ eval { $wsmeta = $impl->has_object($wsmetas); };
 isnt($@,'', "Confirm bad input parameters fails gracefully ");
 
 #Checking if test object is present
-$wsmeta = $impl->has_object($conf1);
-is($wsmeta,1,"has_object successfully determined object Test1 exists!");
+my $bool = $impl->has_object($conf1);
+is($bool,1,"has_object successfully determined object Test1 exists!");
 
-eval { $wsmeta = $impl->has_object($conf2); };
-isnt($@,'', "Confirm that Test2 does not exist");
+$bool = $impl->has_object($conf2);
+is($bool,0, "Confirm that Test2 does not exist");
 #Documentation claims that 0 is returned when this is unsuccessful.  Not true
 #is($wsmeta,0,"has_object successfully determined object Test2 does not exist!");
 
