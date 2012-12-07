@@ -28,7 +28,10 @@ class TestWorkspaces(unittest.TestCase):
         Test Workspace Creation
         """
         impl = self.impl
-        ws_name = "testWS_%s" % datetime.utcnow().strftime('%s')
+        ws_name = self.ws_name
+        conf = self.conf
+        ws_meta = self.ws_meta
+
         self.assertEquals(ws_meta[0], ws_name)
         self.assertEquals(ws_meta[1], 'kbasetest')
         self.assertEquals(ws_meta[3], 0)
@@ -40,7 +43,7 @@ class TestWorkspaces(unittest.TestCase):
 
     def testRevert(self):
         """
-        Test revert object, and make sure appropriate fields are changed.
+        Test revert object
         """
         impl = self.impl
         ws_name = self.ws_name
