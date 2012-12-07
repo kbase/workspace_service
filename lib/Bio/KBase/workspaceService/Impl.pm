@@ -2024,13 +2024,10 @@ sub has_object
     	instance => undef
     });
     my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
-    my $obj;
-    eval {
-    $obj = $ws->getObject($params->{type},$params->{id},{
-    	throwErrorIfMissing => 1,
+    my $obj = $ws->getObject($params->{type},$params->{id},{
+    	throwErrorIfMissing => 0,
     	instance => $params->{instance}
     });
-    };
     $object_present = 1;
     if (!defined($obj)) {
     	$object_present = 0;
