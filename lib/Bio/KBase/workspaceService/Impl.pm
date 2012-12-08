@@ -919,7 +919,7 @@ sub _uncompressData {
 	my ($self,$data) = @_;
 	my $datastring;
 	gunzip \$data => \$datastring;
-	return JSON::XS->new->utf8->decode($datastring);
+	return JSON::XS->new->decode($datastring);
 }
 
 #END_HEADER
@@ -1073,7 +1073,7 @@ sub save_object
     my($metadata);
     #BEGIN save_object
     $self->_setContext($ctx,$params);
-    $self->_validateargs($params,["id","type","data","workspace"],{
+    $params = $self->_validateargs($params,["id","type","data","workspace"],{
     	command => undef,
     	metadata => {},
     	compressedjson => 0
