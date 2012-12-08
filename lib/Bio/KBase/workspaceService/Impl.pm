@@ -31,6 +31,8 @@ use Bio::KBase::workspaceService::Workspace;
 use Bio::KBase::workspaceService::WorkspaceUser;
 use Bio::KBase::workspaceService::DataObject;
 use Config::Simple;
+use IO::Compress::Gzip qw(gzip);
+use IO::Uncompress::Gunzip qw(gunzip);
 
 sub _args {
     my $mandatory = shift;
@@ -913,6 +915,13 @@ sub _validateargs {
 	return $args;
 }
 
+sub _uncompressData {
+	my ($self,$data) = @_;
+	my $datastring;
+	gunzip \$data => \$datastring;
+	return JSON::XS->new->utf8->decode($datastring);
+}
+
 #END_HEADER
 
 sub new
@@ -976,11 +985,13 @@ save_object_params is a reference to a hash where the following keys are defined
 	command has a value which is a string
 	metadata has a value which is a reference to a hash where the key is a string and the value is a string
 	auth has a value which is a string
+	compressedjson has a value which is a bool
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1011,11 +1022,13 @@ save_object_params is a reference to a hash where the following keys are defined
 	command has a value which is a string
 	metadata has a value which is a reference to a hash where the key is a string and the value is a string
 	auth has a value which is a string
+	compressedjson has a value which is a bool
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1062,8 +1075,12 @@ sub save_object
     $self->_setContext($ctx,$params);
     $self->_validateargs($params,["id","type","data","workspace"],{
     	command => undef,
-    	metadata => {}
+    	metadata => {},
+    	compressedjson => 0
     });
+    if ($params->{compressedjson} == 1) {
+    	$params->{data} = $self->_uncompressData($params->{data});
+    }
     my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
     my $obj = $ws->saveObject($params->{type},$params->{id},$params->{data},$params->{command},$params->{metadata});
     $metadata = $obj->metadata();
@@ -3505,6 +3522,7 @@ workspace has a value which is a workspace_id
 command has a value which is a string
 metadata has a value which is a reference to a hash where the key is a string and the value is a string
 auth has a value which is a string
+compressedjson has a value which is a bool
 
 </pre>
 
@@ -3520,6 +3538,7 @@ workspace has a value which is a workspace_id
 command has a value which is a string
 metadata has a value which is a reference to a hash where the key is a string and the value is a string
 auth has a value which is a string
+compressedjson has a value which is a bool
 
 
 =end text

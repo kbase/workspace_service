@@ -31,6 +31,7 @@ module workspaceService {
 		string command;
 		mapping<string,string> metadata;
 		string auth;
+		bool compressedjson;
 	} save_object_params;
     funcdef save_object(save_object_params params) returns (object_metadata metadata);
     
