@@ -33,6 +33,8 @@ use Bio::KBase::workspaceService::DataObject;
 use Config::Simple;
 use IO::Compress::Gzip qw(gzip);
 use IO::Uncompress::Gunzip qw(gunzip);
+use File::Temp qw(tempfile);
+use LWP::Simple qw(getstore);
 
 sub _args {
     my $mandatory = shift;
@@ -915,12 +917,31 @@ sub _validateargs {
 	return $args;
 }
 
-sub _uncompressData {
+sub _retreiveDataFromURL {
+	my ($self,$data) = @_;
+	my ($fh, $uncompressed_filename) = tempfile();
+	close($fh);
+	my $status = getstore($data, $uncompressed_filename);
+	print $data."\n";
+	die "Unable to fetch object from URL!\n" unless($status == 200);
+	local $/;
+	open($fh, "<", $uncompressed_filename) || die "$!: $@";
+	my $string = <$fh>;
+	close($fh);
+	return $string;
+}
+
+sub _uncompress {
 	my ($self,$data) = @_;
 	my $datastring;
 	gunzip \$data => \$datastring;
-	return JSON::XS->new->decode($datastring);
+	return $datastring;
 }
+
+sub _decode {
+	my ($self,$data) = @_;
+	return JSON::XS->new->decode($data);	
+} 
 
 #END_HEADER
 
@@ -985,7 +1006,9 @@ save_object_params is a reference to a hash where the following keys are defined
 	command has a value which is a string
 	metadata has a value which is a reference to a hash where the key is a string and the value is a string
 	auth has a value which is a string
-	compressedjson has a value which is a bool
+	json has a value which is a bool
+	compressed has a value which is a bool
+	retrieveFromURL has a value which is a bool
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -1022,7 +1045,9 @@ save_object_params is a reference to a hash where the following keys are defined
 	command has a value which is a string
 	metadata has a value which is a reference to a hash where the key is a string and the value is a string
 	auth has a value which is a string
-	compressedjson has a value which is a bool
+	json has a value which is a bool
+	compressed has a value which is a bool
+	retrieveFromURL has a value which is a bool
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -1076,10 +1101,18 @@ sub save_object
     $params = $self->_validateargs($params,["id","type","data","workspace"],{
     	command => undef,
     	metadata => {},
-    	compressedjson => 0
+    	json => 0,
+    	compressed => 0,
+    	retrieveFromURL => 0
     });
-    if ($params->{compressedjson} == 1) {
-    	$params->{data} = $self->_uncompressData($params->{data});
+    if ($params->{retrieveFromURL} == 1) {
+    	$params->{data} = $self->_retreiveDataFromURL($params->{data});
+    }
+    if ($params->{compressed} == 1) {
+    	$params->{data} = $self->_uncompress($params->{data});
+    }
+    if ($params->{json} == 1) {
+    	$params->{data} = $self->_decode($params->{data});
     }
     my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
     my $obj = $ws->saveObject($params->{type},$params->{id},$params->{data},$params->{command},$params->{metadata});
@@ -3522,7 +3555,9 @@ workspace has a value which is a workspace_id
 command has a value which is a string
 metadata has a value which is a reference to a hash where the key is a string and the value is a string
 auth has a value which is a string
-compressedjson has a value which is a bool
+json has a value which is a bool
+compressed has a value which is a bool
+retrieveFromURL has a value which is a bool
 
 </pre>
 
@@ -3538,7 +3573,9 @@ workspace has a value which is a workspace_id
 command has a value which is a string
 metadata has a value which is a reference to a hash where the key is a string and the value is a string
 auth has a value which is a string
-compressedjson has a value which is a bool
+json has a value which is a bool
+compressed has a value which is a bool
+retrieveFromURL has a value which is a bool
 
 
 =end text

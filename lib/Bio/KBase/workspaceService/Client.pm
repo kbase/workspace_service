@@ -67,7 +67,9 @@ save_object_params is a reference to a hash where the following keys are defined
 	command has a value which is a string
 	metadata has a value which is a reference to a hash where the key is a string and the value is a string
 	auth has a value which is a string
-	compressedjson has a value which is a bool
+	json has a value which is a bool
+	compressed has a value which is a bool
+	retrieveFromURL has a value which is a bool
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -104,7 +106,9 @@ save_object_params is a reference to a hash where the following keys are defined
 	command has a value which is a string
 	metadata has a value which is a reference to a hash where the key is a string and the value is a string
 	auth has a value which is a string
-	compressedjson has a value which is a bool
+	json has a value which is a bool
+	compressed has a value which is a bool
+	retrieveFromURL has a value which is a bool
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -2687,7 +2691,9 @@ workspace has a value which is a workspace_id
 command has a value which is a string
 metadata has a value which is a reference to a hash where the key is a string and the value is a string
 auth has a value which is a string
-compressedjson has a value which is a bool
+json has a value which is a bool
+compressed has a value which is a bool
+retrieveFromURL has a value which is a bool
 
 </pre>
 
@@ -2703,7 +2709,9 @@ workspace has a value which is a workspace_id
 command has a value which is a string
 metadata has a value which is a reference to a hash where the key is a string and the value is a string
 auth has a value which is a string
-compressedjson has a value which is a bool
+json has a value which is a bool
+compressed has a value which is a bool
+retrieveFromURL has a value which is a bool
 
 
 =end text

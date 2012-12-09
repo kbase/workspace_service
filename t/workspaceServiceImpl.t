@@ -115,8 +115,21 @@ note("Test Adding Objects to the workspace testworkspace");
 my $objmeta = $impl->save_object($conf);
 is(ref($objmeta),'ARRAY', "Did the save_object return an ARRAY ?");
 
-ok $objmeta->[0] eq "Test1",
-	"save_object ran and returned Test1 object with correct ID!";
+#Adding object from URL
+$objmeta = $impl->save_object({
+	id => "testbiochem",
+	type => "Biochemistry",
+	data => "http://bioseed.mcs.anl.gov/~chenry/KbaseFiles/defaultKBaseBiochem.json.gz",
+	workspace => "testworkspace",
+	command => "implementationTest",
+	auth => $token,
+	json => 1,
+	compressed => 1,
+	retrieveFromURL => 1,
+	auth => $token->token()
+});
+ok $objmeta->[0] eq "testbiochem",
+	"save_object ran and returned testbiochem object with correct ID!";
 
 #Test should fail gracefully when sending bad parameters
 eval { $wsmeta = $impl->has_object($wsmetas); };
