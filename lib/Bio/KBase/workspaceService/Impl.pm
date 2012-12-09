@@ -922,7 +922,6 @@ sub _retreiveDataFromURL {
 	my ($fh, $uncompressed_filename) = tempfile();
 	close($fh);
 	my $status = getstore($data, $uncompressed_filename);
-	print $data."\n";
 	die "Unable to fetch object from URL!\n" unless($status == 200);
 	local $/;
 	open($fh, "<", $uncompressed_filename) || die "$!: $@";
