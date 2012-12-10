@@ -417,7 +417,7 @@ sub permanentDelete {
 	my ($self) = @_;
 	my $objs = $self->parent()->_getObjectsByID($self->id(),$self->type(),$self->workspace());
 	for (my $i=0; $i < @{$objs};$i++) {
-		$self->parent()->_deleteObject($objs->uuid(),1);
+		$self->parent()->_deleteObject($objs->[$i]->uuid(),1);
 	}
 }
 
