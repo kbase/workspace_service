@@ -541,12 +541,13 @@ Description:
 
 sub checkPermissions {
 	my ($self,$perms) = @_;
-	my $permstring = join("",@{$perms});
 	my $currperm = $self->currentPermission();
-	if ($permstring !~ m/$currperm/) {
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "User lacks permissions for the specified activity!",
-		method_name => 'checkPermissions');
+	for (my $i=0; $i < @{$perms}; $i++) {
+		if ($currperm eq $perms->[$i]) {
+			return;
+		}
 	}
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "User lacks permissions for the specified activity!",method_name => 'checkPermissions');
 }
 
 =head3 _updateObjects
