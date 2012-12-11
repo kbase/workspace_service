@@ -2256,6 +2256,278 @@ sub set_workspace_permissions
 
 
 
+=head2 queue_job
+
+  $success = $obj->queue_job($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a queue_job_params
+$success is a bool
+queue_job_params is a reference to a hash where the following keys are defined:
+	jobid has a value which is a string
+	jobws has a value which is a string
+	auth has a value which is a string
+bool is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a queue_job_params
+$success is a bool
+queue_job_params is a reference to a hash where the following keys are defined:
+	jobid has a value which is a string
+	jobws has a value which is a string
+	auth has a value which is a string
+bool is an int
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub queue_job
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function queue_job (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to queue_job:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'queue_job');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "workspaceService.queue_job",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'queue_job',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method queue_job",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'queue_job',
+				       );
+    }
+}
+
+
+
+=head2 set_job_status
+
+  $success = $obj->set_job_status($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a set_job_status_params
+$success is a bool
+set_job_status_params is a reference to a hash where the following keys are defined:
+	jobid has a value which is a string
+	jobws has a value which is a string
+	status has a value which is a string
+	auth has a value which is a string
+bool is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a set_job_status_params
+$success is a bool
+set_job_status_params is a reference to a hash where the following keys are defined:
+	jobid has a value which is a string
+	jobws has a value which is a string
+	status has a value which is a string
+	auth has a value which is a string
+bool is an int
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub set_job_status
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function set_job_status (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to set_job_status:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'set_job_status');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "workspaceService.set_job_status",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'set_job_status',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method set_job_status",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'set_job_status',
+				       );
+    }
+}
+
+
+
+=head2 get_jobs
+
+  $jobs = $obj->get_jobs($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a get_jobs_params
+$jobs is a reference to a list where each element is an ObjectData
+get_jobs_params is a reference to a hash where the following keys are defined:
+	status has a value which is a string
+	auth has a value which is a string
+ObjectData is a reference to a hash where the following keys are defined:
+	version has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a get_jobs_params
+$jobs is a reference to a list where each element is an ObjectData
+get_jobs_params is a reference to a hash where the following keys are defined:
+	status has a value which is a string
+	auth has a value which is a string
+ObjectData is a reference to a hash where the following keys are defined:
+	version has a value which is an int
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_jobs
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_jobs (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_jobs:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_jobs');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "workspaceService.get_jobs",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_jobs',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_jobs",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_jobs',
+				       );
+    }
+}
+
+
+
 sub version {
     my ($self) = @_;
     my $result = $self->{client}->call($self->{url}, {
@@ -2267,16 +2539,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'set_workspace_permissions',
+                method_name => 'get_jobs',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method set_workspace_permissions",
+            error => "Error invoking method get_jobs",
             status_line => $self->{client}->status_line,
-            method_name => 'set_workspace_permissions',
+            method_name => 'get_jobs',
         );
     }
 }
@@ -3392,6 +3664,108 @@ a reference to a hash where the following keys are defined:
 users has a value which is a reference to a list where each element is a username
 new_permission has a value which is a permission
 workspace has a value which is a workspace_id
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 queue_job_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+jobid has a value which is a string
+jobws has a value which is a string
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+jobid has a value which is a string
+jobws has a value which is a string
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 set_job_status_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+jobid has a value which is a string
+jobws has a value which is a string
+status has a value which is a string
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+jobid has a value which is a string
+jobws has a value which is a string
+status has a value which is a string
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 get_jobs_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+status has a value which is a string
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+status has a value which is a string
 auth has a value which is a string
 
 

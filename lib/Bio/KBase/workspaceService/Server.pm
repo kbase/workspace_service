@@ -32,6 +32,9 @@ our %return_counts = (
         'list_workspace_objects' => 1,
         'set_global_workspace_permissions' => 1,
         'set_workspace_permissions' => 1,
+        'queue_job' => 1,
+        'set_job_status' => 1,
+        'get_jobs' => 1,
         'version' => 1,
 );
 
@@ -60,6 +63,9 @@ sub _build_valid_methods
         'list_workspace_objects' => 1,
         'set_global_workspace_permissions' => 1,
         'set_workspace_permissions' => 1,
+        'queue_job' => 1,
+        'set_job_status' => 1,
+        'get_jobs' => 1,
         'version' => 1,
     };
     return $methods;

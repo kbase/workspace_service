@@ -183,4 +183,25 @@ module workspaceService {
        string auth;
     } set_workspace_permissions_params;
     funcdef set_workspace_permissions(set_workspace_permissions_params params) returns (bool success);
+
+	typedef structure {
+		string jobid;
+		string jobws;
+    	string auth;
+    } queue_job_params;
+    funcdef queue_job(queue_job_params params) returns (bool success);
+
+	typedef structure {
+		string jobid;
+		string jobws;
+    	string status;
+    	string auth;
+    } set_job_status_params;
+    funcdef set_job_status(set_job_status_params params) returns (bool success);
+	
+	typedef structure {
+		string status;
+    	string auth;
+    } get_jobs_params;
+    funcdef get_jobs(get_jobs_params params) returns (list<ObjectData> jobs);
 };
