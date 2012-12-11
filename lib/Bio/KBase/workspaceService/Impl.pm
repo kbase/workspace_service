@@ -970,7 +970,6 @@ sub new
 		$self->{_host} = $c->param("workspaceServices.mongodb-hostname");
 		$self->{_db}   = $c->param("workspaceServices.mongodb-database");
 	}
-	print "Connected to:".$self->{_host}.".".$self->{_db}."\n";
     #END_CONSTRUCTOR
 
     if ($self->can('_init_instance'))
