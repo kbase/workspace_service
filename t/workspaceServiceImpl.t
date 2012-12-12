@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 use Data::Dumper;
-my $test_count = 42;
+my $test_count = 46;
 
 #  Test 1 - Can a new impl object be created without parameters? 
 #Creating new workspace services implementation connected to testdb
@@ -308,4 +308,28 @@ ok $idhash->{testworkspace} eq "r",
 ok $idhash->{clonetestworkspace} eq "w",
 	"list_workspaces says testuser1 has write privelages to clonetestworkspace!";
 
+#Testing the very basic type services
+eval { $impl->add_type({type => "TempTestType",auth => $token->token()}); };
+my $types;
+eval { $types = $impl->get_types(); };
+my $typehash = {};
+foreach my $type (@{$types}) {
+	$typehash->{$type} = 1;
+}
+ok defined($typehash->{TempTestType}),
+	"TempTestType exists!";
+ok defined($typehash->{Genome}),
+	"Genome exists!";
+eval { $impl->remove_type({type => "TempTestType",auth => $token->token()}); };
+eval { $impl->remove_type({type => "Genome",auth => $token->token()}); };
+eval { $types = $impl->get_types(); };
+$typehash = {};
+foreach my $type (@{$types}) {
+	$typehash->{$type} = 1;
+}
+ok !defined($typehash->{TempTestType}),
+	"TempTestType no longer exists!";
+ok defined($typehash->{Genome}),
+	"Genome exists!";
+	
 done_testing($test_count);

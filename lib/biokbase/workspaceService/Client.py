@@ -479,6 +479,66 @@ class workspaceService:
         else:
             raise ServerError('Unknown', 0, 'An unknown server error occurred')
 
+    def get_types(self, ):
+
+        arg_hash = { 'method': 'workspaceService.get_types',
+                     'params': [],
+                     'version': '1.1'
+                     }
+
+        body = json.dumps(arg_hash)
+        ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
+        if ret.code != httplib.OK:
+            raise URLError('Received bad response code from server:' + ret.code)
+        resp = json.loads(ret.read())
+
+        if 'result' in resp:
+            return resp['result'][0]
+        elif 'error' in resp:
+            raise ServerError(**resp['error'])
+        else:
+            raise ServerError('Unknown', 0, 'An unknown server error occurred')
+
+    def add_type(self, params):
+
+        arg_hash = { 'method': 'workspaceService.add_type',
+                     'params': [params],
+                     'version': '1.1'
+                     }
+
+        body = json.dumps(arg_hash)
+        ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
+        if ret.code != httplib.OK:
+            raise URLError('Received bad response code from server:' + ret.code)
+        resp = json.loads(ret.read())
+
+        if 'result' in resp:
+            return resp['result'][0]
+        elif 'error' in resp:
+            raise ServerError(**resp['error'])
+        else:
+            raise ServerError('Unknown', 0, 'An unknown server error occurred')
+
+    def remove_type(self, params):
+
+        arg_hash = { 'method': 'workspaceService.remove_type',
+                     'params': [params],
+                     'version': '1.1'
+                     }
+
+        body = json.dumps(arg_hash)
+        ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
+        if ret.code != httplib.OK:
+            raise URLError('Received bad response code from server:' + ret.code)
+        resp = json.loads(ret.read())
+
+        if 'result' in resp:
+            return resp['result'][0]
+        elif 'error' in resp:
+            raise ServerError(**resp['error'])
+        else:
+            raise ServerError('Unknown', 0, 'An unknown server error occurred')
+
 
 
 

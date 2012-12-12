@@ -204,4 +204,18 @@ module workspaceService {
     	string auth;
     } get_jobs_params;
     funcdef get_jobs(get_jobs_params params) returns (list<ObjectData> jobs);
+	
+    funcdef get_types() returns (list<string> types);
+	
+	typedef structure {
+		string type;
+    	string auth;
+    } add_type_params;
+	funcdef add_type(add_type_params params) returns (bool success);
+	
+	typedef structure {
+		string type;
+    	string auth;
+    } remove_type_params;
+	funcdef remove_type(remove_type_params params) returns (bool success);
 };

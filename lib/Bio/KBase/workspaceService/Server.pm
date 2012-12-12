@@ -35,6 +35,9 @@ our %return_counts = (
         'queue_job' => 1,
         'set_job_status' => 1,
         'get_jobs' => 1,
+        'get_types' => 1,
+        'add_type' => 1,
+        'remove_type' => 1,
         'version' => 1,
 );
 
@@ -66,6 +69,9 @@ sub _build_valid_methods
         'queue_job' => 1,
         'set_job_status' => 1,
         'get_jobs' => 1,
+        'get_types' => 1,
+        'add_type' => 1,
+        'remove_type' => 1,
         'version' => 1,
     };
     return $methods;

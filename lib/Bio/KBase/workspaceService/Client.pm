@@ -2528,6 +2528,249 @@ sub get_jobs
 
 
 
+=head2 get_types
+
+  $types = $obj->get_types()
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$types is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$types is a reference to a list where each element is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_types
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 0)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_types (received $n, expecting 0)");
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "workspaceService.get_types",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'get_types',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_types",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_types',
+				       );
+    }
+}
+
+
+
+=head2 add_type
+
+  $success = $obj->add_type($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is an add_type_params
+$success is a bool
+add_type_params is a reference to a hash where the following keys are defined:
+	type has a value which is a string
+	auth has a value which is a string
+bool is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is an add_type_params
+$success is a bool
+add_type_params is a reference to a hash where the following keys are defined:
+	type has a value which is a string
+	auth has a value which is a string
+bool is an int
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub add_type
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function add_type (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to add_type:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'add_type');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "workspaceService.add_type",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'add_type',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method add_type",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'add_type',
+				       );
+    }
+}
+
+
+
+=head2 remove_type
+
+  $success = $obj->remove_type($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a remove_type_params
+$success is a bool
+remove_type_params is a reference to a hash where the following keys are defined:
+	type has a value which is a string
+	auth has a value which is a string
+bool is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a remove_type_params
+$success is a bool
+remove_type_params is a reference to a hash where the following keys are defined:
+	type has a value which is a string
+	auth has a value which is a string
+bool is an int
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub remove_type
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function remove_type (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to remove_type:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'remove_type');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "workspaceService.remove_type",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'remove_type',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method remove_type",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'remove_type',
+				       );
+    }
+}
+
+
+
 sub version {
     my ($self) = @_;
     my $result = $self->{client}->call($self->{url}, {
@@ -2539,16 +2782,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'get_jobs',
+                method_name => 'remove_type',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method get_jobs",
+            error => "Error invoking method remove_type",
             status_line => $self->{client}->status_line,
-            method_name => 'get_jobs',
+            method_name => 'remove_type',
         );
     }
 }
@@ -3766,6 +4009,70 @@ auth has a value which is a string
 
 a reference to a hash where the following keys are defined:
 status has a value which is a string
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 add_type_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+type has a value which is a string
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+type has a value which is a string
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 remove_type_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+type has a value which is a string
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+type has a value which is a string
 auth has a value which is a string
 
 

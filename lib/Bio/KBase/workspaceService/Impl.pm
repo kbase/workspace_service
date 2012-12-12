@@ -875,7 +875,20 @@ sub _validatePermission {
 
 sub _validateObjectType {
 	my ($self,$type) = @_;
-	my $types = {
+	my $types = $self->_permanentTypes();
+	if (defined($types->{$type})) {
+		return;
+	}
+	my $cursor = $self->_mongodb()->typeObjects->find({id => $type});
+    if (my $object = $cursor->next) {
+		return;
+    }
+    my $msg = "Specified type not valid!";
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => '_validateObjectType');
+}
+
+sub _permanentTypes {
+	return {
 		Genome => 1,
 		Unspecified => 1,
 		TestData => 1,
@@ -890,10 +903,9 @@ sub _validateObjectType {
         FBAJob => 1,
         GapFill => 1,
         GapGen => 1,
-        PROMModel => 1
+        PROMModel => 1,
+        ProbAnno => 1
 	};
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Specified type not valid!",
-		method_name => '_validateObjectType') if (!defined($types->{$type}));
 }
 
 sub _validateargs {
@@ -3436,6 +3448,250 @@ sub get_jobs
 
 
 
+=head2 get_types
+
+  $types = $obj->get_types()
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$types is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$types is a reference to a list where each element is a string
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub get_types
+{
+    my $self = shift;
+
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($types);
+    #BEGIN get_types
+    my $types = [keys(%{$self->_permanentTypes()})];
+    my $cursor = $self->_mongodb()->typeObjects->find({});
+    while (my $object = $cursor->next) {
+    	push(@{$types},$object->{id});
+    }
+    #END get_types
+    my @_bad_returns;
+    (ref($types) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"types\" (value was \"$types\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_types:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_types');
+    }
+    return($types);
+}
+
+
+
+
+=head2 add_type
+
+  $success = $obj->add_type($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is an add_type_params
+$success is a bool
+add_type_params is a reference to a hash where the following keys are defined:
+	type has a value which is a string
+	auth has a value which is a string
+bool is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is an add_type_params
+$success is a bool
+add_type_params is a reference to a hash where the following keys are defined:
+	type has a value which is a string
+	auth has a value which is a string
+bool is an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub add_type
+{
+    my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to add_type:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'add_type');
+    }
+
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($success);
+    #BEGIN add_type
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["type"],{});
+    if ($self->_getUsername() eq "public") {
+    	my $msg = "Must be authenticated to add new types!";
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'add_type');
+    }
+    if (defined($self->_permanentTypes()->{$params->{type}})) {
+    	my $msg = "Trying to add a type that already exists!";
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'queue_job');
+    }
+    my $cursor = $self->_mongodb()->typeObjects->find({id => $params->{type}});
+    if (my $object = $cursor->next) {
+    	my $msg = "Trying to add a type that already exists!";
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'queue_job');
+    }
+    $self->_mongodb()->typeObjects->insert({
+		id => $params->{type},
+		owner => $self->_getUsername(),
+		moddate => time(),
+		permanent => 0
+    });
+   	$self->_clearContext();
+    #END add_type
+    my @_bad_returns;
+    (!ref($success)) or push(@_bad_returns, "Invalid type for return variable \"success\" (value was \"$success\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to add_type:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'add_type');
+    }
+    return($success);
+}
+
+
+
+
+=head2 remove_type
+
+  $success = $obj->remove_type($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a remove_type_params
+$success is a bool
+remove_type_params is a reference to a hash where the following keys are defined:
+	type has a value which is a string
+	auth has a value which is a string
+bool is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a remove_type_params
+$success is a bool
+remove_type_params is a reference to a hash where the following keys are defined:
+	type has a value which is a string
+	auth has a value which is a string
+bool is an int
+
+
+=end text
+
+
+
+=item Description
+
+
+
+=back
+
+=cut
+
+sub remove_type
+{
+    my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to remove_type:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'remove_type');
+    }
+
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($success);
+    #BEGIN remove_type
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["type"],{});
+    if ($self->_getUsername() eq "public") {
+    	my $msg = "Must be authenticated to remove types!";
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'add_type');
+    }
+    my $cursor = $self->_mongodb()->typeObjects->find({id => $params->{type},permanent => 0});
+    if (my $object = $cursor->next) {
+    	$self->_mongodb()->typeObjects->remove({id => $params->{type}});
+    } else {
+    	my $msg = "Trying to remove a type that doesn't exist  or a permanent type!";
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'queue_job');
+    }
+   	$self->_clearContext();
+    #END remove_type
+    my @_bad_returns;
+    (!ref($success)) or push(@_bad_returns, "Invalid type for return variable \"success\" (value was \"$success\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to remove_type:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'remove_type');
+    }
+    return($success);
+}
+
+
+
+
 =head2 version 
 
   $return = $obj->version()
@@ -4655,6 +4911,70 @@ auth has a value which is a string
 
 a reference to a hash where the following keys are defined:
 status has a value which is a string
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 add_type_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+type has a value which is a string
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+type has a value which is a string
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 remove_type_params
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+type has a value which is a string
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+type has a value which is a string
 auth has a value which is a string
 
 
