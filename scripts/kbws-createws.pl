@@ -57,5 +57,5 @@ if (!defined($output)) {
 	print "Workspace creation failed!\n";
 } else {
 	my $obj = parseWorkspaceMeta($output);
-	print "Workspace created with name '".$obj->{workspace}."' with id '".$obj->{id}."'";
+	print "Workspace created with name:\n".$obj->{id}."\n";
 }
