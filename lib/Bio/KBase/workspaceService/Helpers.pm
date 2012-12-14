@@ -4,12 +4,11 @@ use warnings;
 use Bio::KBase::workspaceService::Client;
 use Exporter;
 use parent qw(Exporter);
-our @EXPORT_OK = qw( auth get_client workspace );
-#our $SERVICE_URL = "http://140.221.92.150:8080";
-our $SERVICE_URL = "http://140.221.92.231/services/workspaceService/";
+our @EXPORT_OK = qw( auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta);
+our $defaultURL = "http://wwww.kbase.us/services/workspace/";
 
-sub get_client {
-    return Bio::KBase::workspaceService::Client->new($SERVICE_URL);
+sub get_ws_client {
+    return Bio::KBase::workspaceService::Client->new(workspaceURL());
 }
 
 sub auth {
@@ -44,6 +43,72 @@ sub workspace {
         close($fh);
     }
     return $workspace;
+}
+
+sub workspaceURL {
+    my $set = shift;
+    my $url;
+    my $filename = "$ENV{HOME}/.kbase_workspaceURL";
+    if ( defined $set ) {
+        if ($set eq "default") {
+        	$set = $defaultURL;
+        }
+        open(my $fh, ">", $filename) || return;
+        print $fh $set;
+        close($fh);
+        $url = $set;
+    } elsif( -e $filename ) {
+        open(my $fh, "<", $filename) || return;
+        $url = <$fh>;
+        chomp $url;
+        close($fh);
+    } else {
+        $url = $defaultURL;	
+    }
+    return $url;
+}
+
+sub parseObjectMeta {
+    my $object = shift;
+    my $hash = {
+    	id => $object->[0],
+    	type => $object->[1],
+    	moddate => $object->[2],
+    	instance => $object->[3],
+    	command => $object->[4],
+    	lastmodifier => $object->[5],
+    	owner => $object->[6],
+    	workspace => $object->[7],
+    	reference => $object->[8],
+    };
+    return $hash;
+}
+
+sub printObjectMeta {
+	my $meta = shift;
+    my $obj = parseObjectMeta($meta);
+    print "Object ID: ".$obj->{id}."\n";
+    print "Type: ".$obj->{type}."\n";
+    print "Workspace: ".$obj->{workspace}."\n";
+    print "Owner: ".$obj->{instance}."\n";
+    print "Instance: ".$obj->{instance}."\n";
+    print "Moddate: ".$obj->{moddate}."\n";
+    print "Last cmd: ".$obj->{command}."\n";
+    print "Modified by: ".$obj->{lastmodifier}."\n";
+    print "Perm ref: ".$obj->{reference}."\n";
+}
+
+sub parseWorkspaceMeta {
+    my $object = shift;
+    my $hash = {
+    	id => $object->[0],
+    	owner => $object->[1],
+    	moddate => $object->[2],
+    	objects => $object->[3],
+    	user_permission => $object->[4],
+    	global_permission => $object->[5],
+    };
+    return $hash;
 }
 
 1;
