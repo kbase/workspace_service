@@ -119,7 +119,7 @@ sub printWorkspaceMeta {
     print "Moddate: ".$obj->{moddate}."\n";
     print "Objects: ".$obj->{objects}."\n";
     print "User permission: ".$obj->{user_permission}."\n";
-    print "Global permission".$obj->{global_permission}."\n";
+    print "Global permission:".$obj->{global_permission}."\n";
 }
 
 1;

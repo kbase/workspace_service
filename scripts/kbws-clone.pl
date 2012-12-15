@@ -17,7 +17,7 @@ my $servercommand = "clone_workspace";
 my $translation = {
 	"Destination workspace ID" => "new_workspace",
 	"Destination workspace permission" => "default_permission",
-    "workspace" => "current_workspace";
+    "workspace" => "current_workspace"
 };
 #Defining usage and options
 my ($opt, $usage) = describe_options(
