@@ -21,9 +21,12 @@ my $translation = {
 my ($opt, $usage) = describe_options(
     'kbws-deletews <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}],
-    [ 'help|h|?', 'Print this usage information' ]
-    
+    [ 'help|h|?', 'Print this usage information' ]  
 );
+if (defined($opt->{help})) {
+	print $usage;
+    exit;
+}
 #Processing primary arguments
 foreach my $arg (@{$primaryArgs}) {
 	$opt->{$arg} = shift @ARGV;

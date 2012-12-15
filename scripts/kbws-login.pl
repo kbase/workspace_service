@@ -17,6 +17,10 @@ my ($opt, $usage) = describe_options(
     'kbws-login <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'help|h|?', 'Print this usage information' ],
 );
+if (defined($opt->{help})) {
+	print $usage;
+    exit;
+}
 if (!defined($ARGV[0])) {
 	print $usage;
 	exit();

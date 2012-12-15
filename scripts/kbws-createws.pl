@@ -26,6 +26,10 @@ my ($opt, $usage) = describe_options(
     [ 'verbose|v', 'Print verbose messages' ],
     [ 'help|h|?', 'Print this usage information' ],
 );
+if (defined($opt->{help})) {
+	print $usage;
+    exit;
+}
 #Processing primary arguments
 foreach my $arg (@{$primaryArgs}) {
 	$opt->{$arg} = shift @ARGV;

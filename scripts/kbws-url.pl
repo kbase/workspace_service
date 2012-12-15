@@ -16,4 +16,8 @@ my ($opt, $usage) = describe_options(
     'kbws-url <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'help|h|?', 'Print this usage information' ],
 );
+if (defined($opt->{help})) {
+	print $usage;
+    exit;
+}
 print "Current URL is:\n".workspaceURL($ARGV[0])."\n";

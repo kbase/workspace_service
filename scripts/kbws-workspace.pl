@@ -16,4 +16,8 @@ my ($opt, $usage) = describe_options(
     'kbws-workspace <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'help|h|?', 'Print this usage information' ],
 );
+if (defined($opt->{help})) {
+	print $usage;
+    exit;
+}
 print "Current workspace is:\n".workspace($ARGV[0])."\n";

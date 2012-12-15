@@ -31,8 +31,11 @@ my ($opt, $usage) = describe_options(
     [ 'fromurl|r', 'gets from url' , {"default" =>0} ],
     [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]
-    
 );
+if (defined($opt->{help})) {
+	print $usage;
+    exit;
+}
 $opt->{command} = "kb_load";
 #Processing primary arguments
 foreach my $arg (@{$primaryArgs}) {
