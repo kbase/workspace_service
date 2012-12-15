@@ -13,13 +13,13 @@ use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace worksp
 my $serv = get_ws_client();
 #Defining globals describing behavior
 my $primaryArgs = ["Type to remove"];
-my $servercommand = "get_object";
+my $servercommand = "remove_type";
 my $translation = {
 	"Type to remove" => "type",
 };
 #Defining usage and options
 my ($opt, $usage) = describe_options(
-    'kbws-removetypes <'.join("> <",@{$primaryArgs}).'> %o',
+    'kbws-removetype <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]
 );

@@ -56,5 +56,5 @@ if ($opt->{showerror} == 0){
 if (!defined($output)) {
 	print "List of valid types could not be retreived!\n";
 } else {
-	print "Valid types for placement of data in workspace\n".join("\n",@{$output})."\n";
+	print "Valid types for placement of data in workspace:\n".join("\n",@{$output})."\n";
 }

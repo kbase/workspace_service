@@ -3242,6 +3242,7 @@ sub queue_job
 		queuetime => time(),
 		owner => $self->_getUsername()
     });
+    $success = 1;
 	$self->_clearContext();  
     #END queue_job
     my @_bad_returns;
@@ -3340,6 +3341,7 @@ sub set_job_status
     	my $msg = "Error updating job!";
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'set_job_status');
     }
+    $success = 1;
 	$self->_clearContext();
     #END set_job_status
     my @_bad_returns;
@@ -3589,6 +3591,7 @@ sub add_type
 		moddate => time(),
 		permanent => 0
     });
+    $success = 1;
    	$self->_clearContext();
     #END add_type
     my @_bad_returns;
@@ -3678,6 +3681,7 @@ sub remove_type
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'queue_job');
     }
    	$self->_clearContext();
+   	$success = 1;
     #END remove_type
     my @_bad_returns;
     (!ref($success)) or push(@_bad_returns, "Invalid type for return variable \"success\" (value was \"$success\")");
