@@ -12,10 +12,10 @@ use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace worksp
 
 my $serv = get_ws_client();
 #Defining globals describing behavior
-my $primaryArgs = ["type",];
+my $primaryArgs = ["Type to remove"];
 my $servercommand = "get_object";
 my $translation = {
-	type => "type",
+	"Type to remove" => "type",
 };
 #Defining usage and options
 my ($opt, $usage) = describe_options(
@@ -53,8 +53,7 @@ if ($opt->{showerror} == 0){
 
 #Checking output and report results
 if (!defined($output)) {
-	print "Types not remove\n";
+	print "Failed to remove type\n";
 } else {
-	my $obj = parseWorkspaceMeta($output);
-	print "Types remove with name '".$obj->{id}."";
+	print "Type successfully removed!\n";
 }

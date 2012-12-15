@@ -15,10 +15,11 @@ my $serv = get_ws_client();
 my $primaryArgs = [];
 my $servercommand = "get_workspacemeta";
 my $translation = {
+    workspace => "workspace"
 };
 #Defining usage and options
 my ($opt, $usage) = describe_options(
-    'kbws-meta <'.join("> <",@{$primaryArgs}).'> %o',
+    'kbws-meta %o',
     [ 'workspace|w:s', 'ID for workspace', {"default" => workspace()} ],
     [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]
@@ -52,8 +53,7 @@ if ($opt->{showerror} == 0){
 }
 #Checking output and report results
 if (!defined($output)) {
-	print "Object does not exist\n";
+	print "Could not retrieve workspace meta\n";
 } else {
-	my $obj = parseWorkspaceMeta($output);
-	print "Object meta data is '".$obj->{id}."";
+	print "Workspace meta:\n".printWorkspaceMeta($output)."\n";
 }

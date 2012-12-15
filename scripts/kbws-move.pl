@@ -12,19 +12,21 @@ use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace worksp
 
 my $serv = get_ws_client();
 #Defining globals describing behavior
-my $primaryArgs = ["new id","source id","type"];
+my $primaryArgs = ["Object type","Object ID","New ID"];
 my $servercommand = "move_object";
 my $translation = {
-	"new id" => "new_id",
-	"source id" => "source_id",
-    "destinationworkspace" => new_workspace;
-    "workspace" => source_workspace;
-    type => "type"
+	"New ID" => "new_id",
+	"Object ID" => "source_id",
+    "destws" => new_workspace,
+    "workspace" => source_workspace,
+    "Object type" => "type",
+    instance => "instance",
+    workspace => "workspace"
 };
 #Defining usage and options
 my ($opt, $usage) = describe_options(
     'kbws-move <'.join("> <",@{$primaryArgs}).'> %o',
-    [ 'destinationworkspace|n=s', 'ID for destination workspace', {"default" => workspace()} ],
+    [ 'destws|n=s', 'ID for destination workspace', {"default" => workspace()} ],
     [ 'instance|i:i', 'Instance ID' ],
     [ 'workspace|s=s', 'ID for source workspace', {"default" => workspace()} ],
     [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}]
@@ -59,8 +61,7 @@ if ($opt->{showerror} == 0){
 }
 #Checking output and report results
 if (!defined($output)) {
-	print "Object not moved\n";
+	print "Failed to move object!\n";
 } else {
-	my $obj = parseWorkspaceMeta($output);
-	print "Object moved with name '".$obj->{id}."";
+	print "Object moved to:\n".$opt->{destws}."/".$opt->{"Object type"}."/".$opt->{"New ID"}."\n";
 }

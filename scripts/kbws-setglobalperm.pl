@@ -12,10 +12,11 @@ use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace worksp
 
 my $serv = get_ws_client();
 #Defining globals describing behavior
-my $primaryArgs = ["new permission"];
+my $primaryArgs = ["New default permission"];
 my $servercommand = "set_global_workspace_permissions";
 my $translation = {
-	"new permission" => "new_permission",
+	"New default permission" => "new_permission",
+    workspace => "workspace"
 };
 #Defining usage and options
 my ($opt, $usage) = describe_options(
@@ -25,7 +26,6 @@ my ($opt, $usage) = describe_options(
     [ 'help|h|?', 'Print this usage information' ]
     
 );
-$opt->{command} = "kb_load";
 #Processing primary arguments
 foreach my $arg (@{$primaryArgs}) {
 	$opt->{$arg} = shift @ARGV;
@@ -54,8 +54,7 @@ if ($opt->{showerror} == 0){
 }
 #Checking output and report results
 if (!defined($output)) {
-	print "Can not set global permissions\n";
+	print "Failed to reset workspace global permissions!\n";
 } else {
-	my $obj = parseWorkspaceMeta($output);
-	print "Global permissions set for '".$obj->{id}."";
+	print "Global permissions reset!\n";
 }

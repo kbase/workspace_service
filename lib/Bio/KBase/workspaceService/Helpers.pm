@@ -111,4 +111,15 @@ sub parseWorkspaceMeta {
     return $hash;
 }
 
+sub printWorkspaceMeta {
+	my $meta = shift;
+    my $obj = parseWorkspaceMeta($meta);
+    print "Workspace ID: ".$obj->{id}."\n";
+    print "Owner: ".$obj->{owner}."\n";
+    print "Moddate: ".$obj->{moddate}."\n";
+    print "Objects: ".$obj->{objects}."\n";
+    print "User permission: ".$obj->{user_permission}."\n";
+    print "Global permission".$obj->{global_permission}."\n";
+}
+
 1;

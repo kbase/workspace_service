@@ -18,7 +18,8 @@ my $translation = {
 };
 #Defining usage and options
 my ($opt, $usage) = describe_options(
-    'kbws-types <'.join("> <",@{$primaryArgs}).'> %o',
+    'kbws-types %o',
+    [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]
     
 );
@@ -41,13 +42,16 @@ foreach my $key (keys(%{$translation})) {
 }
 #Calling the server
 my $output;
-eval {
-	$output = $serv->$servercommand($params);
-};
+if ($opt->{showerror} == 0){
+    eval {
+        $output = $serv->$servercommand($params);
+    };
+}else{
+    $output = $serv->$servercommand($params);
+}
 #Checking output and report results
 if (!defined($output)) {
-	print "Can not get types\n";
+	print "List of valid types could not be retreived!\n";
 } else {
-	my $obj = parseWorkspaceMeta($output);
-	print "Types listed with '".$obj->{id}."";
+	print "Valid types for placement of data in workspace\n".join("\n",@{$output})."\n";
 }

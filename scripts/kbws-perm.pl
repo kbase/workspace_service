@@ -15,10 +15,11 @@ my $serv = get_ws_client();
 my $primaryArgs = [];
 my $servercommand = "get_workspacepermissions";
 my $translation = {
+    workspace => "workspace"
 };
 #Defining usage and options
 my ($opt, $usage) = describe_options(
-    'kbws-perm <'.join("> <",@{$primaryArgs}).'> %o',
+    'kbws-perm %o',
     [ 'workspace|w:s', 'ID for workspace', {"default" => workspace()} ],
     [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]
@@ -52,8 +53,15 @@ if ($opt->{showerror} == 0){
 }
 #Checking output and report results
 if (!defined($output)) {
-	print "Can not get workspace permissions\n";
+	print "Failed to retrieve workspace permissions!\n";
 } else {
-	my $obj = parseWorkspaceMeta($output);
-	print "Workspace permissions are '".$obj->{id}."";
+	my $tbl = [];
+    foreach my $username (keys(%{$output})) {
+        push(@{$tbl},[$username,$output->{$username}]);
+    }
+	my $table = Text::Table->new(
+    'Username', 'Permissions'
+    );
+    $table->load(@$tbl);
+    print $table;
 }

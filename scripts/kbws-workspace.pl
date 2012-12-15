@@ -16,10 +16,4 @@ my ($opt, $usage) = describe_options(
     'kbws-workspace <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'help|h|?', 'Print this usage information' ],
 );
-my $workspace = workspace($ARGV[0]);
-if (defined($workspace)) {
-	print "Current workspace is:\n".$workspace."\n";
-} else {
-	print "No workspace currently selected!\n";
-}
-
+print "Current workspace is:\n".workspace($ARGV[0])."\n";

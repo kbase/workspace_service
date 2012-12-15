@@ -12,11 +12,13 @@ use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace worksp
 
 my $serv = get_ws_client();
 #Defining globals describing behavior
-my $primaryArgs = ["id","type",];
+my $primaryArgs = ["Object type","Object ID"];
 my $servercommand = "revert_object";
 my $translation = {
-	id => "id",
-	type => "type",
+	"Object ID" => "id",
+	"Object type" => "type",
+    workspace => "workspace",
+    instance => "instance"
 };
 #Defining usage and options
 my ($opt, $usage) = describe_options(
@@ -56,8 +58,8 @@ eval {
 
 #Checking output and report results
 if (!defined($output)) {
-	print "Object not reverted\n";
+	print "Failed to revert object!\n";
 } else {
-	my $obj = parseWorkspaceMeta($output);
-	print "Object reverted with name '".$obj->{id}."";
+	print "Object reverted:\n";
+    printObjectMeta($output);
 }

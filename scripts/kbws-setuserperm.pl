@@ -12,20 +12,21 @@ use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace worksp
 
 my $serv = get_ws_client();
 #Defining globals describing behavior
-my $primaryArgs = ["users","new permission"];
+my $primaryArgs = ["Users (; delimited)","New permission"];
 my $servercommand = "set_workspace_permissions";
 my $translation = {
-    users => "users",
-	"new permission" => "new_permission",
+    "Users (; delimited)" => "users",
+	"New permission" => "new_permission",
+    workspace => "workspace"
 };
 #Defining usage and options
 my ($opt, $usage) = describe_options(
     'kbws-setuserperm <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'workspace|w:s', 'ID for workspace', {"default" => workspace()} ],
+    [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]
-    
+
 );
-$opt->{command} = "kb_load";
 #Processing primary arguments
 foreach my $arg (@{$primaryArgs}) {
 	$opt->{$arg} = shift @ARGV;
@@ -43,15 +44,19 @@ foreach my $key (keys(%{$translation})) {
 		$params->{$translation->{$key}} = $opt->{$key};
 	}
 }
+$params->{users} = [split(/;/,$params->{users})];
 #Calling the server
 my $output;
-eval {
-	$output = $serv->$servercommand($params);
-};
+if ($opt->{showerror} == 0){
+    eval {
+        $output = $serv->$servercommand($params);
+    };
+}else{
+    $output = $serv->$servercommand($params);
+}
 #Checking output and report results
 if (!defined($output)) {
-	print "Can not set user permissions\n";
+	print "Failed to set user permissions!\n";
 } else {
-	my $obj = parseWorkspaceMeta($output);
-	print "User permissions set for '".$obj->{id}."";
+	print "User permissions set for:\n".join("\n",@{$params->{users}})."\n";
 }
