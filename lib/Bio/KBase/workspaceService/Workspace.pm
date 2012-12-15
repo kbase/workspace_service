@@ -524,7 +524,7 @@ sub permanentDelete {
 		$objs->[$i]->permanentDelete();
 	}
 	my $wsus = $self->parent()->_getAllWorkspaceUsersByWorkspace($self->id());
-	$self->parent()->_deleteWorkspace();
+	$self->parent()->_deleteWorkspace($self->id());
 	for (my $i=0; $i < @{$wsus}; $i++) {
 		$wsus->[$i]->setWorkspacePermission($self->id(),"n");
 	}
