@@ -19,11 +19,14 @@ my $translation = {
 };
 #Defining usage and options
 my ($opt, $usage) = describe_options(
-    'kbws-addtypes <'.join("> <",@{$primaryArgs}).'> %o',
+    'kbws-addtype <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]
-    
 );
+if (defined($opt->{help})) {
+	print $usage;
+    exit;
+}
 #Processing primary arguments
 foreach my $arg (@{$primaryArgs}) {
 	$opt->{$arg} = shift @ARGV;
@@ -53,7 +56,7 @@ if ($opt->{showerror} == 0){
 
 #Checking output and report results
 if (!defined($output)) {
-	print "User specified type '".$opt->{"Object type"}."' not added!\n";
+	print "User specified type not added!\n";
 } else {
 	print "New object type added with name:\n".$opt->{"Object type"}."\n";
 }

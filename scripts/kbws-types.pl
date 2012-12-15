@@ -47,10 +47,10 @@ foreach my $key (keys(%{$translation})) {
 my $output;
 if ($opt->{showerror} == 0){
     eval {
-        $output = $serv->$servercommand($params);
+        $output = $serv->$servercommand();
     };
 }else{
-    $output = $serv->$servercommand($params);
+    $output = $serv->$servercommand();
 }
 #Checking output and report results
 if (!defined($output)) {
