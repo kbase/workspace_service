@@ -12,7 +12,7 @@ use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace worksp
 
 my $serv = get_ws_client();
 #Defining globals describing behavior
-my $primaryArgs = ["Object type","New object ID","Original object ID"];
+my $primaryArgs = ["Object type","Original object ID","New object ID"];
 my $servercommand = "copy_object";
 my $translation = {
 	"New object ID" => "new_id",

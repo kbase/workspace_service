@@ -15,6 +15,7 @@ my $primaryArgs = ["Username"];
 #Defining usage and options
 my ($opt, $usage) = describe_options(
     'kbws-login <'.join("> <",@{$primaryArgs}).'> %o',
+    [ 'password|p:s', 'User password' ],
     [ 'help|h|?', 'Print this usage information' ],
 );
 if (defined($opt->{help})) {
@@ -25,7 +26,12 @@ if (!defined($ARGV[0])) {
 	print $usage;
 	exit();
 }
-my $pswd = get_pass();
+my $pswd;
+if (defined($opt->{password})) {
+	$pswd = $opt->{password};
+} else {
+	$pswd = get_pass();
+}
 my $token = Bio::KBase::AuthToken->new(user_id => $ARGV[0], password => $pswd);
 if (!defined($token->token())) {
 	print "Login failed. Now logged in as:\npublic\n";

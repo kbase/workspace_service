@@ -3324,6 +3324,22 @@ sub set_job_status
     #BEGIN set_job_status
     $self->_setContext($ctx,$params);
     $self->_validateargs($params,["jobid","jobws","status"],{});
+    my $peviousStatus;
+    my $timevar = "requeuetime";
+    #Checking status validity
+    if ($params->{status} eq "queued") {
+    	$peviousStatus = "none";
+    	$timevar = "queuetime";
+    } elsif ($params->{status} eq "running") {
+    	$timevar = "starttime";
+    	$peviousStatus = "queued";
+    } elsif ($params->{status} eq "done") {
+    	$peviousStatus = "running";
+    	$timevar = "completetime";
+    } else {
+    	my $msg = "Input status not valid!";
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'set_job_status');
+    }
     #Checking that job doesn't already exist
     my $cursor = $self->_mongodb()->jobObjects->find({id => $params->{jobid},ws => $params->{jobws}});
     my $object = $cursor->next;
@@ -3331,17 +3347,8 @@ sub set_job_status
     	my $msg = "Job not found!";
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'set_job_status');
     }
-    my $timevar = "requeuetime";
-    if ($params->{status} eq "done") {
-    	$timevar = "completetime";
-    } elsif ($params->{status} eq "running") {
-    	$timevar = "starttime";
-    }
-    if ($self->_updateDB("jobObjects",{id => $params->{jobid},ws => $params->{jobws}},{'$set' => {'status' => $params->{status},$timevar => time()}}) == 0) {
-    	my $msg = "Error updating job!";
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'set_job_status');
-    }
-    $success = 1;
+    #Updating job
+    my $success = $self->_updateDB("jobObjects",{status => $peviousStatus,id => $params->{jobid},ws => $params->{jobws}},{'$set' => {'status' => $params->{status},$timevar => time()}});
 	$self->_clearContext();
     #END set_job_status
     my @_bad_returns;
