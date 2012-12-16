@@ -59,7 +59,6 @@ sub new {
 		_chsum => $args->{chsum}
 	};
 	bless $self;
-	$self->_validateType($args->{type});
 	$self->_validateID($args->{id});
 	if (defined($args->{rawdata})) {
 		$self->processRawData($args->{rawdata});
