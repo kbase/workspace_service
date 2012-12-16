@@ -23,7 +23,7 @@ kbws-getmeta temptype testobject -w scriptTestClone -e
 kbws-get temptype testobject -w scriptTestClone -e
 kbws-load temptype testobject "test object string data version 2" -s -e
 kbws-get temptype testobject -e
-kbws-revert temptype testobject -i 0
+kbws-revert temptype testobject -i 0 -e
 kbws-get temptype testobject -e
 kbws-history temptype testobject -e
 kbws-delete temptype testobject -e
