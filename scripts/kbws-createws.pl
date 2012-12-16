@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use Getopt::Long::Descriptive;
 use Text::Table;
-use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta);
+use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printWorkspaceMeta);
 
 my $serv = get_ws_client();
 #Defining globals describing behavior
@@ -22,7 +22,7 @@ my $translation = {
 #Defining usage and options
 my ($opt, $usage) = describe_options(
     'kb_createws <'.join("> <",@{$primaryArgs}).'> %o',
-    [ 'showerror', 'Show any errors in execution',{"default"=>0}],
+    [ 'showerror|e', 'Show any errors in execution',{"default"=>0}],
     [ 'verbose|v', 'Print verbose messages' ],
     [ 'help|h|?', 'Print this usage information' ],
 );
