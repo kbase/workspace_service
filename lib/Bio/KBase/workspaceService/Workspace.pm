@@ -367,7 +367,7 @@ sub revertObject {
 	my $currInst = $origObj->instance();
 	my $obj;
 	if (defined($instance)) {
-		$obj = $self->_getObjectByID($id,$type,$self->id(),$instance);
+		$obj = $self->parent()->_getObjectByID($id,$type,$self->id(),$instance);
 	} else {
 		$obj = $self->parent()->_getObject($origObj->ancestor(),{throwErrorIfMissing => 1});
 	} 
