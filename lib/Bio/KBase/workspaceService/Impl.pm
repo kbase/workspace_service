@@ -747,7 +747,7 @@ sub _getObjectByID {
         return $newObject;
     }
     if ($options->{throwErrorIfMissing} == 1) {
-    	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object not found with specified ".$id.", ".$type.", ".$workspace.", ".$instance."!",method_name => '_getObjectByID');
+    	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object not found with specified ".$workspace."/".$type."/".$id.".V".$instance."!",method_name => '_getObjectByID');
     }
 	return undef;
 }

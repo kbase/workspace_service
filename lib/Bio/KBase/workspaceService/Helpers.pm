@@ -90,7 +90,7 @@ sub printObjectMeta {
     print "Object ID: ".$obj->{id}."\n";
     print "Type: ".$obj->{type}."\n";
     print "Workspace: ".$obj->{workspace}."\n";
-    print "Owner: ".$obj->{instance}."\n";
+    print "Owner: ".$obj->{owner}."\n";
     print "Instance: ".$obj->{instance}."\n";
     print "Moddate: ".$obj->{moddate}."\n";
     print "Last cmd: ".$obj->{command}."\n";
