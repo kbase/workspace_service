@@ -70,7 +70,7 @@ if (-e $opt->{"Filename, data, or URL"}) {
 		$params->{retrieveFromURL} = 1;
 	}	
 }
-if (defined($opt->{metadata}) {
+if (defined($opt->{metadata})) {
 	if (-e $opt->{metadata}) {
 		open(my $fh, "<", $opt->{metadata}) || return;
 	   	$params->{metadata} = "";
