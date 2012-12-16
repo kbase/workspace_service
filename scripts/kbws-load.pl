@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use Getopt::Long::Descriptive;
 use Text::Table;
-use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta);
+use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace workspaceURL parseObjectMeta printObjectMeta parseWorkspaceMeta);
 
 my $serv = get_ws_client();
 #Defining globals describing behavior
@@ -70,15 +70,17 @@ if (-e $opt->{"Filename, data, or URL"}) {
 		$params->{retrieveFromURL} = 1;
 	}	
 }
-if (-e $opt->{metadata}) {
-	open(my $fh, "<", $opt->{metadata}) || return;
-   	$params->{metadata} = "";
-    while (my $line = <$fh>) {
-    	$params->{metadata} .= $line;
-    }
-    close($fh);
-} else {
-	$params->{metadata} = $opt->{metadata};
+if (defined($opt->{metadata}) {
+	if (-e $opt->{metadata}) {
+		open(my $fh, "<", $opt->{metadata}) || return;
+	   	$params->{metadata} = "";
+	    while (my $line = <$fh>) {
+	    	$params->{metadata} .= $line;
+	    }
+	    close($fh);
+	} else {
+		$params->{metadata} = $opt->{metadata};
+	}
 }
 #Calling the server
 my $output;

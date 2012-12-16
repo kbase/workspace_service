@@ -17,8 +17,8 @@ my $servercommand = "move_object";
 my $translation = {
 	"New ID" => "new_id",
 	"Object ID" => "source_id",
-    "destws" => new_workspace,
-    "workspace" => source_workspace,
+    "destws" => "new_workspace",
+    "workspace" => "source_workspace",
     "Object type" => "type",
     instance => "instance",
     workspace => "workspace"
@@ -29,7 +29,7 @@ my ($opt, $usage) = describe_options(
     [ 'destws|n=s', 'ID for destination workspace', {"default" => workspace()} ],
     [ 'instance|i:i', 'Instance ID' ],
     [ 'workspace|s=s', 'ID for source workspace', {"default" => workspace()} ],
-    [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}]
+    [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ] 
 );
 if (defined($opt->{help})) {

@@ -23,7 +23,7 @@ my $translation = {
 my ($opt, $usage) = describe_options(
     'kbws-clone <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'workspace|w:s', 'ID for current workspace', {"default" => workspace()} ],
-    [ 'showerror', 'Show any errors in execution',{"default"=>0}],
+    [ 'showerror|e', 'Show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]
 );
 if (defined($opt->{help})) {
