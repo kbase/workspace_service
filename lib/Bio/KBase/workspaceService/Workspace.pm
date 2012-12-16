@@ -375,7 +375,7 @@ sub revertObject {
 			my $msg = "Input instance not valid!";
 			Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'revertObject');
 		} else {
-			for (my $i=0; $i < @{$count}; $i++) {
+			for (my $i=0; $i < $count; $i++) {
 				$obj = $self->parent()->_getObject($obj->ancestor(),{throwErrorIfMissing => 1});
 			}
 		}
