@@ -365,9 +365,20 @@ sub revertObject {
 		method_name => 'revertObject');
 	}
 	my $currInst = $origObj->instance();
+	my $count = $currInst-$instance;
 	my $obj;
 	if (defined($instance)) {
-		$obj = $self->parent()->_getObjectByID($id,$type,$self->id(),$instance);
+		$obj = $origObj;
+		if ($count == 0) {
+			return $origObj;
+		} elsif ($count < 0) {
+			my $msg = "Input instance not valid!";
+			Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'revertObject');
+		} else {
+			for (my $i=0; $i < @{$count}; $i++) {
+				$obj = $self->parent()->_getObject($obj->ancestor(),{throwErrorIfMissing => 1});
+			}
+		}
 	} else {
 		$obj = $self->parent()->_getObject($origObj->ancestor(),{throwErrorIfMissing => 1});
 	} 
