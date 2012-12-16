@@ -21,14 +21,13 @@ my $translation = {
     "workspace" => "source_workspace",
     "Object type" => "type",
     instance => "instance",
-    workspace => "workspace"
 };
 #Defining usage and options
 my ($opt, $usage) = describe_options(
     'kbws-move <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'destws|n=s', 'ID for destination workspace', {"default" => workspace()} ],
     [ 'instance|i:i', 'Instance ID' ],
-    [ 'workspace|s=s', 'ID for source workspace', {"default" => workspace()} ],
+    [ 'workspace|w:s', 'ID for source workspace', {"default" => workspace()} ],
     [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ] 
 );
