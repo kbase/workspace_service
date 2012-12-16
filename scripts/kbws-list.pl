@@ -19,7 +19,7 @@ my $translation = {
 #Defining usage and options
 my ($opt, $usage) = describe_options(
     'kbws-list %o',
-    [ 'showerror', 'Show any errors in execution',{"default"=>0}],
+    [ 'showerror|e', 'Show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]
 );
 if (defined($opt->{help})) {
