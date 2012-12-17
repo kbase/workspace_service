@@ -25,23 +25,19 @@ ok( defined $impl, "Did an impl object get defined" );
 #  Test 2 - Is the impl object in the right class?
 isa_ok( $impl, 'Bio::KBase::workspaceService::Client', "Is it in the right class" );   
 
-
-#Deleting test objects
-#$impl->_clearAllWorkspaces();
-#$impl->_clearAllWorkspaceObjects();
-#$impl->_clearAllWorkspaceUsers();
-#$impl->_clearAllWorkspaceDataObjects();
-
 my $oauth_token = $token->token();
+my @kbws = `kbws-list`;
+print "DEBUG: KBWS\n@kbws\n\n";
 
 # Can I delete a workspace
 eval { $impl->delete_workspace({workspace=>"testworkspace1",auth=>$oauth_token})  };
-if ($@)  { print  "Not able to delete the testworkspace1\n"; }
+
+my $workspace_list = $impl->list_workspaces({auth=>$oauth_token});
+print Dumper($workspace_list);
 
 # Can I create a test workspace
 my $wsmeta1 = $impl->create_workspace({workspace=>"testworkspace1",default_permission=>"n",auth=>$oauth_token});
 
-exit;
 
 ok(defined $wsmeta1, "workspace defined");
 
@@ -57,7 +53,7 @@ ok($wsmeta1->[5] eq "n", "ws has n global perms");
 
 # Is the workspace listed
 
-my $workspace_list = $impl->list_workspaces({auth=>$oauth_token});
+$workspace_list = $impl->list_workspaces({auth=>$oauth_token});
 
 ok(@{$workspace_list}[0]->[0] eq "testworkspace1", "name matches");
 
@@ -140,13 +136,19 @@ $impl->delete_workspace({workspace=>"testworkspace3", auth=>$oauth_token});
 $impl->delete_workspace({workspace=>"testworkspace4", auth=>$oauth_token});
 $impl->delete_workspace({workspace=>"testworkspace5", auth=>$oauth_token});
 
+$workspace_list = $impl->list_workspaces({auth=>$oauth_token});
+print "WORKSPACE_LIST=@$workspace_list\n";
 
-$impl->_deleteWorkspaceUser("kbasetest");
+@kbws = `kbws-list`;
+print "DEBUG: KBWS\n@kbws\n\n";
+
+
+#$impl->_deleteWorkspaceUser("kbasetest");
 
 #Deleting test objects
-$impl->_clearAllWorkspaces();
-$impl->_clearAllWorkspaceObjects();
-$impl->_clearAllWorkspaceUsers();
-$impl->_clearAllWorkspaceDataObjects();
+#$impl->_clearAllWorkspaces();
+#$impl->_clearAllWorkspaceObjects();
+#$impl->_clearAllWorkspaceUsers();
+#$impl->_clearAllWorkspaceDataObjects();
 
 done_testing($test_count);
