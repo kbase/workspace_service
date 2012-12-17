@@ -5,7 +5,7 @@ use Bio::KBase::workspaceService::Client;
 use Exporter;
 use parent qw(Exporter);
 our @EXPORT_OK = qw( auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta printWorkspaceMeta);
-our $defaultURL = "http://wwww.kbase.us/services/workspace/";
+our $defaultURL = "http://kbase.us/services/workspace/";
 
 sub get_ws_client {
     return Bio::KBase::workspaceService::Client->new(workspaceURL());
