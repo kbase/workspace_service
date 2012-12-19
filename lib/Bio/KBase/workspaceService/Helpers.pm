@@ -13,16 +13,25 @@ sub get_ws_client {
 
 sub auth {
     my $token = shift;
-    my $filename = "$ENV{HOME}/.kbase_auth";
     if ( defined $token ) {
-        open(my $fh, ">", $filename) || return;
-        print $fh $token;
-        close($fh);
-    } elsif ( -e $filename ) {
-        open(my $fh, "<", $filename) || return;
-        $token = <$fh>;
-        chomp($token);
-        close($fh);
+        if (defined($ENV{KB_NO_FILE_ENVIRONMENT})) {
+        	$ENV{KB_AUTH_TOKEN} = $token;
+        } else {
+        	my $filename = "$ENV{HOME}/.kbase_auth";
+        	open(my $fh, ">", $filename) || return;
+        	print $fh $token;
+        	close($fh);
+        }
+    } else {
+    	my $filename = "$ENV{HOME}/.kbase_auth";
+    	if (defined($ENV{KB_NO_FILE_ENVIRONMENT}) && defined($ENV{KB_AUTH_TOKEN})) {
+        	$token = $ENV{KB_AUTH_TOKEN};
+        } elsif ( -e $filename ) {
+        	open(my $fh, "<", $filename) || return;
+        	$token = <$fh>;
+        	chomp($token);
+        	close($fh);
+        }
     }
     return $token;
 }
