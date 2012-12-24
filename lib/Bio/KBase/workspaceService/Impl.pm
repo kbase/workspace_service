@@ -1099,7 +1099,7 @@ workspace_ref is a string
 
 =item Description
 
-
+Saves the input object data and metadata into the selected workspace, returning the object_metadata of the saved object
 
 =back
 
@@ -1228,7 +1228,8 @@ workspace_ref is a string
 
 =item Description
 
-
+Deletes the specified object from the specified workspace, returning the object_metadata of the deleted object.
+Object is only temporarily deleted and can be recovered by using the revert command.
 
 =back
 
@@ -1342,7 +1343,9 @@ workspace_ref is a string
 
 =item Description
 
-
+Permanently deletes the specified object from the specified workspace.
+This permanently deletes the object and object history, and the data cannot be recovered.
+Objects cannot be permanently deleted unless they've been deleted first.
 
 =back
 
@@ -1468,7 +1471,9 @@ workspace_ref is a string
 
 =item Description
 
-
+Retrieves the specified object from the specified workspace.
+Both the object data and metadata are returned.
+This commands provides access to all versions of the object via the instance parameter.
 
 =back
 
@@ -1592,7 +1597,8 @@ workspace_ref is a string
 
 =item Description
 
-
+Retrieves the metadata for a specified object from the specified workspace.
+This commands provides access to metadata for all versions of the object via the instance parameter.
 
 =back
 
@@ -1713,7 +1719,10 @@ workspace_ref is a string
 
 =item Description
 
-
+Reverts a specified object in a specifed workspace to a previous version of the object.
+Returns the metadata of the newly reverted object.
+This command still makes a new instance of the object, copying data related to the target instance to the new instance.
+This ensures that the object instance always increases and no portion of the object history is ever lost.
 
 =back
 
@@ -1835,7 +1844,9 @@ workspace_ref is a string
 
 =item Description
 
-
+Copies a specified object in a specifed workspace to a new ID and/or workspace.
+Returns the metadata of the newly copied object.
+It is possible to use the version parameter to copy any version of a workspace object.
 
 =back
 
@@ -1967,7 +1978,8 @@ workspace_ref is a string
 
 =item Description
 
-
+Moves a specified object in a specifed workspace to a new ID and/or workspace.
+Returns the metadata of the newly moved object.
 
 =back
 
@@ -2072,7 +2084,8 @@ bool is an int
 
 =item Description
 
-
+Checks if a specified object in a specifed workspace exists.
+Returns "1" if the object exists, "0" if not
 
 =back
 
@@ -2194,7 +2207,7 @@ workspace_ref is a string
 
 =item Description
 
-
+Returns the metadata associated with every version of a specified object in a specified workspace.
 
 =back
 
@@ -2298,7 +2311,7 @@ timestamp is a string
 
 =item Description
 
-
+Creates a new workspace with the specified name and default permissions.
 
 =back
 
@@ -2404,7 +2417,7 @@ permission is a string
 
 =item Description
 
-
+Retreives the metadata associated with the specified workspace.
 
 =back
 
@@ -2487,7 +2500,7 @@ permission is a string
 
 =item Description
 
-
+Retreives a list of all users with custom permissions to the workspace.
 
 =back
 
@@ -2586,7 +2599,7 @@ permission is a string
 
 =item Description
 
-
+Deletes a specified workspace with all objects.
 
 =back
 
@@ -2690,7 +2703,7 @@ timestamp is a string
 
 =item Description
 
-
+Copies a specified workspace with all objects.
 
 =back
 
@@ -2798,7 +2811,7 @@ permission is a string
 
 =item Description
 
-
+Lists the metadata of all workspaces a user has access to.
 
 =back
 
@@ -2921,7 +2934,7 @@ workspace_ref is a string
 
 =item Description
 
-
+Lists the metadata of all objects in the specified workspace with the specified type (or with any type).
 
 =back
 
@@ -3031,7 +3044,8 @@ timestamp is a string
 
 =item Description
 
-
+Sets the default permissions for accessing a specified workspace for all users.
+Must have admin privelages to change workspace global permissions.
 
 =back
 
@@ -3121,7 +3135,8 @@ bool is an int
 
 =item Description
 
-
+Sets the permissions for a list of users for accessing a specified workspace.
+Must have admin privelages to change workspace permissions.
 
 =back
 
@@ -3203,7 +3218,8 @@ bool is an int
 
 =item Description
 
-
+Queues a new job in the workspace.
+Workspace job queues handles jobs that don't get submitted to large clusters.
 
 =back
 
@@ -3300,7 +3316,8 @@ bool is an int
 
 =item Description
 
-
+Changes the current status of a currently queued jobs 
+Used to manage jobs by ensuring multiple server don't claim the same job.
 
 =back
 
@@ -3485,7 +3502,8 @@ $types is a reference to a list where each element is a string
 
 =item Description
 
-
+Returns a list of all permanent and optional types currently accepted by the workspace service.
+An object cannot be saved in any workspace if it's type is not on this list.
 
 =back
 
@@ -3555,7 +3573,8 @@ bool is an int
 
 =item Description
 
-
+Adds a new custom type to the workspace service, so that objects of this type may be retreived.
+Cannot add a type that already exists.
 
 =back
 
@@ -3652,7 +3671,8 @@ bool is an int
 
 =item Description
 
-
+Removes a custom type from the workspace service.
+Permanent types cannot be removed.
 
 =back
 
@@ -3747,6 +3767,11 @@ sub version {
 
 
 
+=item Description
+
+indicates true or false values, false <= 0, true >=1
+
+
 =item Definition
 
 =begin html
@@ -3771,6 +3796,11 @@ an int
 
 =over 4
 
+
+
+=item Description
+
+A string used as an ID for a workspace. Any string consisting of alphanumeric characters and "-" is acceptable
 
 
 =item Definition
@@ -3799,6 +3829,11 @@ a string
 
 
 
+=item Description
+
+A string indicating the "type" of an object stored in a workspace. Acceptable types are returned by the "get_types()" command
+
+
 =item Definition
 
 =begin html
@@ -3823,6 +3858,11 @@ a string
 
 =over 4
 
+
+
+=item Description
+
+ID of an object stored in the workspace. Any string consisting of alphanumeric characters and "-" is acceptable
 
 
 =item Definition
@@ -3851,6 +3891,11 @@ a string
 
 
 
+=item Description
+
+Single letter indicating permissions on access to workspace. Options are: 'a' for administative access, 'w' for read/write access, 'r' for read access, and 'n' for no access.
+
+
 =item Definition
 
 =begin html
@@ -3875,6 +3920,11 @@ a string
 
 =over 4
 
+
+
+=item Description
+
+Login name of KBase useraccount to which permissions for workspaces are mapped
 
 
 =item Definition
@@ -3903,6 +3953,11 @@ a string
 
 
 
+=item Description
+
+Exact time for workspace operations. e.g. 2012-12-17T23:24:06
+
+
 =item Definition
 
 =begin html
@@ -3927,6 +3982,11 @@ a string
 
 =over 4
 
+
+
+=item Description
+
+A 36 character string referring to a particular instance of an object in a workspace that lasts forever. Objects should always be retreivable using this ID
 
 
 =item Definition
@@ -3955,34 +4015,13 @@ a string
 
 
 
-=item Definition
+=item Description
 
-=begin html
+Generic definition for object data stored in the workspace
 
-<pre>
-a reference to a hash where the following keys are defined:
-version has a value which is an int
+Data objects stored in the workspace could be either a string or a reference to a complex perl data structure. So we can't really formulate a strict type definition for this data.
 
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-version has a value which is an int
-
-
-=end text
-
-=back
-
-
-
-=head2 WorkspaceData
-
-=over 4
-
+        version - for complex data structures, the datastructure should include a version number to enable tracking of changes that may occur to the structure of the data over time
 
 
 =item Definition
@@ -4013,6 +4052,22 @@ version has a value which is an int
 
 =over 4
 
+
+
+=item Description
+
+Meta data associated with an object stored in a workspace.
+
+    object_id id - ID of the object assigned by the user or retreived from the IDserver (e.g. kb|g.0)
+    object_type type - type of the object (e.g. Genome)
+    timestamp moddate - date when the object was modified by the user (e.g. 2012-12-17T23:24:06)
+    int instance - instance of the object, which is equal to the number of times the user has overwritten the object
+    timestamp date_created - time at which the alignment was built/loaded in seconds since the epoch
+    string command - name of the command last used to modify or create the object
+    username lastmodifier - name of the user who last modified the object
+    username owner - name of the user who owns (who created) this object
+    workspace_id workspace - ID of the workspace in which the object is currently stored
+    workspace_ref ref - a 36 character ID that provides permanent undeniable access to this specific instance of this object
 
 
 =item Definition
@@ -4061,6 +4116,18 @@ a reference to a list containing 9 items:
 
 
 
+=item Description
+
+Meta data associated with a workspace.
+
+    workspace_id id - ID of the object assigned by the user or retreived from the IDserver (e.g. kb|g.0)
+    username owner - name of the user who owns (who created) this object
+    timestamp moddate - date when the workspace was last modified
+    int objects - number of objects currently stored in the workspace
+    permission user_permission - permissions for the currently logged user for the workspace
+    permission global_permission - default permissions for the workspace for all KBase users
+
+
 =item Definition
 
 =begin html
@@ -4103,7 +4170,18 @@ a reference to a list containing 6 items:
 
 =item Description
 
-Object management routines
+Input parameters for the "save_objects function.
+
+    object_type type - type of the object to be saved (an essential argument)
+    workspace_id workspace - ID of the workspace where the object is to be saved (an essential argument)
+    object_id id - ID behind which the object will be saved in the workspace (an essential argument)
+            ObjectData data - string or reference to complex datastructure to be saved in the workspace (an essential argument)
+            string command - the name of the KBase command that is calling the "save_object" function (an optional argument with default "unknown")
+            mapping<string,string> metadata - a hash of metadata to be associated with the object (an optional argument with default "{}")
+            string auth - the authentication token of the KBase account to associate this save command (an optional argument, user is "public" if auth is not provided)
+            bool retrieveFromURL - a flag indicating that the "data" argument contains a URL from which the actual data should be downloaded (an optional argument with default "0")
+            bool json - a flag indicating if the input data is encoded as a JSON string (an optional argument with default "0")
+            bool compressed - a flag indicating if the input data in zipped (an optional argument with default "0")
 
 
 =item Definition
@@ -4154,6 +4232,16 @@ retrieveFromURL has a value which is a bool
 
 
 
+=item Description
+
+Input parameters for the "delete_object" function.
+
+    object_type type - type of the object to be deleted (an essential argument)
+    workspace_id workspace - ID of the workspace where the object is to be deleted (an essential argument)
+    object_id id - ID of the object to be deleted (an essential argument)
+            string auth - the authentication token of the KBase account to associate this deletion command (an optional argument; user is "public" if auth is not provided)
+
+
 =item Definition
 
 =begin html
@@ -4190,6 +4278,16 @@ auth has a value which is a string
 
 
 
+=item Description
+
+Input parameters for the "delete_object_permanently" function.
+
+    object_type type - type of the object to be permanently deleted (an essential argument)
+    workspace_id workspace - ID of the workspace where the object is to be permanently deleted (an essential argument)
+    object_id id - ID of the object to be permanently deleted (an essential argument)
+            string auth - the authentication token of the KBase account to associate with this permanent deletion command (an optional argument; user is "public" if auth is not provided)
+
+
 =item Definition
 
 =begin html
@@ -4224,6 +4322,17 @@ auth has a value which is a string
 
 =over 4
 
+
+
+=item Description
+
+Input parameters for the "get_object" function.
+
+    object_type type - type of the object to be retrieved (an essential argument)
+    workspace_id workspace - ID of the workspace containing the object to be retrieved (an essential argument)
+    object_id id - ID of the object to be retrieved (an essential argument)
+    int instance - Version of the object to be retrieved, enabling retrieval of any previous version of an object (an optional argument; the current version is retrieved if no version is provides)
+            string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument; user is "public" if auth is not provided)
 
 
 =item Definition
@@ -4264,6 +4373,14 @@ auth has a value which is a string
 
 
 
+=item Description
+
+Output generated by the "get_object" function.
+
+    ObjectData data - data for object retrieved (an essential argument)
+    object_metadata metadata - metadata for object retrieved (an essential argument)
+
+
 =item Definition
 
 =begin html
@@ -4294,6 +4411,17 @@ metadata has a value which is an object_metadata
 
 =over 4
 
+
+
+=item Description
+
+Input parameters for the "get_objectmeta" function.
+
+    object_type type - type of the object for which metadata is to be retrieved (an essential argument)
+    workspace_id workspace - ID of the workspace containing the object for which metadata is to be retrieved (an essential argument)
+    object_id id - ID of the object for which metadata is to be retrieved (an essential argument)
+    int instance - Version of the object for which metadata is to be retrieved, enabling retrieval of any previous version of an object (an optional argument; the current metadata is retrieved if no version is provides)
+            string auth - the authentication token of the KBase account to associate with this object metadata retrieval command (an optional argument; user is "public" if auth is not provided)
 
 
 =item Definition
@@ -4334,6 +4462,17 @@ auth has a value which is a string
 
 
 
+=item Description
+
+Input parameters for the "revert_object" function.
+
+    object_type type - type of the object to be reverted (an essential argument)
+    workspace_id workspace - ID of the workspace containing the object to be reverted (an essential argument)
+    object_id id - ID of the object to be reverted (an essential argument)
+    int instance - Previous version of the object to which the object should be reset (an essential argument)
+            string auth - the authentication token of the KBase account to associate with this object reversion command (an optional argument; user is "public" if auth is not provided)
+
+
 =item Definition
 
 =begin html
@@ -4370,6 +4509,19 @@ auth has a value which is a string
 
 =over 4
 
+
+
+=item Description
+
+Input parameters for the "copy_object" function.
+
+    object_type type - type of the object to be copied (an essential argument)
+    workspace_id source_workspace - ID of the workspace containing the object to be copied (an essential argument)
+    object_id source_id - ID of the object to be copied (an essential argument)
+    int instance - Version of the object to be copied, enabling retrieval of any previous version of an object (an optional argument; the current object is copied if no version is provides)
+            workspace_id new_workspace - ID of the workspace the object to be copied to (an essential argument)
+    object_id new_id - ID the object is to be copied to (an essential argument)
+            string auth - the authentication token of the KBase account to associate with this object copy command (an optional argument; user is "public" if auth is not provided)
 
 
 =item Definition
@@ -4414,6 +4566,18 @@ auth has a value which is a string
 
 
 
+=item Description
+
+Input parameters for the "move_object" function.
+
+    object_type type - type of the object to be moved (an essential argument)
+    workspace_id source_workspace - ID of the workspace containing the object to be moved (an essential argument)
+    object_id source_id - ID of the object to be moved (an essential argument)
+             workspace_id new_workspace - ID of the workspace the object to be moved to (an essential argument)
+    object_id new_id - ID the object is to be moved to (an essential argument)
+            string auth - the authentication token of the KBase account to associate with this object move command (an optional argument; user is "public" if auth is not provided)
+
+
 =item Definition
 
 =begin html
@@ -4454,6 +4618,17 @@ auth has a value which is a string
 
 
 
+=item Description
+
+Input parameters for the "has_object" function.
+
+    object_type type - type of the object to be checked for existance (an essential argument)
+    workspace_id workspace - ID of the workspace containing the object to be checked for existance (an essential argument)
+    object_id id - ID of the object to be checked for existance (an essential argument)
+            int instance - Version of the object to be checked for existance (an optional argument; the current object is checked if no version is provided)
+            string auth - the authentication token of the KBase account to associate with this object check command (an optional argument; user is "public" if auth is not provided)
+
+
 =item Definition
 
 =begin html
@@ -4490,6 +4665,16 @@ auth has a value which is a string
 
 =over 4
 
+
+
+=item Description
+
+Input parameters for the "object_history" function.
+
+    object_type type - type of the object to have history printed (an essential argument)
+    workspace_id workspace - ID of the workspace containing the object to have history printed (an essential argument)
+    object_id id - ID of the object to have history printed (an essential argument)
+            string auth - the authentication token of the KBase account to associate with this object history command (an optional argument; user is "public" if auth is not provided)
 
 
 =item Definition
@@ -4530,7 +4715,11 @@ auth has a value which is a string
 
 =item Description
 
-Workspace management routines
+Input parameters for the "create_workspace" function.
+
+    workspace_id workspace - ID of the workspace to be created (an essential argument)
+    permission default_permission - Default permissions of the workspace to be created. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
+            string auth - the authentication token of the KBase account that will own the created workspace (an optional argument; user is "public" if auth is not provided)
 
 
 =item Definition
@@ -4567,6 +4756,14 @@ auth has a value which is a string
 
 
 
+=item Description
+
+Input parameters for the "get_workspacemeta" function.
+
+    workspace_id workspace - ID of the workspace for which metadata should be returned (an essential argument)
+    string auth - the authentication token of the KBase account accessing workspace metadata (an optional argument; user is "public" if auth is not provided)
+
+
 =item Definition
 
 =begin html
@@ -4597,6 +4794,14 @@ auth has a value which is a string
 
 =over 4
 
+
+
+=item Description
+
+Input parameters for the "get_workspacepermissions" function.
+
+    workspace_id workspace - ID of the workspace for which custom user permissions should be returned (an essential argument)
+    string auth - the authentication token of the KBase account accessing workspace permissions; must have admin privelages to workspace (an optional argument; user is "public" if auth is not provided)
 
 
 =item Definition
@@ -4631,6 +4836,14 @@ auth has a value which is a string
 
 
 
+=item Description
+
+Input parameters for the "delete_workspace" function.
+
+    workspace_id workspace - ID of the workspace to be deleted (an essential argument)
+    string auth - the authentication token of the KBase account deleting the workspace; must be the workspace owner (an optional argument; user is "public" if auth is not provided)
+
+
 =item Definition
 
 =begin html
@@ -4661,6 +4874,16 @@ auth has a value which is a string
 
 =over 4
 
+
+
+=item Description
+
+Input parameters for the "clone_workspace" function.
+
+    workspace_id current_workspace - ID of the workspace to be cloned (an essential argument)
+    workspace_id new_workspace - ID of the workspace to which the cloned workspace will be copied (an essential argument)
+    permission default_permission - Default permissions of the workspace created by the cloning process. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
+            string auth - the authentication token of the KBase account that will own the cloned workspace (an optional argument; user is "public" if auth is not provided)
 
 
 =item Definition
@@ -4699,6 +4922,13 @@ auth has a value which is a string
 
 
 
+=item Description
+
+Input parameters for the "list_workspaces" function.
+
+    string auth - the authentication token of the KBase account accessing the list of workspaces (an optional argument; user is "public" if auth is not provided)
+
+
 =item Definition
 
 =begin html
@@ -4727,6 +4957,16 @@ auth has a value which is a string
 
 =over 4
 
+
+
+=item Description
+
+Input parameters for the "list_workspace_objects" function.
+
+    workspace_id workspace - ID of the workspace for which objects should be listed (an essential argument)
+    string type - type of the objects to be listed (an optional argument; all object types will be listed if left unspecified)
+    bool showDeletedObject - a flag that, if set to '1', causes any deleted objects to be included in the output (an optional argument; default is '0')
+            string auth - the authentication token of the KBase account listing workspace objects; must have at least 'read' privelages (an optional argument; user is "public" if auth is not provided)
 
 
 =item Definition
@@ -4765,6 +5005,15 @@ auth has a value which is a string
 
 
 
+=item Description
+
+Input parameters for the "set_global_workspace_permissions" function.
+
+    workspace_id workspace - ID of the workspace for which permissions will be set (an essential argument)
+    permission new_permission - New default permissions to which the workspace should be set. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
+            string auth - the authentication token of the KBase account changing workspace default permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+
+
 =item Definition
 
 =begin html
@@ -4797,6 +5046,16 @@ auth has a value which is a string
 
 =over 4
 
+
+
+=item Description
+
+Input parameters for the "set_workspace_permissions" function.
+
+    workspace_id workspace - ID of the workspace for which permissions will be set (an essential argument)
+    list<username> users - list of users for which workspace privaleges are to be reset (an essential argument)
+    permission new_permission - New permissions to which all users in the user list will be set for the workspace. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
+            string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
 
 
 =item Definition
@@ -4835,6 +5094,15 @@ auth has a value which is a string
 
 
 
+=item Description
+
+Input parameters for the "queue_job" function.
+
+    string jobid - ID of the job to be queued (an essential argument)
+    string jobws - Workspace containing the job to be queued (an essential argument)
+    string auth - the authentication token of the KBase account queuing the job; must have access to the job being queued (an optional argument; user is "public" if auth is not provided)
+
+
 =item Definition
 
 =begin html
@@ -4867,6 +5135,16 @@ auth has a value which is a string
 
 =over 4
 
+
+
+=item Description
+
+Input parameters for the "set_job_status" function.
+
+    string jobid - ID of the job to be have status changed (an essential argument)
+    string jobws - Workspace containing the job to have status changed (an essential argument)
+            string status - Status to which job should be changed; accepted values are 'queued', 'running', and 'done' (an essential argument)
+    string auth - the authentication token of the KBase account requesting job status; only status for owned jobs can be retrieved (an optional argument; user is "public" if auth is not provided)
 
 
 =item Definition
@@ -4905,6 +5183,14 @@ auth has a value which is a string
 
 
 
+=item Description
+
+Input parameters for the "get_jobs" function.
+
+            string status - Status of all jobs to be retrieved; accepted values are 'queued', 'running', and 'done' (an essential argument)
+    string auth - the authentication token of the KBase account accessing job list; only owned jobs will be returned (an optional argument; user is "public" if auth is not provided)
+
+
 =item Definition
 
 =begin html
@@ -4937,6 +5223,14 @@ auth has a value which is a string
 
 
 
+=item Description
+
+Input parameters for the "add_type" function.
+
+    string type - Name of type being added (an essential argument)
+    string auth - the authentication token of the KBase account adding a type (an optional argument; user is "public" if auth is not provided)
+
+
 =item Definition
 
 =begin html
@@ -4967,6 +5261,14 @@ auth has a value which is a string
 
 =over 4
 
+
+
+=item Description
+
+Input parameters for the "remove_type" function.
+
+            string type - name of custom type to be removed from workspace service (an essential argument)
+    string auth - the authentication token of the KBase account removing a custom type (an optional argument; user is "public" if auth is not provided)
 
 
 =item Definition
