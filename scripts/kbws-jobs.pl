@@ -21,7 +21,7 @@ my $translation = {
 my ($opt, $usage) = describe_options(
     'kbws-jobs %o',
     [ 'status|s:s', 'Job status (queued,running,done)' ],
-    [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}]
+    [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]
 );
 if (defined($opt->{help})) {
@@ -67,12 +67,12 @@ if (!defined($output)) {
     for (my $i=0; $i < @{$output};$i++) {
         my $j = $output->[$i];
         push(@{$tbl},[
-            $r->{id},
-            $r->{workspace},
-            $r->{owner},
-            $r->{queuing_command},
-            $r->{queuetime},
-            $r->{complete}
+            $j->{id},
+            $j->{workspace},
+            $j->{owner},
+            $j->{queuing_command},
+            $j->{queuetime},
+            $j->{complete}
         ]);
     }
 	my $table = Text::Table->new(
