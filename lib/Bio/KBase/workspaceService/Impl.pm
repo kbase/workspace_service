@@ -3451,13 +3451,22 @@ sub get_jobs
     if (defined($params->{status})) {
     	$query->{status} = $params->{status};
     }
-    if ($self->_getUsername() ne "cshenry") {
+    if ($self->_getUsername() ne "chenry") {
     	$query->{owner} = $self->_getUsername();
     }
     my $cursor = $self->_mongodb()->jobObjects->find($query);
 	$jobs = [];
 	while (my $object = $cursor->next) {
-        push(@{$jobs},$object);
+        my $keys = [qw(
+        	jobid jobws auth status queuetime owner requeuetime starttime completetime
+        )];
+        my $newobj = {};
+        foreach my $key (@{$keys}) {
+        	if (defined($object->{$key})) {
+        		$newobj->{$key} = $object->{$key};
+        	}
+        }
+        push(@{$jobs},$newobj);
     }
    	$self->_clearContext();
     #END get_jobs
