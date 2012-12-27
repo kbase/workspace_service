@@ -725,7 +725,7 @@ sub _getObjectByID {
     	id => $id,
     	type => $type,
     	workspace => $workspace,
-    	instance => $instance
+    	instance => int($instance)
     });
 	while (my $object = $cursor->next) {
         my $newObject = Bio::KBase::workspaceService::Object->new({
