@@ -57,53 +57,50 @@ sub _args {
 
 sub _getUsername {
 	my ($self) = @_;
-	if (!defined($self->{_currentUser})) {
+	if (!defined($self->_getContext->{_override}->{_currentUser})) {
 		if (defined($self->{_testuser})) {
-			$self->{_currentUser} = $self->{_testuser};
+			$self->_getContext->{_override}->{_currentUser} = $self->{_testuser};
 		} else {
-			$self->{_currentUser} = "public";
+			$self->_getContext->{_override}->{_currentUser} = "public";
 		}
 		
 	}
-	return $self->{_currentUser};
+	return $self->_getContext->{_override}->{_currentUser};
 }
 
 sub _getCurrentUserObj {
 	my ($self) = @_;
-	if (!defined($self->{_currentUserObj})) {
-		$self->{_currentUserObj} = $self->_getWorkspaceUser($self->_getUsername());
+	if (!defined($self->_getContext->{_override}->{_currentUserObj})) {
+		$self->_getContext->{_override}->{_currentUserObj} = $self->_getWorkspaceUser($self->_getUsername());
 	}
-	return $self->{_currentUserObj};
+	return $self->_getContext->{_override}->{_currentUserObj};
 }
 
 sub _setContext {
 	my ($self,$context,$params) = @_;
     if ( defined $params->{auth} ) {
-        my $token = Bio::KBase::AuthToken->new(
-            token => $params->{auth},
-        );
-        if ($token->validate()) {
-            $self->{_currentUser} = $token->user_id;
-        } else {
-            Bio::KBase::Exceptions::KBaseException->throw(error => "Invalid authorization token!",
-                method_name => 'workspaceDocument::_setContext');
-        }
+		if (!defined($self->_getContext()->{_override}) || $self->_getContext()->{_override}->{_authentication} ne $params->{auth}) {
+			my $token = Bio::KBase::AuthToken->new(
+				token => $params->{auth},
+			);
+			if ($token->validate()) {
+				$self->_getContext()->{_override}->{_authentication} = $params->{auth};
+				$self->_getContext()->{_override}->{_currentUser} = $token->user_id;
+			} else {
+				Bio::KBase::Exceptions::KBaseException->throw(error => "Invalid authorization token!",
+				method_name => '_setContext');
+			}
+		}
     }
-	$self->{_authentication} = $params->{auth};
-	$self->{_context} = $context;
 }
 
 sub _getContext {
 	my ($self) = @_;
-	return $self->{_context};
+	return $Bio::KBase::workspaceService::Server::CallContext;
 }
 
 sub _clearContext {
 	my ($self) = @_;
-    delete $self->{_currentUserObj};
-    delete $self->{_currentUser};
-    delete $self->{_authentication};
-	delete $self->{_context};
 }
 
 #####################################################################
