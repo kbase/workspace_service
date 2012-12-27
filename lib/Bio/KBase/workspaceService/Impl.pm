@@ -3458,12 +3458,16 @@ sub get_jobs
 	$jobs = [];
 	while (my $object = $cursor->next) {
         my $keys = [qw(
-        	jobid jobws auth status queuetime owner requeuetime starttime completetime
+        	id ws auth status queuetime owner requeuetime starttime completetime
         )];
         my $newobj = {};
         foreach my $key (@{$keys}) {
         	if (defined($object->{$key})) {
-        		$newobj->{$key} = $object->{$key};
+        		if ($key =~ m/time$/) {
+        			$newobj->{$key} = DateTime->from_epoch(epoch => $object->{$key})->datetime();
+        		} else {
+        			$newobj->{$key} = $object->{$key};
+        		}
         	}
         }
         push(@{$jobs},$newobj);
