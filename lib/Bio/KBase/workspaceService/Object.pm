@@ -329,7 +329,21 @@ Description:
 =cut
 
 sub metadata {
-	my ($self) = @_;
+	my ($self,$ashhash) = @_;
+	if (defined($ashhash) && $ashhash == 1) {
+		return {
+			id => $self->id(),
+			type => $self->type(),
+			moddate => $self->moddate(),
+			instance => $self->instance(),
+			command => $self->command(),
+			lastmodifier => $self->lastModifiedBy(),
+			owner => $self->owner(),
+			workspace => $self->workspace(),
+			"ref" => $self->uuid(),
+			chsum => $self->chsum()
+		};
+	}
 	return [
 		$self->id(),
 		$self->type(),
@@ -339,7 +353,8 @@ sub metadata {
 		$self->lastModifiedBy(),
 		$self->owner(),
 		$self->workspace(),
-		$self->uuid()
+		$self->uuid(),
+		$self->chsum()
 	];
 }
 

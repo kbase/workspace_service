@@ -32,12 +32,17 @@ sub new {
 		"id",
 		"workspaces",
 		"moddate"
-	],{},$args);
+	],{
+		settings => {
+			workspace => "default"
+		}
+	},$args);
 	my $self = {
 		_id => $args->{id},
 		_parent => $args->{parent},
 		_workspaces => $args->{workspaces},
-		_moddate => $args->{moddate}
+		_moddate => $args->{moddate},
+		_settings => $args->{settings}
 	};
 	bless $self;
 	$self->_validateID($args->{id});
@@ -84,6 +89,20 @@ Description:
 sub workspaces {
 	my ($self) = @_;
 	return $self->{_workspaces};
+}
+
+=head3 settings
+
+Definition:
+	string = settings()
+Description:
+	Returns the settings for the workspace user
+
+=cut
+
+sub settings {
+	my ($self) = @_;
+	return $self->{_settings};
 }
 
 =head3 moddate
@@ -161,6 +180,21 @@ sub getUserWorkspaces {
     	}
     }
 	return $self->parent()->_getWorkspaces([keys(%{$workspaceHash})],{orQuery => [{defaultPermissions => {'$in' => ["a","w","r"]}}]});
+}
+
+=head3 updateSettings
+
+Definition:
+	[Bio::KBase::workspaceService::Workspace] = updateSettings(string setting,string value)
+Description:
+	Updates user settings in workspace
+
+=cut
+
+sub updateSettings {
+	my ($self,$setting,$value) = @_;
+	$self->settings()->{$setting} = $value;
+	$self->parent()->_updateDB("workspaceUsers",{id => $self->id()},{'$set' => {'settings.'.$setting => $value}});
 }
 
 sub _validateID {

@@ -156,12 +156,13 @@ sub processRawData {
     	$data = $JSON->encode($data);
     	$json = 1;
 	}
-	if (length($data) > 5000000) {
-		my $gzip_obj;
-		gzip \$data => \$gzip_obj;
-		$data = $gzip_obj;
-		$compressed = 1;
-	}
+	
+	#if (length($data) > 5000000) {
+	#	my $gzip_obj;
+	#	gzip \$data => \$gzip_obj;
+	#	$data = $gzip_obj;
+	#	$compressed = 1;
+	#}
 	$self->{_compressed} = $compressed;
 	$self->{_json} = $json;
 	$self->{_data} = $data;

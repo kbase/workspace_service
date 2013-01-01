@@ -19,6 +19,7 @@ API for accessing and writing documents objects to a workspace.
 
 #BEGIN_HEADER
 use MongoDB;
+use MongoDB::GridFS;
 use JSON::XS;
 use Tie::IxHash;
 use FileHandle;
@@ -78,17 +79,22 @@ sub _getCurrentUserObj {
 
 sub _setContext {
 	my ($self,$context,$params) = @_;
-    if ( defined $params->{auth} ) {
+    if (defined($params->{auth})) {
 		if (!defined($self->_getContext()->{_override}) || $self->_getContext()->{_override}->{_authentication} ne $params->{auth}) {
-			my $token = Bio::KBase::AuthToken->new(
-				token => $params->{auth},
-			);
-			if ($token->validate()) {
+			if ($params->{auth} =~ m/^IRIS-/) {
 				$self->_getContext()->{_override}->{_authentication} = $params->{auth};
-				$self->_getContext()->{_override}->{_currentUser} = $token->user_id;
+				$self->_getContext()->{_override}->{_currentUser} = $params->{auth};
 			} else {
-				Bio::KBase::Exceptions::KBaseException->throw(error => "Invalid authorization token!",
-				method_name => '_setContext');
+				my $token = Bio::KBase::AuthToken->new(
+					token => $params->{auth},
+				);
+				if ($token->validate()) {
+					$self->_getContext()->{_override}->{_authentication} = $params->{auth};
+					$self->_getContext()->{_override}->{_currentUser} = $token->user_id;
+				} else {
+					Bio::KBase::Exceptions::KBaseException->throw(error => "Invalid authorization token!",
+					method_name => '_setContext');
+				}
 			}
 		}
     }
@@ -96,6 +102,9 @@ sub _setContext {
 
 sub _getContext {
 	my ($self) = @_;
+	if (!defined($Bio::KBase::workspaceService::Server::CallContext)) {
+		$Bio::KBase::workspaceService::Server::CallContext = {};
+	}
 	return $Bio::KBase::workspaceService::Server::CallContext;
 }
 
@@ -134,6 +143,24 @@ sub _mongodb {
     }    
     return $self->{_mongodb};
 }
+
+=head3 _gridfs
+
+Definition:
+	MongoDB = _gridfs();
+Description:
+	Returns MongoDB::GridFS object
+
+=cut
+
+sub _gridfs {
+    my ($self) = @_;
+    if (!defined($self->{_gridfs})) {
+    	$self->{_gridfs} = $self->_mongodb()->get_gridfs;
+    }    
+    return $self->{_gridfs};
+}
+
 
 =head3 _updateDB
 
@@ -220,12 +247,14 @@ sub _createWorkspaceUser {
 		parent => $self,
 		moddate => DateTime->now()->datetime(),
 		id => $id,
-		workspaces => {}
+		workspaces => {},
+		settings => {workspace => "default"}
 	});
 	$self->_mongodb()->workspaceUsers->insert({
 		moddate => $user->moddate(),
 		id => $user->id(),
-		workspaces => $user->workspaces()
+		workspaces => $user->workspaces(),
+		settings => $user->settings()
 	});
 	return $user;
 }
@@ -280,13 +309,18 @@ sub _createDataObject {
 	if (defined($dbobj)) {
 		return $dbobj;
 	}
-	$self->_mongodb()->workspaceDataObjects->insert({
-		creationDate => $obj->creationDate(),
+	#Inserting data using gridfs
+	my $dataString = $obj->data();
+    print "Inserting:".$dataString."\n";
+    open(my $basic_fh, "<", \$dataString);
+    my $fh = FileHandle->new;
+    $fh->fdopen($basic_fh, 'r');
+    $self->_gridfs()->insert($fh, {
+    	creationDate => $obj->creationDate(),
 		chsum => $obj->chsum(),
-		data => $obj->data(),
 		compressed => $obj->compressed(),
 		json => $obj->json()
-	});
+    });
 	return $obj;
 }
 
@@ -357,8 +391,8 @@ Description:
 
 sub _deleteDataObject {
 	my ($self,$chsum) = @_;
-	$self->_getDataObject($chsum,{throwErrorIfMissing => 1});
-	$self->_mongodb()->workspaceDataObjects->remove({chsum => $chsum});
+	my $grid = $self->_gridfs();
+	$grid->remove({chsum => $chsum});
 }
 
 =head3 _clearAllWorkspaces
@@ -428,7 +462,8 @@ Description:
 
 sub _clearAllWorkspaceDataObjects {
 	my ($self) = @_;
-	$self->_mongodb()->workspaceDataObjects->remove({});
+	my $grid = $self->_gridfs();
+	$grid->drop();
 }
 
 #####################################################################
@@ -472,6 +507,7 @@ sub _getWorkspaceUsers {
 			id => $object->{id},
 			workspaces => $object->{workspaces},
 			moddate => $object->{moddate},
+			settings => $object->{settings}
 		});
         $objHash->{$newObject->id()} = $newObject;
     }
@@ -817,26 +853,25 @@ Description:
 
 sub _getDataObjects {
 	my ($self,$chsums,$options) = @_;
-    my $cursor = $self->_mongodb()->workspaceDataObjects->find({chsum => {'$in' => $chsums} });
-	my $objHash = {};
-	while (my $object = $cursor->next) {
-        my $newObject = Bio::KBase::workspaceService::DataObject->new({
-        	parent => $self,
-        	compressed => $object->{compressed},
-			json => $object->{json},
-			chsum => $object->{chsum},
-			data => $object->{data},
-			creationDate => $object->{creationDate}	
-		});
-        $objHash->{$newObject->chsum()} = $newObject;
-    }
+	my $grid = $self->_gridfs();
     my $objects = [];
-    for (my $i=0; $i < @{$chsums}; $i++) {
-    	if (defined($objHash->{$chsums->[$i]})) {
-    		push(@{$objects},$objHash->{$chsums->[$i]});
-    	} elsif ($options->{throwErrorIfMissing} == 1) {
-    		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "DataObject ".$chsums->[$i]." not found!",
+    foreach my $chsum (@{$chsums}) {
+    	my $file = $grid->find_one({chsum => $chsum});
+    	if (!defined($file) && $options->{throwErrorIfMissing} == 1) {
+    		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "DataObject ".$chsum." not found!",
 							       method_name => '_getDataObjects');
+    	}
+    	if (defined($file)) {
+			my $dataString = $file->slurp();
+	    	my $newObject = Bio::KBase::workspaceService::DataObject->new({
+	        	parent => $self,
+	        	compressed => $file->{info}->{compressed},
+				json => $file->{info}->{json},
+				chsum => $file->{info}->{chsum},
+				data => $dataString,
+				creationDate => $file->{info}->{creationDate}	
+			});
+			push(@{$objects},$newObject);
     	}
     }
 	return $objects;
@@ -1030,6 +1065,7 @@ save_object_params is a reference to a hash where the following keys are defined
 	json has a value which is a bool
 	compressed has a value which is a bool
 	retrieveFromURL has a value which is a bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -1069,6 +1105,7 @@ save_object_params is a reference to a hash where the following keys are defined
 	json has a value which is a bool
 	compressed has a value which is a bool
 	retrieveFromURL has a value which is a bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -1124,7 +1161,8 @@ sub save_object
     	metadata => {},
     	json => 0,
     	compressed => 0,
-    	retrieveFromURL => 0
+    	retrieveFromURL => 0,
+    	asHash => 0,
     });
     if ($params->{retrieveFromURL} == 1) {
     	$params->{data} = $self->_retreiveDataFromURL($params->{data});
@@ -1137,7 +1175,7 @@ sub save_object
     }
     my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
     my $obj = $ws->saveObject($params->{type},$params->{id},$params->{data},$params->{command},$params->{metadata});
-    $metadata = $obj->metadata();
+    $metadata = $obj->metadata($params->{asHash});
 	$self->_clearContext();
     #END save_object
     my @_bad_returns;
@@ -1171,9 +1209,11 @@ delete_object_params is a reference to a hash where the following keys are defin
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1201,9 +1241,11 @@ delete_object_params is a reference to a hash where the following keys are defin
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1249,10 +1291,12 @@ sub delete_object
     my($metadata);
     #BEGIN delete_object
     $self->_setContext($ctx,$params);
-    $self->_validateargs($params,["id","type","workspace"],{});
+    $self->_validateargs($params,["id","type","workspace"],{
+    	asHash => 0
+    });
     my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
     my $obj = $ws->deleteObject($params->{type},$params->{id});
-    $metadata = $obj->metadata();
+    $metadata = $obj->metadata($params->{asHash});
     $self->_clearContext();
     #END delete_object
     my @_bad_returns;
@@ -1286,9 +1330,11 @@ delete_object_permanently_params is a reference to a hash where the following ke
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1316,9 +1362,11 @@ delete_object_permanently_params is a reference to a hash where the following ke
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1365,10 +1413,12 @@ sub delete_object_permanently
     my($metadata);
     #BEGIN delete_object_permanently
     $self->_setContext($ctx,$params);
-    $self->_validateargs($params,["id","type","workspace"],{});
+    $self->_validateargs($params,["id","type","workspace"],{
+    	asHash => 0
+    });
     my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
     my $obj = $ws->deleteObjectPermanently($params->{type},$params->{id});
-    $metadata = $obj->metadata();
+    $metadata = $obj->metadata($params->{asHash});
     $self->_clearContext();
     #END delete_object_permanently
     my @_bad_returns;
@@ -1403,9 +1453,11 @@ get_object_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is an ObjectData
 	metadata has a value which is an object_metadata
@@ -1439,9 +1491,11 @@ get_object_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is an ObjectData
 	metadata has a value which is an object_metadata
@@ -1494,7 +1548,8 @@ sub get_object
     #BEGIN get_object
     $self->_setContext($ctx,$params);
     $self->_validateargs($params,["id","type","workspace"],{
-    	instance => undef
+    	instance => undef,
+    	asHash => 0
     });
     my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
     my $obj = $ws->getObject($params->{type},$params->{id},{
@@ -1503,7 +1558,7 @@ sub get_object
     });
     $output = {
     	data => $obj->data(),
-    	metadata => $obj->metadata()
+    	metadata => $obj->metadata($params->{asHash})
     };
     $self->_clearContext();
     #END get_object
@@ -1539,9 +1594,11 @@ get_objectmeta_params is a reference to a hash where the following keys are defi
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1570,9 +1627,11 @@ get_objectmeta_params is a reference to a hash where the following keys are defi
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1619,14 +1678,15 @@ sub get_objectmeta
     #BEGIN get_objectmeta
     $self->_setContext($ctx,$params);
     $self->_validateargs($params,["id","type","workspace"],{
-    	instance => undef
+    	instance => undef,
+    	asHash => 0
     });
     my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
     my $obj = $ws->getObject($params->{type},$params->{id},{
     	throwErrorIfMissing => 1,
     	instance => $params->{instance}
     });
-    $metadata = $obj->metadata();
+    $metadata = $obj->metadata($params->{asHash});
     $self->_clearContext();
     #END get_objectmeta
     my @_bad_returns;
@@ -1661,9 +1721,11 @@ revert_object_params is a reference to a hash where the following keys are defin
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1692,9 +1754,11 @@ revert_object_params is a reference to a hash where the following keys are defin
 	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1743,11 +1807,12 @@ sub revert_object
     #BEGIN revert_object
     $self->_setContext($ctx,$params);
     $self->_validateargs($params,["id","type","workspace"],{
-    	instance => undef
+    	instance => undef,
+    	asHash => 0
     });
     my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
     my $obj = $ws->revertObject($params->{type},$params->{id},$params->{instance});
-    $metadata = $obj->metadata();
+    $metadata = $obj->metadata($params->{asHash});
     $self->_clearContext();
     #END revert_object
     my @_bad_returns;
@@ -1777,6 +1842,7 @@ sub revert_object
 $params is a copy_object_params
 $metadata is an object_metadata
 copy_object_params is a reference to a hash where the following keys are defined:
+	new_workspace_url has a value which is a string
 	new_id has a value which is an object_id
 	new_workspace has a value which is a workspace_id
 	source_id has a value which is an object_id
@@ -1784,9 +1850,11 @@ copy_object_params is a reference to a hash where the following keys are defined
 	type has a value which is an object_type
 	source_workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 object_type is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1810,6 +1878,7 @@ workspace_ref is a string
 $params is a copy_object_params
 $metadata is an object_metadata
 copy_object_params is a reference to a hash where the following keys are defined:
+	new_workspace_url has a value which is a string
 	new_id has a value which is an object_id
 	new_workspace has a value which is a workspace_id
 	source_id has a value which is an object_id
@@ -1817,9 +1886,11 @@ copy_object_params is a reference to a hash where the following keys are defined
 	type has a value which is an object_type
 	source_workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 object_type is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1867,23 +1938,202 @@ sub copy_object
     #BEGIN copy_object
     $self->_setContext($ctx,$params);
     $self->_validateargs($params,["new_id","new_workspace","source_id","type","source_workspace"],{
-    	instance => undef
+    	instance => undef,
+    	asHash => 0,
+    	new_workspace_url => undef
     });
-    my $ws = $self->_getWorkspace($params->{source_workspace},{throwErrorIfMissing => 1});
-    my $obj = $ws->getObject($params->{type},$params->{source_id},{
+    my $sourcews = $self->_getWorkspace($params->{source_workspace},{throwErrorIfMissing => 1});
+    my $obj = $sourcews->getObject($params->{type},$params->{source_id},{
     	throwErrorIfMissing => 1,
     	instance => $params->{instance}
     });
-    if ($params->{new_workspace} ne $params->{source_workspace}) {
-    	$ws = $self->_getWorkspace($params->{new_workspace},{throwErrorIfMissing => 1});
-    	$obj = $ws->saveObject($params->{type},$params->{new_id},$obj->data(),"copy_object",$obj->meta());
-    	$metadata = $obj->metadata();
-    } elsif ($params->{new_id} eq $params->{source_id}) {
-    	$metadata = $obj->metadata();
-    } else {
-    	$obj = $ws->saveObject($params->{type},$params->{new_id},$obj->data(),"copy_object",$obj->meta());
-    	$metadata = $obj->metadata();
-    }
+    #Copying objects to other workspace servers
+    if (defined($params->{new_workspace_url})) {
+		my $destClient = Bio::KBase::workspaceService::Client->new($params->{new_workspace_url});
+    	my $output = $self->get_workspacemeta({
+    		workspace => $params->{new_workspace},
+    		auth => $self->_getContext->{_override}->{_authentication}
+    	});
+        if ($destClient->has_object({
+    		id => $params->{new_id},
+    		type => $obj->type(),
+    		workspace => $params->{new_workspace},
+    		auth => $self->_getContext->{_override}->{_authentication}
+    	}) == 1) {
+	   		my $otherMeta = $destClient->get_objectmeta({
+		    	id => $params->{new_id},
+		    	type => $obj->type(),
+		    	workspace => $params->{new_workspace},
+		    	auth => $self->_getContext->{_override}->{_authentication},
+		    	asHash => 1
+	   		});
+			if ($otherMeta->{instance} < $obj->instance()) {
+				my $compareObj = $sourcews->getObject($obj->type(),$obj->id(),{instance => $otherMeta->{instance}});
+				if ($compareObj->chsum() eq $otherMeta->{chsum}) {
+					#Copying over all instances of object since the last sync
+					for (my $j=($otherMeta->{instance}+1); $j <= $obj->instance();$j++) {
+						my $objInst = $sourcews->getObject($obj->type(),$obj->id(),{instance => $j});
+						$metadata = $destClient->save_object({
+							id => $params->{new_id},
+							type => $objInst->type(),
+							data => $objInst->data(),
+							workspace => $params->{new_workspace},
+							command => $objInst->command(),
+							metadata => $objInst->meta(),
+							auth => $self->_getContext->{_override}->{_authentication},
+							json => 0,
+							compressed => 0,
+							retrieveFromURL => 0,
+							asHash => 0
+						});
+					}
+				} else {
+					#Just save the current version if the versions don't overlap
+					$metadata = $destClient->save_object({
+						id => $params->{new_id},
+						type => $obj->type(),
+						data => $obj->data(),
+						workspace => $params->{new_workspace},
+						command => "copy_object",
+						metadata => $obj->meta(),
+						auth => $self->_getContext->{_override}->{_authentication},
+						json => 0,
+						compressed => 0,
+						retrieveFromURL => 0,
+						asHash => 0
+					});
+				}
+			} elsif ($otherMeta->{instance} > $obj->instance()) {
+				my $compareMeta = $destClient->get_objectmeta({
+					id => $params->{new_id},
+					type => $obj->type(),
+					instance => $obj->instance(),
+					workspace => $params->{new_workspace},
+					auth => $self->_getContext->{_override}->{_authentication},
+					asHash => 1
+   				});
+  				if ($compareMeta->{chsum} eq $obj->chsum()) {
+					#The other object is more updated than this object, so do nothing
+				} else {
+					#Just save the current version if the versions don't overlap
+					$metadata = $destClient->save_object({
+						id => $params->{new_id},
+						type => $obj->type(),
+						data => $obj->data(),
+						workspace => $params->{new_workspace},
+						command => "copy_object",
+						metadata => $obj->meta(),
+						auth => $self->_getContext->{_override}->{_authentication},
+						json => 0,
+						compressed => 0,
+						retrieveFromURL => 0,
+						asHash => 0
+					});
+				}
+			} elsif ($otherMeta->{chsum} ne $obj->chsum()) {
+				#Just save the current version if the versions are identical but don't overlap
+				$metadata = $destClient->save_object({
+					id => $params->{new_id},
+					type => $obj->type(),
+					data => $obj->data(),
+					workspace => $params->{new_workspace},
+					command => "copy_object",
+					metadata => $obj->meta(),
+					auth => $self->_getContext->{_override}->{_authentication},
+					json => 0,
+					compressed => 0,
+					retrieveFromURL => 0,
+					asHash => 0
+				});
+			}
+	   	} else {
+			for (my $j=0; $j <= $obj->instance();$j++) {
+				my $objInst = $sourcews->getObject($obj->type(),$obj->id(),{instance => $j});
+				$metadata = $destClient->save_object({
+					id => $params->{new_id},
+					type => $objInst->type(),
+					data => $objInst->data(),
+					workspace => $params->{new_workspace},
+					command => $objInst->command(),
+					metadata => $objInst->meta(),
+					auth => $self->_getContext->{_override}->{_authentication},
+					json => 0,
+					compressed => 0,
+					retrieveFromURL => 0,
+					asHash => 0
+				});
+			}
+		}
+	} else {
+		my $newobj;
+		my $ws = $self->_getWorkspace($params->{new_workspace},{throwErrorIfMissing => 1});
+		if (defined($ws->objects()->{$obj->type()}->{$params->{new_id}})) {
+			my $otherObj = $ws->getObject($obj->type(),$params->{new_id});
+			if ($otherObj->instance() < $obj->instance()) {
+				my $compareObj = $sourcews->getObject($obj->type(),$obj->id(),{instance => $otherObj->instance()});
+				if ($compareObj->chsum() eq $otherObj->chsum()) {
+					#Copying over all instances of object since the last sync
+					for (my $j=($otherObj->instance()+1); $j <= $obj->instance();$j++) {
+						my $objInst = $sourcews->getObject($obj->type(),$obj->id(),{instance => $j});
+						$newobj = $ws->saveObject(
+							$objInst->type(),
+							$params->{new_id},
+							$objInst->data(),
+							$objInst->command(),
+							$objInst->meta()
+						);
+					}
+				} else {
+					#Just save the current version if the versions don't overlap
+					$newobj = $ws->saveObject(
+						$obj->type(),
+						$params->{new_id},
+						$obj->data(),
+						"copy_object",
+						$obj->meta()
+					);
+				}
+			} elsif ($otherObj->instance() > $obj->instance()) {
+				my $compareObj = $ws->getObject($obj->type(),$params->{new_id},{instance => $obj->instance()});
+				if ($compareObj->chsum() eq $obj->chsum()) {
+					#The other object is more updated than this object, so do nothing
+				} else {
+					#Just save the current version if the versions don't overlap
+					$newobj = $ws->saveObject(
+						$obj->type(),
+						$params->{new_id},
+						$obj->data(),
+						"copy_object",
+						$obj->meta()
+					);
+				}
+			} elsif ($otherObj->chsum() ne $obj->chsum()) {
+				#Just save the current version if the versions are identical but don't overlap
+				$newobj = $ws->saveObject(
+					$obj->type(),
+					$params->{new_id},
+					$obj->data(),
+					"copy_object",
+					$obj->meta()
+				);
+			}
+		} else {
+			#Copying over all instances of object if the object doesn't exist in other workspace
+			for (my $j=0; $j <= $obj->instance();$j++) {
+				my $objInst = $sourcews->getObject($obj->type(),$obj->id(),{instance => $j});
+				$newobj = $ws->saveObject(
+					$objInst->type(),
+					$params->{new_id},
+					$objInst->data(),
+					$objInst->command(),
+					$objInst->meta()
+				);
+				print $newobj->metadata($params->{asHash})->[0]."\n";
+			}
+			
+		}
+		$metadata = $newobj->metadata($params->{asHash});
+	}
     $self->_clearContext();
     #END copy_object
     my @_bad_returns;
@@ -1913,15 +2163,18 @@ sub copy_object
 $params is a move_object_params
 $metadata is an object_metadata
 move_object_params is a reference to a hash where the following keys are defined:
+	new_workspace_url has a value which is a string
 	new_id has a value which is an object_id
 	new_workspace has a value which is a workspace_id
 	source_id has a value which is an object_id
 	type has a value which is an object_type
 	source_workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 object_type is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1945,15 +2198,18 @@ workspace_ref is a string
 $params is a move_object_params
 $metadata is an object_metadata
 move_object_params is a reference to a hash where the following keys are defined:
+	new_workspace_url has a value which is a string
 	new_id has a value which is an object_id
 	new_workspace has a value which is a workspace_id
 	source_id has a value which is an object_id
 	type has a value which is an object_type
 	source_workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 object_type is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -1999,7 +2255,9 @@ sub move_object
     my($metadata);
     #BEGIN move_object
     $self->_setContext($ctx,$params);
-    $self->_validateargs($params,["new_id","new_workspace","source_id","type","source_workspace"],{});
+    $self->_validateargs($params,["new_id","new_workspace","source_id","type","source_workspace"],{
+    	asHash => 0
+    });
     my $ws = $self->_getWorkspace($params->{source_workspace},{throwErrorIfMissing => 1});
     my $obj = $ws->getObject($params->{type},$params->{source_id},{
     	throwErrorIfMissing => 1
@@ -2008,13 +2266,13 @@ sub move_object
     	$ws->deleteObject($params->{type},$params->{source_id});
     	$ws = $self->_getWorkspace($params->{new_workspace},{throwErrorIfMissing => 1});
     	$obj = $ws->saveObject($params->{type},$params->{new_id},$obj->data(),"move_object",$obj->meta());
-    	$metadata = $obj->metadata();
+    	$metadata = $obj->metadata($params->{asHash});
     } elsif ($params->{new_id} eq $params->{source_id}) {
-    	$metadata = $obj->metadata();
+    	$metadata = $obj->metadata($params->{asHash});
     } else {
     	$ws->deleteObject($params->{type},$params->{source_id});
     	$obj = $ws->saveObject($params->{type},$params->{new_id},$obj->data(),"move_object",$obj->meta());
-    	$metadata = $obj->metadata();
+    	$metadata = $obj->metadata($params->{asHash});
     }
     $self->_clearContext();
     #END move_object
@@ -2150,9 +2408,11 @@ object_history_params is a reference to a hash where the following keys are defi
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -2180,9 +2440,11 @@ object_history_params is a reference to a hash where the following keys are defi
 	type has a value which is an object_type
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 9 items:
 	0: an object_id
 	1: an object_type
@@ -2227,11 +2489,13 @@ sub object_history
     my($metadatas);
     #BEGIN object_history
     $self->_setContext($ctx,$params);
-    $self->_validateargs($params,["id","type","workspace"],{});
+    $self->_validateargs($params,["id","type","workspace"],{
+    	asHash => 0
+    });
     my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
     my $history = $ws->getObjectHistory($params->{type},$params->{id});
     for (my $i=0; $i < @{$history}; $i++) {
-    	$metadatas->[$history->[$i]->instance()] = $history->[$i]->metadata();
+    	$metadatas->[$history->[$i]->instance()] = $history->[$i]->metadata($params->{asHash});
     }
     $self->_clearContext();
     #END object_history
@@ -2265,8 +2529,10 @@ create_workspace_params is a reference to a hash where the following keys are de
 	workspace has a value which is a workspace_id
 	default_permission has a value which is a permission
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -2289,8 +2555,10 @@ create_workspace_params is a reference to a hash where the following keys are de
 	workspace has a value which is a workspace_id
 	default_permission has a value which is a permission
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -2332,7 +2600,8 @@ sub create_workspace
     #BEGIN create_workspace
     $self->_setContext($ctx,$params);
     $self->_validateargs($params,["workspace"],{
-    	default_permission => "n"
+    	default_permission => "n",
+    	asHash => 0
     });
     my $ws = $self->_getWorkspace($params->{workspace});
     if (defined($ws)) {
@@ -2340,7 +2609,7 @@ sub create_workspace
 		method_name => 'create_workspace');
     }
     $ws = $self->_createWorkspace($params->{workspace},$params->{default_permission});
-    $metadata = $ws->metadata();
+    $metadata = $ws->metadata($params->{asHash});
     $self->_clearContext();
     #END create_workspace
     my @_bad_returns;
@@ -2372,7 +2641,9 @@ $metadata is a workspace_metadata
 get_workspacemeta_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -2395,7 +2666,9 @@ $metadata is a workspace_metadata
 get_workspacemeta_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -2437,9 +2710,11 @@ sub get_workspacemeta
     my($metadata);
     #BEGIN get_workspacemeta
     $self->_setContext($ctx,$params);
-    $self->_validateargs($params,["workspace"],{});
+    $self->_validateargs($params,["workspace"],{
+    	asHash => 0
+    });
     my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
-	$metadata = $ws->metadata();
+	$metadata = $ws->metadata($params->{asHash});
     $self->_clearContext();
     #END get_workspacemeta
     my @_bad_returns;
@@ -2554,7 +2829,9 @@ $metadata is a workspace_metadata
 delete_workspace_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -2577,7 +2854,9 @@ $metadata is a workspace_metadata
 delete_workspace_params is a reference to a hash where the following keys are defined:
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -2619,10 +2898,12 @@ sub delete_workspace
     my($metadata);
     #BEGIN delete_workspace
     $self->_setContext($ctx,$params);
-    $self->_validateargs($params,["workspace"],{});
+    $self->_validateargs($params,["workspace"],{
+    	asHash => 0
+    });
     my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
     $ws->permanentDelete();
-    $metadata = $ws->metadata();
+    $metadata = $ws->metadata($params->{asHash});
     $self->_clearContext();
     #END delete_workspace
     my @_bad_returns;
@@ -2653,11 +2934,14 @@ $params is a clone_workspace_params
 $metadata is a workspace_metadata
 clone_workspace_params is a reference to a hash where the following keys are defined:
 	new_workspace has a value which is a workspace_id
+	new_workspace_url has a value which is a string
 	current_workspace has a value which is a workspace_id
 	default_permission has a value which is a permission
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -2678,11 +2962,14 @@ $params is a clone_workspace_params
 $metadata is a workspace_metadata
 clone_workspace_params is a reference to a hash where the following keys are defined:
 	new_workspace has a value which is a workspace_id
+	new_workspace_url has a value which is a string
 	current_workspace has a value which is a workspace_id
 	default_permission has a value which is a permission
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -2724,19 +3011,219 @@ sub clone_workspace
     #BEGIN clone_workspace
     $self->_setContext($ctx,$params);
     $self->_validateargs($params,["new_workspace","current_workspace"],{
-    	default_permissions => "n"
+    	default_permissions => "n",
+    	asHash => 0,
+    	new_workspace_url => undef
     });
-    my $ws = $self->_getWorkspace($params->{current_workspace},{throwErrorIfMissing => 1});
-    my $objs = $ws->getAllObjects();
-    $ws = $self->_getWorkspace($params->{new_workspace});
-    if (!defined($ws)) {
-    	$ws = $self->_createWorkspace($params->{new_workspace},$params->{default_permission});
+    my $sourcews = $self->_getWorkspace($params->{current_workspace},{throwErrorIfMissing => 1});
+    my $objs = $sourcews->getAllObjects();
+    if (defined($params->{new_workspace_url})) {
+		my $destClient = Bio::KBase::workspaceService::Client->new($params->{new_workspace_url});
+    	my $output;
+    	eval {
+    		$output = $self->get_workspacemeta({
+    			workspace => $params->{new_workspace},
+    			auth => $self->_getContext->{_override}->{_authentication}
+    		});
+    	};
+    	if (!defined($output)) {
+    		$self->create_workspace({
+    			workspace => $params->{new_workspace},
+    			default_permission => $params->{default_permissions},
+    			auth => $self->_getContext->{_override}->{_authentication}
+    		});
+    	}
+    	for (my $i=0; $i < @{$objs}; $i++) {
+    		my $obj = $objs->[$i];
+    		if ($destClient->has_object({
+    			id => $obj->id(),
+    			type => $obj->type(),
+    			workspace => $params->{new_workspace},
+    			auth => $self->_getContext->{_override}->{_authentication}
+    		}) == 1) {
+   				my $otherMeta = $destClient->get_objectmeta({
+	    			id => $obj->id(),
+	    			type => $obj->type(),
+	    			workspace => $params->{new_workspace},
+	    			auth => $self->_getContext->{_override}->{_authentication},
+	    			asHash => 1
+   				});
+    			if ($otherMeta->{instance} < $obj->instance()) {
+    				my $compareObj = $sourcews->getObject($obj->type(),$obj->id(),{instance => $otherMeta->{instance}});
+    				if ($compareObj->chsum() eq $otherMeta->{chsum}) {
+    					#Copying over all instances of object since the last sync
+    					for (my $j=($otherMeta->{instance}+1); $j <= $obj->instance();$j++) {
+			    			my $objInst = $sourcews->getObject($obj->type(),$obj->id(),{instance => $j});
+			    			$destClient->save_object({
+		    					id => $objInst->id(),
+								type => $objInst->type(),
+								data => $objInst->data(),
+								workspace => $params->{new_workspace},
+								command => $objInst->command(),
+								metadata => $objInst->meta(),
+								auth => $self->_getContext->{_override}->{_authentication},
+								json => 0,
+								compressed => 0,
+								retrieveFromURL => 0,
+								asHash => 0
+		    				});
+			    		}
+    				} else {
+    					#Just save the current version if the versions don't overlap
+    					$destClient->save_object({
+	    					id => $obj->id(),
+							type => $obj->type(),
+							data => $obj->data(),
+							workspace => $params->{new_workspace},
+							command => "clone_workspace",
+							metadata => $obj->meta(),
+							auth => $self->_getContext->{_override}->{_authentication},
+							json => 0,
+							compressed => 0,
+							retrieveFromURL => 0,
+							asHash => 0
+	    				});
+    				}
+    			} elsif ($otherMeta->{instance} > $obj->instance()) {
+    				my $compareMeta = $destClient->get_objectmeta({
+		    			id => $obj->id(),
+		    			type => $obj->type(),
+		    			instance => $obj->instance(),
+		    			workspace => $params->{new_workspace},
+		    			auth => $self->_getContext->{_override}->{_authentication},
+		    			asHash => 1
+	   				});
+      				if ($compareMeta->{chsum} eq $obj->chsum()) {
+    					#The other object is more updated than this object, so do nothing
+    				} else {
+    					#Just save the current version if the versions don't overlap
+    					$destClient->save_object({
+	    					id => $obj->id(),
+							type => $obj->type(),
+							data => $obj->data(),
+							workspace => $params->{new_workspace},
+							command => "clone_workspace",
+							metadata => $obj->meta(),
+							auth => $self->_getContext->{_override}->{_authentication},
+							json => 0,
+							compressed => 0,
+							retrieveFromURL => 0,
+							asHash => 0
+	    				});
+    				}
+    			} elsif ($otherMeta->{chsum} ne $obj->chsum()) {
+    				#Just save the current version if the versions are identical but don't overlap
+    				$destClient->save_object({
+    					id => $obj->id(),
+						type => $obj->type(),
+						data => $obj->data(),
+						workspace => $params->{new_workspace},
+						command => "clone_workspace",
+						metadata => $obj->meta(),
+						auth => $self->_getContext->{_override}->{_authentication},
+						json => 0,
+						compressed => 0,
+						retrieveFromURL => 0,
+						asHash => 0
+    				});
+    			}
+       		} else {
+    			for (my $j=0; $j <= $obj->instance();$j++) {
+    				my $objInst = $sourcews->getObject($obj->type(),$obj->id(),{instance => $j});
+    				$destClient->save_object({
+    					id => $objInst->id(),
+						type => $objInst->type(),
+						data => $objInst->data(),
+						workspace => $params->{new_workspace},
+						command => $objInst->command(),
+						metadata => $objInst->meta(),
+						auth => $self->_getContext->{_override}->{_authentication},
+						json => 0,
+						compressed => 0,
+						retrieveFromURL => 0,
+						asHash => 0
+    				});
+    			}
+    		}
+    	}
+    	$metadata = $destClient->get_workspacemeta({
+    		workspace => $params->{new_workspace},
+			auth => $self->_getContext->{_override}->{_authentication},
+			asHash => $params->{asHash}
+    	});
+    } else {
+    	my $ws = $self->_getWorkspace($params->{new_workspace});
+    	if (!defined($ws)) {
+    		$ws = $self->_createWorkspace($params->{new_workspace},$params->{default_permission});
+    	}
+    	for (my $i=0; $i < @{$objs}; $i++) {
+    		my $obj = $objs->[$i];
+    		if (defined($ws->objects()->{$obj->type()}->{$obj->id()})) {
+    			my $otherObj = $ws->getObject($obj->type(),$obj->id());
+    			if ($otherObj->instance() < $obj->instance()) {
+    				my $compareObj = $sourcews->getObject($obj->type(),$obj->id(),{instance => $otherObj->instance()});
+    				if ($compareObj->chsum() eq $otherObj->chsum()) {
+    					#Copying over all instances of object since the last sync
+    					for (my $j=($otherObj->instance()+1); $j <= $obj->instance();$j++) {
+			    			my $objInst = $sourcews->getObject($obj->type(),$obj->id(),{instance => $j});
+			    			$ws->saveObject(
+			    				$objInst->type(),
+			    				$objInst->id(),
+			    				$objInst->data(),
+			    				$objInst->command(),
+			    				$objInst->meta()
+			    			);
+			    		}
+    				} else {
+    					#Just save the current version if the versions don't overlap
+    					$ws->saveObject(
+		    				$obj->type(),
+		    				$obj->id(),
+		    				$obj->data(),
+		    				"clone_workspace",
+		    				$obj->meta()
+		    			);
+    				}
+    			} elsif ($otherObj->instance() > $obj->instance()) {
+    				my $compareObj = $ws->getObject($obj->type(),$obj->id(),{instance => $obj->instance()});
+    				if ($compareObj->chsum() eq $obj->chsum()) {
+    					#The other object is more updated than this object, so do nothing
+    				} else {
+    					#Just save the current version if the versions don't overlap
+    					$ws->saveObject(
+		    				$obj->type(),
+		    				$obj->id(),
+		    				$obj->data(),
+		    				"clone_workspace",
+		    				$obj->meta()
+		    			);
+    				}
+    			} elsif ($otherObj->chsum() ne $obj->chsum()) {
+    				#Just save the current version if the versions are identical but don't overlap
+    				$ws->saveObject(
+		    			$obj->type(),
+		    			$obj->id(),
+		    			$obj->data(),
+		    			"clone_workspace",
+		    			$obj->meta()
+		    		);
+    			}
+    		} else {
+    			#Copying over all instances of object if the object doesn't exist in other workspace
+    			for (my $j=0; $j <= $obj->instance();$j++) {
+	    			my $objInst = $sourcews->getObject($obj->type(),$obj->id(),{instance => $j});
+	    			$ws->saveObject(
+	    				$objInst->type(),
+	    				$objInst->id(),
+	    				$objInst->data(),
+	    				$objInst->command(),
+	    				$objInst->meta()
+	    			);
+	    		}
+    		}
+    	}
+    	$metadata = $ws->metadata($params->{asHash});
     }
-    for (my $i=0; $i < @{$objs}; $i++) {
-    	my $obj = $objs->[$i];
-    	$ws->saveObject($obj->type(),$obj->id(),"CHSUM:".$obj->chsum(),$obj->command(),$obj->meta());
-    }
-    $metadata = $ws->metadata();
     $self->_clearContext();
     #END clone_workspace
     my @_bad_returns;
@@ -2767,6 +3254,8 @@ $params is a list_workspaces_params
 $workspaces is a reference to a list where each element is a workspace_metadata
 list_workspaces_params is a reference to a hash where the following keys are defined:
 	auth has a value which is a string
+	asHash has a value which is a bool
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -2789,6 +3278,8 @@ $params is a list_workspaces_params
 $workspaces is a reference to a list where each element is a workspace_metadata
 list_workspaces_params is a reference to a hash where the following keys are defined:
 	auth has a value which is a string
+	asHash has a value which is a bool
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -2831,7 +3322,9 @@ sub list_workspaces
     my($workspaces);
     #BEGIN list_workspaces
     $self->_setContext($ctx,$params);
-    $self->_validateargs($params,[],{});
+    $self->_validateargs($params,[],{
+    	asHash => 0
+    });
     #Getting user-specific permissions
     my $wsu = $self->_getWorkspaceUser($self->_getUsername());
     if (!defined($wsu)) {
@@ -2840,7 +3333,7 @@ sub list_workspaces
     my $wss = $wsu->getUserWorkspaces();
     $workspaces = [];
     for (my $i=0; $i < @{$wss}; $i++) {
-    	push(@{$workspaces},$wss->[$i]->metadata());
+    	push(@{$workspaces},$wss->[$i]->metadata($params->{asHash}));
     }
     $self->_clearContext();
     #END list_workspaces
@@ -2875,6 +3368,7 @@ list_workspace_objects_params is a reference to a hash where the following keys 
 	type has a value which is a string
 	showDeletedObject has a value which is a bool
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 9 items:
@@ -2906,6 +3400,7 @@ list_workspace_objects_params is a reference to a hash where the following keys 
 	type has a value which is a string
 	showDeletedObject has a value which is a bool
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 9 items:
@@ -2956,14 +3451,15 @@ sub list_workspace_objects
     $self->_setContext($ctx,$params);
     $self->_validateargs($params,["workspace"],{
     	type => undef,
-    	showDeletedObject => 0
+    	showDeletedObject => 0,
+    	asHash => 0
     });
     my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
 	$objects = [];
 	my $objs = $ws->getAllObjects($params->{type});    
 	foreach my $obj (@{$objs}) {
 		if ($obj->command() ne "delete" || $params->{showDeletedObject} == 1) {
-			push(@{$objects},$obj->metadata());
+			push(@{$objects},$obj->metadata($params->{asHash}));
 		}
 	}
 	$self->_clearContext();
@@ -2998,8 +3494,10 @@ set_global_workspace_permissions_params is a reference to a hash where the follo
 	new_permission has a value which is a permission
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 permission is a string
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -3022,8 +3520,10 @@ set_global_workspace_permissions_params is a reference to a hash where the follo
 	new_permission has a value which is a permission
 	workspace has a value which is a workspace_id
 	auth has a value which is a string
+	asHash has a value which is a bool
 permission is a string
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: a workspace_id
 	1: a username
@@ -3065,10 +3565,12 @@ sub set_global_workspace_permissions
     my($metadata);
     #BEGIN set_global_workspace_permissions
     $self->_setContext($ctx,$params);
-    $self->_validateargs($params,["new_permission","workspace"],{});
+    $self->_validateargs($params,["new_permission","workspace"],{
+    	asHash => 0
+    });
     my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
     $ws->setDefaultPermissions($params->{new_permission});
-    $metadata = $ws->metadata();
+    $metadata = $ws->metadata($params->{asHash});
     $self->_clearContext();
     #END set_global_workspace_permissions
     my @_bad_returns;
@@ -3170,6 +3672,173 @@ sub set_workspace_permissions
 							       method_name => 'set_workspace_permissions');
     }
     return($success);
+}
+
+
+
+
+=head2 get_user_settings
+
+  $output = $obj->get_user_settings($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a get_user_settings_params
+$output is a user_settings
+get_user_settings_params is a reference to a hash where the following keys are defined:
+	auth has a value which is a string
+user_settings is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
+workspace_id is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a get_user_settings_params
+$output is a user_settings
+get_user_settings_params is a reference to a hash where the following keys are defined:
+	auth has a value which is a string
+user_settings is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
+workspace_id is a string
+
+
+=end text
+
+
+
+=item Description
+
+Retrieves settings for user account, including currently selected workspace
+
+=back
+
+=cut
+
+sub get_user_settings
+{
+    my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_user_settings:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_user_settings');
+    }
+
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($output);
+    #BEGIN get_user_settings
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,[],{});
+    my $wsu = $self->_getWorkspaceUser($self->_getUsername(),{createIfMissing => 1});
+    $output = $wsu->settings();
+	$self->_clearContext();
+    #END get_user_settings
+    my @_bad_returns;
+    (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_user_settings:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_user_settings');
+    }
+    return($output);
+}
+
+
+
+
+=head2 set_user_settings
+
+  $output = $obj->set_user_settings($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a set_user_settings_params
+$output is a user_settings
+set_user_settings_params is a reference to a hash where the following keys are defined:
+	setting has a value which is a string
+	value has a value which is a string
+	auth has a value which is a string
+user_settings is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
+workspace_id is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a set_user_settings_params
+$output is a user_settings
+set_user_settings_params is a reference to a hash where the following keys are defined:
+	setting has a value which is a string
+	value has a value which is a string
+	auth has a value which is a string
+user_settings is a reference to a hash where the following keys are defined:
+	workspace has a value which is a workspace_id
+workspace_id is a string
+
+
+=end text
+
+
+
+=item Description
+
+Retrieves settings for user account, including currently selected workspace
+
+=back
+
+=cut
+
+sub set_user_settings
+{
+    my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to set_user_settings:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'set_user_settings');
+    }
+
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($output);
+    #BEGIN set_user_settings
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,["setting","value"],{});
+    my $wsu = $self->_getWorkspaceUser($self->_getUsername(),{createIfMissing => 1});
+    $wsu->updateSettings($params->{setting},$params->{value});
+    $output = $wsu->settings();
+	$self->_clearContext();
+    #END set_user_settings
+    my @_bad_returns;
+    (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to set_user_settings:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'set_user_settings');
+    }
+    return($output);
 }
 
 
@@ -4172,6 +4841,43 @@ a reference to a list containing 6 items:
 
 
 
+=head2 user_settings
+
+=over 4
+
+
+
+=item Description
+
+Settings for user accounts stored in the workspace
+
+        workspace_id workspace - the workspace currently selected by the user
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+workspace has a value which is a workspace_id
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+workspace has a value which is a workspace_id
+
+
+=end text
+
+=back
+
+
+
 =head2 save_object_params
 
 =over 4
@@ -4192,6 +4898,7 @@ Input parameters for the "save_objects function.
         bool retrieveFromURL - a flag indicating that the "data" argument contains a URL from which the actual data should be downloaded (an optional argument with default "0")
         bool json - a flag indicating if the input data is encoded as a JSON string (an optional argument with default "0")
         bool compressed - a flag indicating if the input data in zipped (an optional argument with default "0")
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4210,6 +4917,7 @@ auth has a value which is a string
 json has a value which is a bool
 compressed has a value which is a bool
 retrieveFromURL has a value which is a bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -4228,6 +4936,7 @@ auth has a value which is a string
 json has a value which is a bool
 compressed has a value which is a bool
 retrieveFromURL has a value which is a bool
+asHash has a value which is a bool
 
 
 =end text
@@ -4250,6 +4959,7 @@ Input parameters for the "delete_object" function.
         workspace_id workspace - ID of the workspace where the object is to be deleted (an essential argument)
         object_id id - ID of the object to be deleted (an essential argument)
         string auth - the authentication token of the KBase account to associate this deletion command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4262,6 +4972,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4274,6 +4985,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4296,6 +5008,7 @@ Input parameters for the "delete_object_permanently" function.
         workspace_id workspace - ID of the workspace where the object is to be permanently deleted (an essential argument)
         object_id id - ID of the object to be permanently deleted (an essential argument)
         string auth - the authentication token of the KBase account to associate with this permanent deletion command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4308,6 +5021,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4320,6 +5034,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4343,6 +5058,7 @@ Input parameters for the "get_object" function.
         object_id id - ID of the object to be retrieved (an essential argument)
         int instance - Version of the object to be retrieved, enabling retrieval of any previous version of an object (an optional argument; the current version is retrieved if no version is provides)
         string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4356,6 +5072,7 @@ type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4369,6 +5086,7 @@ type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4432,6 +5150,7 @@ Input parameters for the "get_objectmeta" function.
         object_id id - ID of the object for which metadata is to be retrieved (an essential argument)
         int instance - Version of the object for which metadata is to be retrieved, enabling retrieval of any previous version of an object (an optional argument; the current metadata is retrieved if no version is provides)
         string auth - the authentication token of the KBase account to associate with this object metadata retrieval command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4445,6 +5164,7 @@ type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4458,6 +5178,7 @@ type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4481,6 +5202,7 @@ Input parameters for the "revert_object" function.
         object_id id - ID of the object to be reverted (an essential argument)
         int instance - Previous version of the object to which the object should be reset (an essential argument)
         string auth - the authentication token of the KBase account to associate with this object reversion command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4494,6 +5216,7 @@ type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4507,6 +5230,7 @@ type has a value which is an object_type
 workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4531,7 +5255,9 @@ Input parameters for the "copy_object" function.
         int instance - Version of the object to be copied, enabling retrieval of any previous version of an object (an optional argument; the current object is copied if no version is provides)
         workspace_id new_workspace - ID of the workspace the object to be copied to (an essential argument)
         object_id new_id - ID the object is to be copied to (an essential argument)
+        string new_workspace_url - URL of workspace server where object should be copied (an optional argument - object will be saved in the same server if not provided)
         string auth - the authentication token of the KBase account to associate with this object copy command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4540,6 +5266,7 @@ Input parameters for the "copy_object" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
+new_workspace_url has a value which is a string
 new_id has a value which is an object_id
 new_workspace has a value which is a workspace_id
 source_id has a value which is an object_id
@@ -4547,6 +5274,7 @@ instance has a value which is an int
 type has a value which is an object_type
 source_workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4555,6 +5283,7 @@ auth has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
+new_workspace_url has a value which is a string
 new_id has a value which is an object_id
 new_workspace has a value which is a workspace_id
 source_id has a value which is an object_id
@@ -4562,6 +5291,7 @@ instance has a value which is an int
 type has a value which is an object_type
 source_workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4585,7 +5315,9 @@ Input parameters for the "move_object" function.
         object_id source_id - ID of the object to be moved (an essential argument)
          workspace_id new_workspace - ID of the workspace the object to be moved to (an essential argument)
         object_id new_id - ID the object is to be moved to (an essential argument)
+        string new_workspace_url - URL of workspace server where object should be copied (an optional argument - object will be saved in the same server if not provided)
         string auth - the authentication token of the KBase account to associate with this object move command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4594,12 +5326,14 @@ Input parameters for the "move_object" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
+new_workspace_url has a value which is a string
 new_id has a value which is an object_id
 new_workspace has a value which is a workspace_id
 source_id has a value which is an object_id
 type has a value which is an object_type
 source_workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4608,12 +5342,14 @@ auth has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
+new_workspace_url has a value which is a string
 new_id has a value which is an object_id
 new_workspace has a value which is a workspace_id
 source_id has a value which is an object_id
 type has a value which is an object_type
 source_workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4685,6 +5421,7 @@ Input parameters for the "object_history" function.
         workspace_id workspace - ID of the workspace containing the object to have history printed (an essential argument)
         object_id id - ID of the object to have history printed (an essential argument)
         string auth - the authentication token of the KBase account to associate with this object history command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4697,6 +5434,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4709,6 +5447,7 @@ id has a value which is an object_id
 type has a value which is an object_type
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4730,6 +5469,7 @@ Input parameters for the "create_workspace" function.
         workspace_id workspace - ID of the workspace to be created (an essential argument)
         permission default_permission - Default permissions of the workspace to be created. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
         string auth - the authentication token of the KBase account that will own the created workspace (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4741,6 +5481,7 @@ a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
 default_permission has a value which is a permission
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4752,6 +5493,7 @@ a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
 default_permission has a value which is a permission
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4772,6 +5514,7 @@ Input parameters for the "get_workspacemeta" function.
 
         workspace_id workspace - ID of the workspace for which metadata should be returned (an essential argument)
         string auth - the authentication token of the KBase account accessing workspace metadata (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4782,6 +5525,7 @@ Input parameters for the "get_workspacemeta" function.
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4792,6 +5536,7 @@ auth has a value which is a string
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4852,6 +5597,7 @@ Input parameters for the "delete_workspace" function.
 
         workspace_id workspace - ID of the workspace to be deleted (an essential argument)
         string auth - the authentication token of the KBase account deleting the workspace; must be the workspace owner (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4862,6 +5608,7 @@ Input parameters for the "delete_workspace" function.
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4872,6 +5619,7 @@ auth has a value which is a string
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4892,8 +5640,10 @@ Input parameters for the "clone_workspace" function.
 
         workspace_id current_workspace - ID of the workspace to be cloned (an essential argument)
         workspace_id new_workspace - ID of the workspace to which the cloned workspace will be copied (an essential argument)
+        string new_workspace_url - URL of workspace server where workspace should be cloned (an optional argument - workspace will be cloned in the same server if not provided)
         permission default_permission - Default permissions of the workspace created by the cloning process. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
         string auth - the authentication token of the KBase account that will own the cloned workspace (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4903,9 +5653,11 @@ Input parameters for the "clone_workspace" function.
 <pre>
 a reference to a hash where the following keys are defined:
 new_workspace has a value which is a workspace_id
+new_workspace_url has a value which is a string
 current_workspace has a value which is a workspace_id
 default_permission has a value which is a permission
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4915,9 +5667,11 @@ auth has a value which is a string
 
 a reference to a hash where the following keys are defined:
 new_workspace has a value which is a workspace_id
+new_workspace_url has a value which is a string
 current_workspace has a value which is a workspace_id
 default_permission has a value which is a permission
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4937,6 +5691,7 @@ auth has a value which is a string
 Input parameters for the "list_workspaces" function.
 
         string auth - the authentication token of the KBase account accessing the list of workspaces (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4946,6 +5701,7 @@ Input parameters for the "list_workspaces" function.
 <pre>
 a reference to a hash where the following keys are defined:
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4955,6 +5711,7 @@ auth has a value which is a string
 
 a reference to a hash where the following keys are defined:
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4977,6 +5734,7 @@ Input parameters for the "list_workspace_objects" function.
         string type - type of the objects to be listed (an optional argument; all object types will be listed if left unspecified)
         bool showDeletedObject - a flag that, if set to '1', causes any deleted objects to be included in the output (an optional argument; default is '0')
         string auth - the authentication token of the KBase account listing workspace objects; must have at least 'read' privelages (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -4989,6 +5747,7 @@ workspace has a value which is a workspace_id
 type has a value which is a string
 showDeletedObject has a value which is a bool
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -5001,6 +5760,7 @@ workspace has a value which is a workspace_id
 type has a value which is a string
 showDeletedObject has a value which is a bool
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -5022,6 +5782,7 @@ Input parameters for the "set_global_workspace_permissions" function.
         workspace_id workspace - ID of the workspace for which permissions will be set (an essential argument)
         permission new_permission - New default permissions to which the workspace should be set. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
         string auth - the authentication token of the KBase account changing workspace default permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
 =item Definition
@@ -5033,6 +5794,7 @@ a reference to a hash where the following keys are defined:
 new_permission has a value which is a permission
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -5044,6 +5806,7 @@ a reference to a hash where the following keys are defined:
 new_permission has a value which is a permission
 workspace has a value which is a workspace_id
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -5089,6 +5852,86 @@ a reference to a hash where the following keys are defined:
 users has a value which is a reference to a list where each element is a username
 new_permission has a value which is a permission
 workspace has a value which is a workspace_id
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 get_user_settings_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "get_user_settings" function.
+
+        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 set_user_settings_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "set_user_settings" function.
+
+        string setting - the setting to be set (an essential argument)
+        string value - new value to be set (an essential argument)
+        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+setting has a value which is a string
+value has a value which is a string
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+setting has a value which is a string
+value has a value which is a string
 auth has a value which is a string
 
 

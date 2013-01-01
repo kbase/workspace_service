@@ -12,6 +12,24 @@ datasets and workflows with users. A KOW could be considered supplementary mater
 paper. Finally, the KOWs maintain complete history of all objects, enabling a user to
 review the revisions made to an object over time.
 
+VERSION: 0.0.3 (Released 1/1/2012)
+------------------------------------------
+NEW FEATURES:
+-Added functions to manage the addition and removal of types.
+-Added functions to handle job management to support running jobs on local clusters
+-Added "instance" argument to "get_object" to enable users to access all object instances
+-Created a complete set of command line scripts for interacting with workspace
+
+UPDATED FEATURES / MAJOR BUG FIXES:
+-Added ability to retrieve specific instances of objects
+-Fixed bug in deletion of workspaces
+-Fixed bug in object reversion
+-Fixed bug in object retrieval
+-Fixed bug in management of persistant state in workspace
+
+ANTICIPATED FUTURE DEVELOPMENTS:
+-More strict rigorous handling of types using something like JSON scheme
+
 VERSION: 0.0.2 (Released 11/30/2012)
 ------------------------------------------
 NEW FEATURES:

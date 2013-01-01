@@ -152,10 +152,20 @@ Description:
 =cut
 
 sub metadata {
-	my ($self) = @_;
+	my ($self,$ashash) = @_;
 	my $objects = 0;
 	foreach my $key (keys(%{$self->objects()})) {
 		$objects += keys(%{$self->objects()->{$key}});
+	}
+	if (defined($ashash) && $ashash == 1) {
+		return {
+			id => $self->id(),
+			owner => $self->owner(),
+			moddate => $self->moddate(),
+			objects => $objects,
+			user_permission => $self->currentPermission(),
+			global_permission => $self->defaultPermissions()
+		};
 	}
 	return [
 		$self->id(),
