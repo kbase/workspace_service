@@ -5,6 +5,7 @@ use Tie::IxHash;
 use FileHandle;
 use DateTime;
 use Data::Dumper;
+use Bio::KBase::workspaceService::Impl;
 use Bio::KBase::workspaceService::Object;
 use Bio::KBase::workspaceService::Workspace;
 use Bio::KBase::workspaceService::WorkspaceUser;
@@ -81,7 +82,10 @@ foreach my $key (keys(%{$objHash})) {
 }
 
 #Checking that files were saved intact
+my $numberObjects = 0;
+my $numberMismatch = 0;
 foreach my $key (keys(%{$objHash})) {
+	$numberObjects++;
 	my $obj = $objHash->{$key};
 	my $file = $self->{_gridfs}->find_one({chsum => $obj->chsum()});
     if (!defined($file)) {
@@ -89,6 +93,8 @@ foreach my $key (keys(%{$objHash})) {
     }
 	my $dataString = $file->slurp();
 	if ($dataString ne $obj->data()) {
-		die "Data mismatch!\n";
+		print "Missmatch:".$obj->compressed()."/".$obj->json()."\n";
+		$numberMismatch++;
 	}
 }
+print "Object:".$numberObjects."\nMissmatches:".$numberMismatch."\n";

@@ -311,7 +311,6 @@ sub _createDataObject {
 	}
 	#Inserting data using gridfs
 	my $dataString = $obj->data();
-    print "Inserting:".$dataString."\n";
     open(my $basic_fh, "<", \$dataString);
     my $fh = FileHandle->new;
     $fh->fdopen($basic_fh, 'r');
@@ -2128,7 +2127,6 @@ sub copy_object
 					$objInst->command(),
 					$objInst->meta()
 				);
-				print $newobj->metadata($params->{asHash})->[0]."\n";
 			}
 			
 		}
