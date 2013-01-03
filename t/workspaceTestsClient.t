@@ -142,13 +142,4 @@ print "WORKSPACE_LIST=@$workspace_list\n";
 @kbws = `kbws-list`;
 print "DEBUG: KBWS\n@kbws\n\n";
 
-
-#$impl->_deleteWorkspaceUser("kbasetest");
-
-#Deleting test objects
-#$impl->_clearAllWorkspaces();
-#$impl->_clearAllWorkspaceObjects();
-#$impl->_clearAllWorkspaceUsers();
-#$impl->_clearAllWorkspaceDataObjects();
-
 done_testing($test_count);

@@ -67,4 +67,10 @@ dies_ok sub {
 };
 $test_count += 1;
 
+#Deleting test objects
+$impl->_clearAllWorkspaces();
+$impl->_clearAllWorkspaceObjects();
+$impl->_clearAllWorkspaceUsers();
+$impl->_clearAllWorkspaceDataObjects();
+
 done_testing($test_count);

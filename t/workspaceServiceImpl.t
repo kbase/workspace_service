@@ -165,28 +165,28 @@ eval {
 is(ref($objmeta),'ARRAY', "Did the save_object return an ARRAY ?");
 
 #Adding object from URL
-#$objmeta = $impl->save_object({
-#	id => "testbiochem",
-#	type => "Biochemistry",
-#	data => "http://bioseed.mcs.anl.gov/~chenry/KbaseFiles/defaultKBaseBiochem.json.gz",
-#	workspace => "testworkspace",
-#	command => "implementationTest",
-#	auth => $token,
-#	json => 1,
-#	compressed => 1,
-#	retrieveFromURL => 1,
-#	auth => $token->token()
-#});
-#ok $objmeta->[0] eq "testbiochem",
-#	"save_object ran and returned testbiochem object with correct ID!";
-#
-#($data,$objmeta) = $impl->get_object({
-#	id => "testbiochem",
-#	type => "Biochemistry",
-#	workspace => "testworkspace",
-#	auth => $token->token()
-#});
-#print $data->{uuid}."\n";
+$objmeta = $impl->save_object({
+	id => "testbiochem",
+	type => "Biochemistry",
+	data => "http://bioseed.mcs.anl.gov/~chenry/KbaseFiles/testKBaseBiochem.json",
+	workspace => "testworkspace",
+	command => "implementationTest",
+	auth => $token,
+	json => 1,
+	compressed => 0,
+	retrieveFromURL => 1,
+	auth => $token->token()
+});
+ok $objmeta->[0] eq "testbiochem",
+	"save_object ran and returned testbiochem object with correct ID!";
+
+($data,$objmeta) = $impl->get_object({
+	id => "testbiochem",
+	type => "Biochemistry",
+	workspace => "testworkspace",
+	auth => $token->token()
+});
+print STDERR "Retrieved data with uuid: ", $data->{"data"}->{"uuid"}, "\n";
 
 #Test should fail gracefully when sending bad parameters
 eval {
@@ -461,4 +461,10 @@ ok !defined($typehash->{TempTestType}),
 ok defined($typehash->{Genome}),
 	"Genome exists!";
 	
+#Deleting test objects
+$impl->_clearAllWorkspaces();
+$impl->_clearAllWorkspaceObjects();
+$impl->_clearAllWorkspaceUsers();
+$impl->_clearAllWorkspaceDataObjects();
+
 done_testing($test_count);
