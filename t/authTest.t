@@ -21,30 +21,50 @@ my $token = Bio::KBase::AuthToken->new(
 );
 $token = $token->token;
 # Test creating a workspace with this token
-my ($meta) = $impl->create_workspace({
-        workspace => "testworkspace",
-        default_permission => "n",
-        auth => $token,
-});
+my $meta;
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$meta = $impl->create_workspace({
+	        workspace => "testworkspace",
+	        default_permission => "n",
+	        auth => $token,
+	});
+};
 is $meta->[0], "testworkspace";
 is $meta->[1], "kbasetest";
+
 # Now test creating a workspace without an auth token
-my ($meta2) = $impl->create_workspace({
-        workspace => "test_two",
-        default_permission => "n",
-});
+my $meta2;
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$meta2 = $impl->create_workspace({
+	        workspace => "test_two",
+	        default_permission => "n",
+	});
+};
 isnt $meta2->[0], $meta->[0];
 isnt $meta2->[1], $meta->[1];
 $test_count += 4;
 # Now check that list_workspaces returns only one workspace
 # with each auth type (none and $tokeN)
-my ($metas) = $impl->list_workspaces({});
+my $metas;
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$metas = $impl->list_workspaces({});
+};
 is scalar @$metas, 1;
-($metas) = $impl->list_workspaces({authentication => $token});
+
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$metas = $impl->list_workspaces({authentication => $token});
+};
 is scalar @$metas, 1;
 $test_count += 2;
 # Now test workspace listing with invalid auth token
-dies_ok sub { $impl->list_workspaces({auth => "bad" }) };
+dies_ok sub {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$impl->list_workspaces({auth => "bad" });
+};
 $test_count += 1;
 
 done_testing($test_count);
