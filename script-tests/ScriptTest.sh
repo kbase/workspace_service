@@ -1,7 +1,7 @@
 #!/bin/bash
 
 kbws-list -e
-kbws-url
+kbws-url "http://localhost:7058"
 kbws-login kbasetest -p "@Suite525"
 kbws-whoami
 kbws-createws scriptTestWorkspace n -e

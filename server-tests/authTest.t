@@ -7,8 +7,9 @@ use Test::Exception;
 use Data::Dumper;
 my $test_count = 0;
 
-$ENV{MONGODBHOST} = "127.0.0.1";
-$ENV{MONGODBDB} = "testObjectStore";
+$ENV{KB_SERVICE_NAME}="workspaceService";
+$ENV{KB_DEPLOYMENT_CONFIG}="/kb/deployment/deployment.cfg";
+
 my $impl = Bio::KBase::workspaceService::Impl->new();
 #Deleting test objects
 $impl->_clearAllWorkspaces();

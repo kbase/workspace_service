@@ -11,8 +11,7 @@ my $test_count = 22;
 
 #  Test 1 - Can a new client object be created without parameters? 
 #Creating new workspace services implementation connected to testdb
-$ENV{MONGODBHOST} = "127.0.0.1";
-$ENV{MONGODBDB} = "testObjectStore";
+
 # Create an authorization token
 my $token = Bio::KBase::AuthToken->new(
     user_id => 'kbasetest', password => '@Suite525'

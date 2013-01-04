@@ -7,9 +7,12 @@ use Test::More;
 use Data::Dumper;
 my $test_count = 46;
 
+$ENV{KB_SERVICE_NAME}="workspaceService";
+$ENV{KB_DEPLOYMENT_CONFIG}="/kb/deployment/deployment.cfg";
+
 #  Test 1 - Can a new impl object be created without parameters? 
 #Creating new workspace services implementation connected to testdb
-$ENV{KB_DEPLOYMENT_CONFIG} = "../config/sample.ini";
+
 # Create an authorization token
 my $token = Bio::KBase::AuthToken->new(
     user_id => 'kbasetest', password => '@Suite525'

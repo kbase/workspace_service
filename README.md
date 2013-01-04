@@ -32,24 +32,24 @@ Start the MongoDB service:
 
 ### Deployment ###
 
-Run `make deploy`.
+Run `make deploy` to deploy the service and the client.
+Run 'make deploy-client' to deploy just the client.
 
 
 ### Configure the Service ###
 
-Copy the sample configuration file, modifying the location of the
-MongoDB and altering the database used.
-
-    cp config/sample.ini ~/config.ini
-    vi config.ini
-    export KB_DEPLOYMENT_CONFIG=$HOME/config.ini
-    export KB_SERVICE_NAME=workspaceServices
+The contents of deploy.cfg should be copied into /kb/deployment/deployment.cfg.
+Otherwise the service will default to running against mongodb on localhost.
 
 ### Start the Service ###
 
     cd /kb/deployment/services/workspaceService
     ./start_service
 
+NOTE: service writes stderr to ./error.log
+
 ### Run Tests
 
-    prove -r t
+server-tests: hardcoded to read /kb/deployment/deployment/cfg and instantiate a Server Impl
+client-tests: hardcoded to run against http://localhost:7058
+script-tests: hardcoded to run against http://localhost:7058
