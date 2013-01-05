@@ -7,8 +7,9 @@ use Test::Exception;
 use Data::Dumper;
 my $test_count = 0;
 
-$ENV{MONGODBHOST} = "127.0.0.1";
-$ENV{MONGODBDB} = "testObjectStore";
+$ENV{KB_SERVICE_NAME}="workspaceService";
+$ENV{KB_DEPLOYMENT_CONFIG}="/kb/deployment/deployment.cfg";
+
 my $impl = Bio::KBase::workspaceService::Impl->new();
 #Deleting test objects
 $impl->_clearAllWorkspaces();
@@ -66,5 +67,11 @@ dies_ok sub {
 	$impl->list_workspaces({auth => "bad" });
 };
 $test_count += 1;
+
+#Deleting test objects
+$impl->_clearAllWorkspaces();
+$impl->_clearAllWorkspaceObjects();
+$impl->_clearAllWorkspaceUsers();
+$impl->_clearAllWorkspaceDataObjects();
 
 done_testing($test_count);

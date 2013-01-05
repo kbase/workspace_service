@@ -17,20 +17,37 @@ use File::Temp qw(tempfile);
 use LWP::Simple qw(getstore);
 
 #Handling config file
-my $config = "sample.ini";
-if (defined($ENV{KB_DEPLOYMENT_CONFIG})) {
-	$config = $ENV{KB_DEPLOYMENT_CONFIG};
-} else {
-	warn "No deployment config specified. Using 'sample.ini' by default!\n";
+my %params;
+if ((my $e = $ENV{KB_DEPLOYMENT_CONFIG}) && -e $ENV{KB_DEPLOYMENT_CONFIG})
+{
+    my $service = $ENV{KB_SERVICE_NAME};
+    my $c = Config::Simple->new();
+    $c->read($e);
+    my @params = qw(mongodb-host mongodb-database);
+    for my $p (@params)
+    {
+	my $v = $c->param("$service.$p");
+	if ($v)
+	{
+	    $params{$p} = $v;
+	}
+    }
 }
-if (!-e $config) {
-	warn "Deployment config file not found. Using default settings!\n";
-	$self->{_host} = "localhost";
-	$self->{_db} = "workspace_service";
-} else {
-	my $c = new Config::Simple($config);
-	$self->{_host} = $c->param("workspaceServices.mongodb-hostname");
-	$self->{_db}   = $c->param("workspaceServices.mongodb-database");
+
+if (defined $params{"mongodb-host"}) {
+    $self->{_host} = $params{"mongodb-host"};
+}
+else {
+    warn "mongodb-host configuration not found, using 'localhost'\n";
+    $self->{_host} = "localhost";
+}
+
+if (defined $params{"mongodb-database"}) {
+    $self->{_db} = $params{"mongodb-database"};
+}
+else {
+    warn "mongodb-database configuration not found, using 'workspace_service'\n";
+    $self->{_db} = "workspace_service";
 }
 
 #Connecting to the database
