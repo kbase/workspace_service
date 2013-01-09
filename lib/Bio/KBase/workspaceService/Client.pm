@@ -20,7 +20,53 @@ Bio::KBase::workspaceService::Client
 
 =head1 workspaceService
 
-API for accessing and writing documents objects to a workspace.
+=head2 SYNOPSIS
+
+Workspaces are used in KBase to provide an online location for all data, models, and
+analysis results. Workspaces are a powerful tool for managing private data, tracking 
+workflow provenance, storing and sharing large datasets, and tracking work history. They
+have a number of useful characteristics which you will learn about over the course of the
+workspace tutorials:
+
+1.) Multiple users can read and write from the same workspace at the same time, 
+facilitating collaboration
+
+2.) When an object is overwritten in a workspace, the previous version is preserved and
+easily accessible at any time, enabling the use of workspaces to track object provenance
+
+3.) Workspaces have default permissions and user-specific permissions, providing total 
+control over the sharing and access of workspace contents
+
+=head2 EXAMPLE OF API USE IN PERL
+
+To use the API, first you need to instantiate a workspace client object:
+
+my $client = Bio::KBase::workspaceService::Client->new;
+   
+Next, you can run API commands on the client object:
+   
+my $ws = $client->create_workspace({
+        workspace => "foo",
+        default_permission => "n"
+});
+my $objs = $client->list_workspace_objects({
+        workspace => "foo"
+});
+print map { $_->[0] } @$objs;
+
+=head2 AUTHENTICATION
+
+Each and every function in this service takes a hash reference as
+its single argument. This hash reference may contain a key
+C<auth> whose value is a bearer token for the user making
+the request. If this is not provided a default user "public" is assumed.
+
+=head2 WORKSPACE
+
+A workspace is a named collection of objects owned by a specific
+user, that may be viewable or editable by other users.Functions that operate
+on workspaces take a C<workspace_id>, which is an alphanumeric string that
+uniquely identifies a workspace among all workspaces.
 
 
 =cut
@@ -77,7 +123,7 @@ ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
 workspace_id is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -87,6 +133,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -117,7 +165,7 @@ ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
 workspace_id is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -127,6 +175,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -211,7 +261,7 @@ object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -221,6 +271,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -243,7 +295,7 @@ object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -253,6 +305,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -338,7 +392,7 @@ object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -348,6 +402,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -370,7 +426,7 @@ object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -380,6 +436,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -472,7 +530,7 @@ get_object_output is a reference to a hash where the following keys are defined:
 	metadata has a value which is an object_metadata
 ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -482,6 +540,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -510,7 +570,7 @@ get_object_output is a reference to a hash where the following keys are defined:
 	metadata has a value which is an object_metadata
 ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -520,6 +580,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -607,7 +669,7 @@ object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -617,6 +679,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -640,7 +704,7 @@ object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -650,6 +714,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -736,7 +802,7 @@ object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -746,6 +812,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -769,7 +837,7 @@ object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -779,6 +847,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -870,7 +940,7 @@ object_id is a string
 workspace_id is a string
 object_type is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -880,6 +950,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -906,7 +978,7 @@ object_id is a string
 workspace_id is a string
 object_type is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -916,6 +988,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -1005,7 +1079,7 @@ object_id is a string
 workspace_id is a string
 object_type is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -1015,6 +1089,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -1040,7 +1116,7 @@ object_id is a string
 workspace_id is a string
 object_type is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -1050,6 +1126,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -1236,7 +1314,7 @@ object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -1246,6 +1324,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -1268,7 +1348,7 @@ object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -1278,6 +1358,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -2018,7 +2100,7 @@ list_workspace_objects_params is a reference to a hash where the following keys 
 	asHash has a value which is a bool
 workspace_id is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -2028,6 +2110,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 object_id is a string
 object_type is a string
 timestamp is a string
@@ -2050,7 +2134,7 @@ list_workspace_objects_params is a reference to a hash where the following keys 
 	asHash has a value which is a bool
 workspace_id is a string
 bool is an int
-object_metadata is a reference to a list containing 9 items:
+object_metadata is a reference to a list containing 11 items:
 	0: an object_id
 	1: an object_type
 	2: a timestamp
@@ -2060,6 +2144,8 @@ object_metadata is a reference to a list containing 9 items:
 	6: a username
 	7: a workspace_id
 	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 object_id is a string
 object_type is a string
 timestamp is a string
@@ -3405,6 +3491,8 @@ Meta data associated with an object stored in a workspace.
         username owner - name of the user who owns (who created) this object
         workspace_id workspace - ID of the workspace in which the object is currently stored
         workspace_ref ref - a 36 character ID that provides permanent undeniable access to this specific instance of this object
+        string chsum - checksum of the associated data object
+        mapping<string,string> metadata - custom metadata entered for data object during save operation
 
 
 =item Definition
@@ -3412,7 +3500,7 @@ Meta data associated with an object stored in a workspace.
 =begin html
 
 <pre>
-a reference to a list containing 9 items:
+a reference to a list containing 11 items:
 0: an object_id
 1: an object_type
 2: a timestamp
@@ -3422,6 +3510,8 @@ a reference to a list containing 9 items:
 6: a username
 7: a workspace_id
 8: a workspace_ref
+9: a string
+10: a reference to a hash where the key is a string and the value is a string
 
 </pre>
 
@@ -3429,7 +3519,7 @@ a reference to a list containing 9 items:
 
 =begin text
 
-a reference to a list containing 9 items:
+a reference to a list containing 11 items:
 0: an object_id
 1: an object_type
 2: a timestamp
@@ -3439,6 +3529,8 @@ a reference to a list containing 9 items:
 6: a username
 7: a workspace_id
 8: a workspace_ref
+9: a string
+10: a reference to a hash where the key is a string and the value is a string
 
 
 =end text
