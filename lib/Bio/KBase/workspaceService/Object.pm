@@ -341,7 +341,8 @@ sub metadata {
 			owner => $self->owner(),
 			workspace => $self->workspace(),
 			"ref" => $self->uuid(),
-			chsum => $self->chsum()
+			chsum => $self->chsum(),
+			metadata => $self->meta()
 		};
 	}
 	return [
@@ -354,7 +355,8 @@ sub metadata {
 		$self->owner(),
 		$self->workspace(),
 		$self->uuid(),
-		$self->chsum()
+		$self->chsum(),
+		$self->meta()
 	];
 }
 
