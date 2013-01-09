@@ -34,18 +34,42 @@ bin: $(BIN_PERL)
 $(BIN_DIR)/%: scripts/%.pl 
 	$(TOOLS_DIR)/wrap_perl '$$KB_TOP/modules/$(CURRENT_DIR)/$<' $@
 
-TESTS = $(wildcard t/*.t)
+CLIENT_TESTS = $(wildcard client-tests/*.t)
+SCRIPT_TESTS = $(wildcard script-tests/*.sh)
+SERVER_TESTS = $(wildcard server-tests/*.t)
 
-test:
-	for t in $(TESTS) ; do \
-		echo $$t ; \
-		$(DEPLOY_RUNTIME)/bin/prove $$t ; \
-		if [ $$? -ne 0 ] ; then \
-			exit 1 ; \
+test: test-service test-scripts test-client
+	@echo "running server, script and client tests"
+
+test-service:
+	for t in $(SERVER_TESTS) ; do \
+		if [ -f $$t ] ; then \
+			$(DEPLOY_RUNTIME)/bin/prove $$t ; \
+			if [ $$? -ne 0 ] ; then \
+				exit 1 ; \
+			fi \
 		fi \
 	done
-	@echo running python tests via nose 
-	cd test; nosetests
+
+test-scripts:
+	for t in $(SCRIPT_TESTS) ; do \
+		if [ -f $$t ] ; then \
+			/bin/sh $$t ; \
+			if [ $$? -ne 0 ] ; then \
+				exit 1 ; \
+			fi \
+		fi \
+	done
+
+test-client:
+	for t in $(CLIENT_TESTS) ; do \
+		if [ -f $$t ] ; then \
+			$(DEPLOY_RUNTIME)/bin/prove $$t ; \
+			if [ $$? -ne 0 ] ; then \
+				exit 1 ; \
+			fi \
+		fi \
+	done
 
 deploy: deploy-client deploy-service
 deploy-all: deploy-client deploy-service

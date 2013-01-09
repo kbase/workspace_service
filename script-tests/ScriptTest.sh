@@ -10,8 +10,8 @@ kbws-setglobalperm r -e
 kbws-meta -e
 kbws-setglobalperm n -e
 kbws-setuserperm public w -e
-kbws-logout
 kbws-perm -e
+kbws-logout
 kbws-login kbasetest -p "@Suite525"
 kbws-addtype temptype -e
 kbws-types -e

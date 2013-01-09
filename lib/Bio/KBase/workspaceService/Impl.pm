@@ -1032,7 +1032,6 @@ sub new
     }
 
     if (defined $params{"mongodb-host"}) {
-	print STDERR "mongodb-host set to ", $params{"mongodb-host"}, "\n";
 	$self->{_host} = $params{"mongodb-host"};
     }
     else {
@@ -1041,7 +1040,6 @@ sub new
     }
 
     if (defined $params{"mongodb-database"}) {
-	print STDERR "mongodb-database set to ", $params{"mongodb-database"}, "\n";
 	$self->{_db} = $params{"mongodb-database"};
     }
     else {
