@@ -27,7 +27,7 @@ SERV_TPAGE = $(KB_RUNTIME)/bin/perl $(KB_RUNTIME)/bin/tpage
 SERV_TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(KB_RUNTIME) --define kb_service_name=$(SERV_SERVICE) \
 	--define kb_service_port=$(SERV_SERVICE_PORT) --define kb_service_psgi=$(SERV_PSGI_PATH)
 
-all: bin
+all: bin compile-typespec
 
 bin: $(BIN_PERL)
 
@@ -98,7 +98,7 @@ deploy-scripts:
 		bash $(TOOLS_DIR)/wrap_perl.sh "$(TARGET)/plbin/$$basefile" $(TARGET)/bin/$$base ; \
 	done 
 
-deploy-libs:
+deploy-libs: compile-typespec
 	rsync -arv lib/. $(TARGET)/lib/.
 
 deploy-services: deploy-basic-service
@@ -128,5 +128,9 @@ compile-typespec:
 	-psgi workspaceService.psgi \
 	-client Bio::KBase::workspaceService::Client \
 	-js javascript/workspaceService/Client \
-	-py biokbase/workspaceService/Client \
+	-py biokbase/workspaceService/client \
 	workspaceService.spec lib
+	-rm lib/workspaceServiceImpl.py
+	-rm lib/workspaceServiceServer.py
+	-rm -r Bio
+	
