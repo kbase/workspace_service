@@ -250,6 +250,28 @@ module workspaceService {
 	*/
 	funcdef get_object(get_object_params params) returns (get_object_output output);	
 	
+	
+	/* Input parameters for the "get_object_by_ref" function.
+	
+		workspace_ref reference - reference to a specific instance of a specific object in a workspace (an essential argument)
+		string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument; user is "public" if auth is not provided)
+		bool asHash - a boolean indicating if metadata should be returned as a hash
+			
+	*/
+	typedef structure { 
+		workspace_ref reference;
+		string auth;
+		bool asHash;
+	} get_object_by_ref_params;
+	
+	
+	/*
+		Retrieves the specified object from the specified workspace.
+		Both the object data and metadata are returned.
+		This commands provides access to all versions of the object via the instance parameter.
+	*/
+	funcdef get_object_by_ref(get_object_by_ref_params params) returns (get_object_output output);
+	
 	/* Input parameters for the "get_objectmeta" function.
 	
 		object_type type - type of the object for which metadata is to be retrieved (an essential argument)
@@ -274,6 +296,65 @@ module workspaceService {
 		This commands provides access to metadata for all versions of the object via the instance parameter.
 	*/
 	funcdef get_objectmeta(get_objectmeta_params params) returns (object_metadata metadata); 
+	
+	/* Input parameters for the "get_objectmeta_by_ref" function.
+	
+		workspace_ref reference - reference to a specific instance of a specific object in a workspace (an essential argument)
+		string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument; user is "public" if auth is not provided)
+		bool asHash - a boolean indicating if metadata should be returned as a hash
+			
+	*/
+	typedef structure { 
+		workspace_ref reference;
+		string auth;
+		bool asHash;
+	} get_objectmeta_by_ref_params;
+	/*
+		Retrieves the specified object from the specified workspace.
+		Both the object data and metadata are returned.
+		This commands provides access to all versions of the object via the instance parameter.
+	*/
+	funcdef get_objectmeta_by_ref(get_objectmeta_by_ref_params params) returns (object_metadata metadata);
+	
+	/* Input parameters for the "object_to_html" function.
+	
+		object_type type - type of the object for which metadata is to be retrieved (an essential argument)
+		workspace_id workspace - ID of the workspace containing the object for which metadata is to be retrieved (an essential argument)
+		object_id id - ID of the object for which metadata is to be retrieved (an essential argument)
+		int instance - Version of the object for which metadata is to be retrieved, enabling retrieval of any previous version of an object (an optional argument; the current metadata is retrieved if no version is provides)
+		string auth - the authentication token of the KBase account to associate with this object metadata retrieval command (an optional argument; user is "public" if auth is not provided)
+		bool asHash - a boolean indicating if metadata should be returned as a hash
+			
+	*/
+	typedef structure { 
+		object_id id;
+		object_type type;
+		workspace_id workspace;
+		int instance;
+		string auth;
+		bool asHash;
+	} object_to_html_params;
+	/*
+		Returns an HTML view of the specified input object
+	*/
+	funcdef object_to_html(object_to_html_params params) returns (string html);
+	
+	/* Input parameters for the "objectref_to_html" function.
+	
+		workspace_ref reference - reference to a specific instance of a specific object in a workspace (an essential argument)
+		string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument; user is "public" if auth is not provided)
+		bool asHash - a boolean indicating if metadata should be returned as a hash
+			
+	*/
+	typedef structure { 
+		workspace_ref reference;
+		string auth;
+		bool asHash;
+	} objectref_to_html_params;
+	/*
+		Returns an HTML view of the specified input object
+	*/
+	funcdef objectref_to_html(objectref_to_html_params params) returns (string html);
 	
 	/* Input parameters for the "revert_object" function.
 	
@@ -411,7 +492,7 @@ module workspaceService {
 	/* Input parameters for the "create_workspace" function.
 	
 		workspace_id workspace - ID of the workspace to be created (an essential argument)
-		permission default_permission - Default permissions of the workspace to be created. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
+		permission default_permission - Default permissions of the workspace to be created. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (optional argument with default "n")
 		string auth - the authentication token of the KBase account that will own the created workspace (an optional argument; user is "public" if auth is not provided)
 		bool asHash - a boolean indicating if metadata should be returned as a hash
 		

@@ -17,7 +17,7 @@ my $token = Bio::KBase::AuthToken->new(
     user_id => 'kbasetest', password => '@Suite525'
 );
 #my $url = "http://kbase.us/services/workspace";
-my $url = "http://localhost:7058";
+my $url = "http://kbase.us/services/workspace";
 my $impl = Bio::KBase::workspaceService::Client->new($url);
 ok( defined $impl, "Did an impl object get defined" );    
 

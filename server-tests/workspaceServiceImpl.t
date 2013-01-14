@@ -5,25 +5,40 @@ use strict;
 use warnings;
 use Test::More;
 use Data::Dumper;
-my $test_count = 46;
+my $test_count = 65;
 
+################################################################################
+#Test intiailization: setting test config, instantiating Impl, getting auth token
+################################################################################
 $ENV{KB_SERVICE_NAME}="workspaceService";
-$ENV{KB_DEPLOYMENT_CONFIG}="/kb/deployment/deployment.cfg";
-
-#  Test 1 - Can a new impl object be created without parameters? 
-#Creating new workspace services implementation connected to testdb
-
-# Create an authorization token
-my $token = Bio::KBase::AuthToken->new(
+$ENV{KB_DEPLOYMENT_CONFIG}=$Bin."/../configs/test.cfg";
+print $ENV{KB_DEPLOYMENT_CONFIG}."\n";
+my $impl = Bio::KBase::workspaceService::Impl->new();
+#Getting auth token for kbasetest user
+my $tokenObj = Bio::KBase::AuthToken->new(
     user_id => 'kbasetest', password => '@Suite525'
 );
-my $impl = Bio::KBase::workspaceService::Impl->new();
-ok( defined $impl, "Did an impl object get defined" );    
-
-#  Test 2 - Is the impl object in the right class?
+#This test should immediately die if we cannot get a valid auth token for kbasetest
+if (!$tokenObj->validate()) {
+	die("Authentication of kbasetest is failing! Check connect to auth subservice!");	
+}
+my $oauth = $tokenObj->token();
+#Deleting all existing test objects (note, because we are doing this, you must NEVER use the production config)
+$impl->_clearAllWorkspaces();
+$impl->_clearAllWorkspaceObjects();
+$impl->_clearAllWorkspaceUsers();
+$impl->_clearAllWorkspaceDataObjects();
+################################################################################
+#Test 1: did an impl object get defined
+################################################################################
+ok( defined $impl, "Did an impl object get defined" );
+################################################################################
+#Test 2: Is the impl object in the right class?
+################################################################################
 isa_ok( $impl, 'Bio::KBase::workspaceService::Impl', "Is it in the right class" );   
-
-# Gene calling methods that takes a genomeTO as input
+################################################################################
+#Test 3: Can impl perform all defined functions
+################################################################################
 my @impl_methods = qw(
 	create_workspace
 	delete_workspace
@@ -33,6 +48,7 @@ my @impl_methods = qw(
 	set_global_workspace_permissions
 	set_workspace_permissions
 	save_object
+	delete_workspace
 	delete_object
 	delete_object_permanently
 	get_object
@@ -41,99 +57,219 @@ my @impl_methods = qw(
 	copy_object
 	move_object
 	has_object
+	get_object_by_ref
+	get_objectmeta_by_ref
+	get_workspacemeta
+	get_workspacepermissions
+	object_to_html
+	objectref_to_html
+	object_history
+	get_user_settings
+	set_user_settings
+	queue_job
+	set_job_status
+	get_jobs
+	add_type
+	get_types
+	remove_type
 );
-
-#  Test 3 - Can the object do all of the methods
 can_ok($impl, @impl_methods);    
-
-#Deleting test objects
-$impl->_clearAllWorkspaces();
-$impl->_clearAllWorkspaceObjects();
-$impl->_clearAllWorkspaceUsers();
-$impl->_clearAllWorkspaceDataObjects();
-
-note("create_workspace called testworkspace");
-#TESTS Creating a workspace called "testworkspace"
-my $wsmeta;
+################################################################################
+#Test 4-9: Can kbasetest create a workspace, and is the returned metadata correct?
+################################################################################
+my $meta;
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
-	$wsmeta = $impl->create_workspace({
-		workspace=>"testworkspace",
-		default_permission=>"a",
-		auth=>$token->token()
+	$meta = $impl->create_workspace({
+	        workspace => "testworkspace",
+	        default_permission => "n",
+	        auth => $oauth,
 	});
 };
-is($@,'',"create workspace works without error");
-is(ref($wsmeta),'ARRAY', "Did the create_workspace return an ARRAY (workspace_metadata)?");
-ok $wsmeta->[0] eq "testworkspace", "create_workspace creates new workspace testworkspace!";
-
-
-eval{
+ok(defined $meta, "Workspace defined");
+is $meta->[0],"testworkspace";
+is $meta->[1],"kbasetest";
+is $meta->[3],0;
+is $meta->[4],"a";
+is $meta->[5],"n";
+################################################################################
+#Test 10-11: Creating a public workspace, and is the returned metadata correct?
+################################################################################
+eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
-	$wsmeta = $impl->create_workspace({
-		workspace=>"testworkspace",
-		default_permission=>"n",
-		auth=>$token->token()
+	$meta = $impl->create_workspace({
+	        workspace => "test_two",
+	        default_permission => "n",
 	});
 };
-isnt($@,'',"Attempt to create duplicate workspace fails");
-
+is $meta->[0], "test_two";
+is $meta->[1], "public";
+################################################################################
+#Test 12-15: List workspaces returns the right workspaces
+################################################################################
+my $metas;
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$metas = $impl->list_workspaces({});
+};
+is scalar @$metas, 1;
+ok($metas->[0]->[0] eq "test_two", "name matches");
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$metas = $impl->list_workspaces({auth => $oauth});
+};
+is scalar @$metas, 1;
+ok($metas->[0]->[0] eq "testworkspace", "name matches");
+################################################################################
+#Test 16: Workspace dies when accessed with bad token
+################################################################################
+my $output;
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$output = $impl->list_workspaces({auth => "bad" });
+};
+is $output, undef, "list_workspaces dies with bad authentication";
+################################################################################
+#Test 17-22: Can create lots of workspaces and list the right number
+################################################################################
+# Create a few more workspaces
+$output = undef;
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$output = $impl->create_workspace({workspace=>"testworkspace2",default_permission=>"r",auth=>$oauth}); 
+};
+ok (defined($output),"Created workspace");
+$output = undef;
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$output = $impl->create_workspace({workspace=>"testworkspace3",default_permission=>"a",auth=>$oauth}); 
+};
+ok (defined($output),"Created workspace");
+$output = undef;
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$output = $impl->create_workspace({workspace=>"testworkspace4",default_permission=>"w",auth=>$oauth}); 
+};
+ok (defined($output),"Created workspace");
+$output = undef;
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$output = $impl->create_workspace({workspace=>"testworkspace5",default_permission=>"n",auth=>$oauth}); 
+};
+ok (defined($output),"Created workspace"); 
+my $workspace_list = $impl->list_workspaces({auth=>$oauth});
+# Makes sure the length matches
+ok(scalar(@{$workspace_list}) eq 5, "length matches");
+my $idhash={};
+my $ws;
+foreach $ws (@{$workspace_list}) {
+    $idhash->{$ws->[0]} = 1;
+}
+ok(defined($idhash->{testworkspace3}),
+   "list_workspaces returns newly created workspace testworkspace!");
+################################################################################
+#Test 23: Dies when attempting to create duplicate workspace
+################################################################################   
+$output = undef;
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$output = $impl->create_workspace({workspace=>"testworkspace",default_permission=>"n",auth=>$oauth});
+};
+ok(!defined($output), "Dies when attempting to create duplicate workspace");
+################################################################################
+#Test 24-26: Can delete workspace, but cannot delete twice, and cannot delete nonexistant workspace
+################################################################################ 
+$output = undef;
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$output = $impl->delete_workspace({workspace=>"testworkspace",auth=>$oauth});
+};
+ok (defined($output),"delete succeeds");
+# Does deleting a non-existent workspace fail
+$output = undef;
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$output = $impl->delete_workspace({workspace=>"testworkspace_foo",auth=>$oauth});
+};
+ok(!defined($output), "delete for non-existent ws fails");
+# Does deleting a previously deleted workspace fail
+$output = undef;
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$output = $impl->delete_workspace({workspace=>"testworkspace",auth=>$oauth});
+};
+ok(!defined($output),"duplicate delete fails");
+################################################################################
+#Test 27-29: Can clone workspace, but cannot clone a deleted or nonexistant workspace
+################################################################################ 
+$output = undef;
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$output = $impl->clone_workspace({
+		new_workspace => "clonetestworkspace2",
+		current_workspace => "testworkspace2",
+		default_permission => "n",
+		auth => $oauth
+	}); 
+};
+ok (defined($output),"clone succeeds");
+$impl->delete_workspace({workspace=>"clonetestworkspace2", auth=>$oauth});
+$output = undef;
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$output = $impl->clone_workspace({
+		new_workspace => "clonetestworkspace",
+		current_workspace => "testworkspace",
+		default_permission => "n",
+		auth=> $oauth
+	}); 
+};
+is $output, undef, "clone a deleted workspace should fail";
+$output = undef;
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$output = $impl->clone_workspace({
+		new_workspace => "clonetestworkspace3",
+		current_workspace => "testworkspace_foo",
+		default_permission => "n",
+		auth => $oauth
+	}); 
+};
+is $output, undef, "clone a non-existent workspace should fail";
+# Does the cloned workspace match the original
+# Does the cloned workspace preserve permissions
+################################################################################
+#Test 30-32: Cannot make workspace with bad or no permissions, and must use hash ref
+################################################################################ 
 eval{
-	$wsmeta = $impl->create_workspace({
-		workspace=>"testworkspace",
+	$meta = $impl->create_workspace({
+		workspace=>"testworkspace6",
 		default_permission=>"g",
-		auth=>$token->token()
+		auth=>$oauth
 	});
 };
 isnt($@,'',"Attempt to create workspace with bad permissions fails");
-
 eval{
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
-	$wsmeta = $impl->create_workspace({
-		workspace=>"testworkspace",
-		auth=>$token->token()
-	});
-};
-isnt($@,'',"Attempt to create workspace with no permissions fails");
-
-eval{
-	local $Bio::KBase::workspaceService::Server::CallContext = {};
-	$wsmeta = $impl->create_workspace(
+	$meta = $impl->create_workspace(
 		"testworkspace",
 		'n',
-		auth=>$token->token()
+		auth=>$oauth
 	);
 };
 isnt($@,'',"Attempt to create workspace without a hash reference  fails");
-
-note("list_workspaces");
-#Listing workspaces that user testuser has access to
-my $wsmetas;
-eval {
-	local $Bio::KBase::workspaceService::Server::CallContext = {};
-	$wsmetas = $impl->list_workspaces({
-		auth=>$token->token()
-	});
-};
-is($@,'',"list workspace works without error");
-is(ref($wsmetas),'ARRAY', "Did the list_workspace return an ARRAY (workspace_metadata objects)?");
-isnt(scalar $#{$wsmetas}, -1, "Was the returned ARRAY not empty?");
-is($wsmetas->[0]->[0],'testworkspace',"Was the returned name testworkspace");
-
-eval {
-	local $Bio::KBase::workspaceService::Server::CallContext = {};
+################################################################################
+#Test 33-38: Adding objects to workspace
+################################################################################ 
+note("Test Adding Objects to the workspace testworkspace");
+my $wsmeta;
+eval{
 	$wsmeta = $impl->create_workspace({
-		workspace=>"testworkspace2",
-		default_permission=>"r",
-		auth=>$token->token()
+		workspace=>"testworkspace",
+		default_permission=>"n",
+		auth=>$oauth
 	});
 };
-ok $wsmeta->[0] eq "testworkspace2", "create_workspace creates 2nd workspace testworkspace with write-only permissions!";
-
-#
-#  Switch to adding objects to this workspace for the next few tests
-#
-
 my $data = "This is my data string";
 my %metadata = (a=>1,b=>2,c=>3);
 my $conf = {
@@ -143,61 +279,58 @@ my $conf = {
         workspace => "testworkspace",
         command => "string",
         metadata => \%metadata,
-        auth => $token->token()
+        auth => $oauth
     };
 my $conf1 = {
         id => "Test1",
         type => "Genome",
         workspace => "testworkspace",
-        auth => $token->token()
+        auth => $oauth
     };
 my $conf2 = {
         id => "Test2",
         type => "Genome",
         workspace => "testworkspace",
-        auth => $token->token()
+        auth => $oauth
     };
-
-note("Test Adding Objects to the workspace testworkspace");
-#Adding new test object to database
 my $objmeta;
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
 	$objmeta = $impl->save_object($conf);
 };
 is(ref($objmeta),'ARRAY', "Did the save_object return an ARRAY ?");
-
 #Adding object from URL
-$objmeta = $impl->save_object({
-	id => "testbiochem",
-	type => "Biochemistry",
-	data => "http://bioseed.mcs.anl.gov/~chenry/KbaseFiles/testKBaseBiochem.json",
-	workspace => "testworkspace",
-	command => "implementationTest",
-	auth => $token,
-	json => 1,
-	compressed => 0,
-	retrieveFromURL => 1,
-	auth => $token->token()
-});
-ok $objmeta->[0] eq "testbiochem",
-	"save_object ran and returned testbiochem object with correct ID!";
-
-($data,$objmeta) = $impl->get_object({
-	id => "testbiochem",
-	type => "Biochemistry",
-	workspace => "testworkspace",
-	auth => $token->token()
-});
-print STDERR "Retrieved data with uuid: ", $data->{"data"}->{"uuid"}, "\n";
-
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$objmeta = $impl->save_object({
+		id => "testbiochem",
+		type => "Biochemistry",
+		data => "http://bioseed.mcs.anl.gov/~chenry/KbaseFiles/testKBaseBiochem.json",
+		workspace => "testworkspace",
+		command => "implementationTest",
+		json => 1,
+		compressed => 0,
+		retrieveFromURL => 1,
+		auth => $oauth
+	});
+};
+ok $objmeta->[0] eq "testbiochem","save_object ran and returned testbiochem object with correct ID!";
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$output = $impl->get_object({
+		id => "testbiochem",
+		type => "Biochemistry",
+		workspace => "testworkspace",
+		auth => $oauth
+	});
+};
+ok $output->{metadata}->[0] eq "testbiochem","save_object ran and returned testbiochem object with correct ID!";
 #Test should fail gracefully when sending bad parameters
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
-	$wsmeta = $impl->has_object($wsmetas);
+	$wsmeta = $impl->has_object($wsmeta);
 };
 isnt($@,'', "Confirm bad input parameters fails gracefully ");
-
 #Checking if test object is present
 my $bool;
 eval {
@@ -205,29 +338,25 @@ eval {
 	$bool = $impl->has_object($conf1);
 };
 is($bool,1,"has_object successfully determined object Test1 exists!");
-
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
 	$bool = $impl->has_object($conf2);
 };
 is($bool,0, "Confirm that Test2 does not exist");
-#Documentation claims that 0 is returned when this is unsuccessful.  Not true
-#is($wsmeta,0,"has_object successfully determined object Test2 does not exist!");
+
 
 note("Retrieving test object data from database");
+################################################################################
+#Test 39-51: Retreiving, moving, copying, deleting, and reverting objects 
+################################################################################ 
 #Retrieving test object data from database
 $objmeta = [];
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
-	($data,$objmeta) = $impl->get_object($conf1);
+	$output = $impl->get_object($conf1);
 };
 is($@,"","Retrieving test object data from database");
-
-if (exists $objmeta->[0]) {
-	ok $objmeta->[0] eq "Test1",
-	"get_object successfully retrieved object Test1!";
-}
-
+ok $output->{metadata}->[0] eq "Test1","get_object successfully retrieved object Test1!";
 note("Retrieving test object metadata from database");
 #Retrieving test object metadata from database
 eval {
@@ -236,7 +365,6 @@ eval {
 }; 
 ok $objmeta->[0] eq "Test1",
 	"get_objectmeta successfully retrieved metadata for Test1!";
-
 #Copying object
 $conf2 = {
 	new_id => "TestCopy",
@@ -244,9 +372,8 @@ $conf2 = {
 	source_id => "Test1",
 	type => "Genome",
 	source_workspace => "testworkspace",
-	auth => $token->token()
+	auth => $oauth
 };
-
 note("copy_object from testworkspace to testworkspace2");
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
@@ -254,7 +381,6 @@ eval {
 };
 ok $objmeta->[0] eq "TestCopy",
 	"copy_object successfully returned metadata for TestCopy!";
-
 note("move_object from testworkspace to testworkspace2");
 $conf2->{'new_id'} = 'TestMove';
 eval {
@@ -263,15 +389,13 @@ eval {
 };
 ok $objmeta->[0] eq "TestMove",
 	"move_object successfully returned metadata for TestMove!";
-
 note("Delete object TestCopy from testworkspace2");
 $conf2 = {
 	id => "TestCopy",
 	type => "Genome",
 	workspace => "testworkspace2",
-	auth => $token->token()
+	auth => $oauth
 };
-
 #Deleting object
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
@@ -279,14 +403,13 @@ eval {
 };
 ok $objmeta->[4] eq "delete",
 	"delete_object successfully returned metadata for deleted object!";
-
 #Reverting deleted object
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
 	$objmeta = $impl->revert_object($conf2);
 	print Dumper($objmeta);
 };
-ok $objmeta->[4] =~ m/^revert/,
+ok $objmeta->[4] =~ m/^revert/,"object successfully reverted!";
 #	"revert_object successfully undeleted TestCopy!";
 my $objmetas;
 my $objidhash = {};
@@ -299,11 +422,10 @@ eval {
 };
 ok defined($objidhash->{TestCopy}),
 	"list_workspace_objects now returns undeleted object TestCopy!";
-	
 note("List the objects in testworkspace");
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
-	$objmetas = $impl->list_workspace_objects( { workspace=>"testworkspace",auth => $token->token()});
+	$objmetas = $impl->list_workspace_objects( { workspace=>"testworkspace",auth => $oauth});
 	$objidhash = {};
 	foreach $objmeta (@{$objmetas}) {
 		$objidhash->{$objmeta->[0]} = 1;
@@ -316,11 +438,10 @@ ok !defined($objidhash->{TestCopy}),
 	"list_workspace_objects returned object list without copied object TestCopy!";
 ok !defined($objidhash->{TestMove}),
 	"list_workspace_objects returned object list without moved result object TestMove!";
-
 note("List the objects in testworkspace2");
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
-	$objmetas = $impl->list_workspace_objects( { workspace=>"testworkspace2",auth => $token->token()});
+	$objmetas = $impl->list_workspace_objects( { workspace=>"testworkspace2",auth => $oauth});
 	$objidhash = {};
 	foreach $objmeta (@{$objmetas}) {
 		$objidhash->{$objmeta->[0]} = 1;
@@ -333,18 +454,15 @@ ok defined($objidhash->{TestCopy}),
 	"list_workspace_objects returned object list without copied object TestCopy!";
 ok defined($objidhash->{TestMove}),
 	"list_workspace_objects returned object list with moved result object TestMove!";
-
-#
-#  Back to workspaces
-#
-
+################################################################################
+#Test 52-61: Cloning workspaces with objects
+################################################################################ 
 $conf2 = {
         new_workspace => "clonetestworkspace",
         current_workspace => "testworkspace2",
         default_permission => "n",
-        auth => $token->token()
+        auth => $oauth
 };
-
 #Cloning workspace
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
@@ -352,7 +470,7 @@ eval {
 };
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
-	$objmetas = $impl->list_workspace_objects({ workspace=>"clonetestworkspace",auth => $token->token()});
+	$objmetas = $impl->list_workspace_objects({ workspace=>"clonetestworkspace",auth => $oauth});
 	$objidhash = {};
 	foreach $objmeta (@{$objmetas}) {
 		$objidhash->{$objmeta->[0]} = 1;
@@ -364,7 +482,7 @@ ok defined($objidhash->{TestMove}),
 $conf = {
         workspace => "testworkspace",
         new_permission => "r",
-        auth => $token->token()
+        auth => $oauth
     };
 
 #Changing workspace global permissions
@@ -381,29 +499,23 @@ $conf = {
         workspace => "clonetestworkspace",
         new_permission => "w",
 		users => ["public"],
-		auth => $token->token()
+		auth => $oauth
     };
-
-$wsmeta='';
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
-	$wsmeta = $impl->set_workspace_permissions($conf);
+	$bool = $impl->set_workspace_permissions($conf);
 };
 is($@,'',"set_workspace_permissions - user global permissions for clonetestworkspace to w - Command ran without errors");
-if (ref($wsmeta) eq 'ARRAY') {
-	ok $wsmeta->[5] eq "w",
-		"set_workspace_permissions - Value = $wsmeta->[5] ";
-	print Dumper($wsmeta);
-}
-
+ok $bool == 1,"set_workspace_permissions - Value = ".$bool;
+#print Dumper($wsmeta);
+my $wsmetas;
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
 	$wsmetas = $impl->list_workspaces({});
 };
 is($@,'',"Logging as public");
-
-print Dumper($wsmetas);
-my $idhash = {};
+#print Dumper($wsmetas);
+$idhash = {};
 foreach $wsmeta (@{$wsmetas}) {
 	$idhash->{$wsmeta->[0]} = $wsmeta->[4];
 }
@@ -415,13 +527,15 @@ ok $idhash->{testworkspace} eq "r",
 	"list_workspaces says public has read only privelages to testworkspace!";
 ok $idhash->{clonetestworkspace} eq "w",
 	"list_workspaces says public has write privelages to clonetestworkspace!";
-
+################################################################################
+#Test 62-65: Testing types
+################################################################################ 
 #Testing the very basic type services
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
 	$impl->add_type({
 		type => "TempTestType",
-		auth => $token->token()
+		auth => $oauth
 	});
 };
 my $types;
@@ -441,14 +555,14 @@ eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
 	$impl->remove_type({
 		type => "TempTestType",
-		auth => $token->token()
+		auth => $oauth
 	});
 };
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
 	$impl->remove_type({
 		type => "Genome",
-		auth => $token->token()
+		auth => $oauth
 	});
 };
 eval {
@@ -463,8 +577,9 @@ ok !defined($typehash->{TempTestType}),
 	"TempTestType no longer exists!";
 ok defined($typehash->{Genome}),
 	"Genome exists!";
-	
-#Deleting test objects
+################################################################################
+#Cleanup: clearing out all objects from the workspace database
+################################################################################ 
 $impl->_clearAllWorkspaces();
 $impl->_clearAllWorkspaceObjects();
 $impl->_clearAllWorkspaceUsers();

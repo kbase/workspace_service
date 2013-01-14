@@ -192,6 +192,10 @@ sub currentPermission {
 		my $userObj = $self->parent()->_getCurrentUserObj();
 		if (!defined($userObj)) {
 			$self->{_currentPermission} = $self->defaultPermissions();
+		} elsif ($userObj->id() eq $self->owner()) {
+			$self->{_currentPermission} = "a";
+		} elsif ($userObj->id() eq "workspaceroot") {
+			$self->{_currentPermission} = "a";
 		} else {
 			$self->{_currentPermission} = $userObj->getWorkspacePermission($self);
 		}
@@ -536,7 +540,7 @@ Description:
 
 sub permanentDelete {
 	my ($self) = @_;
-	if ($self->currentUser() ne $self->owner()) {
+	if ($self->currentUser() ne $self->owner() && $self->currentUser() ne "workspaceroot") {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Only workspace owner can delete workspace!",
 							       method_name => 'permanentDelete');
 	}
