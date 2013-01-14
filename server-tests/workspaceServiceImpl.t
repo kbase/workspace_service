@@ -12,7 +12,6 @@ my $test_count = 65;
 ################################################################################
 $ENV{KB_SERVICE_NAME}="workspaceService";
 $ENV{KB_DEPLOYMENT_CONFIG}=$Bin."/../configs/test.cfg";
-print $ENV{KB_DEPLOYMENT_CONFIG}."\n";
 my $impl = Bio::KBase::workspaceService::Impl->new();
 #Getting auth token for kbasetest user
 my $tokenObj = Bio::KBase::AuthToken->new(
