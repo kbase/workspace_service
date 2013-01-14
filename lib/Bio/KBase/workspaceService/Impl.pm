@@ -233,6 +233,34 @@ sub _updateDB {
 #####################################################################
 #Object creation methods
 #####################################################################
+=head3 _saveObjectByRef
+
+Definition:
+	Bio::KBase::workspaceService::Object =  _saveObjectByRef(string:id,string:permission);
+Description:
+	Creates an object that is saved by reference only and not stored in any workspace.
+	There are no permissions, but you must have the object's uuid in order to access it.
+
+=cut
+
+sub _saveObjectByRef {
+	my ($self,$type,$id,$data,$command,$meta) = @_;
+	$self->_validateType($type);
+	return $self->_createObject({
+		uuid => Data::UUID->new()->create_str(),
+		type => $type,
+		workspace => "NO_WORKSPACE",
+		parent => $self,
+		ancestor => undef,
+		owner => $self->_getUsername(),
+		lastModifiedBy => $self->_getUsername(),
+		command => $command,
+		id => $id,
+		instance => 0,
+		rawdata => $data,
+		meta => $meta
+	});
+}
 
 =head3 _createWorkspace
 
@@ -982,7 +1010,7 @@ sub _tohtml {
 sub _validateWorkspaceID {
 	my ($self,$id) = @_;
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Workspace name must contain only alphanumeric characters!",
-		method_name => '_validateWorkspaceID') if ($id !~ m/^\w+$/);
+		method_name => '_validateWorkspaceID') if ($id !~ m/^\w+$/ || $id eq "NO_WORKSPACE");
 }
 
 sub _validateUserID {
@@ -1034,7 +1062,8 @@ sub _permanentTypes {
         GapFill => 1,
         GapGen => 1,
         PROMModel => 1,
-        ProbAnno => 1
+        ProbAnno => 1,
+        GenomeContigs => 1
 	};
 }
 
@@ -1295,8 +1324,13 @@ sub save_object
     if ($params->{json} == 1) {
     	$params->{data} = $self->_decode($params->{data});
     }
-    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
-    my $obj = $ws->saveObject($params->{type},$params->{id},$params->{data},$params->{command},$params->{metadata});
+    #Dealing with objects that will be saved as references only
+    if ($params->{workspace} eq "NO_WORKSPACE") {
+    	my $obj = $self->_saveObjectByRef($params->{type},$params->{id},$params->{data},$params->{command},$params->{metadata});
+    } else {
+    	my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
+    	my $obj = $ws->saveObject($params->{type},$params->{id},$params->{data},$params->{command},$params->{metadata});	
+    }
     $metadata = $obj->metadata($params->{asHash});
 	$self->_clearContext();
     #END save_object
