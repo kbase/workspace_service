@@ -1325,11 +1325,12 @@ sub save_object
     	$params->{data} = $self->_decode($params->{data});
     }
     #Dealing with objects that will be saved as references only
+    my $obj;
     if ($params->{workspace} eq "NO_WORKSPACE") {
-    	my $obj = $self->_saveObjectByRef($params->{type},$params->{id},$params->{data},$params->{command},$params->{metadata});
+    	$obj = $self->_saveObjectByRef($params->{type},$params->{id},$params->{data},$params->{command},$params->{metadata});
     } else {
     	my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
-    	my $obj = $ws->saveObject($params->{type},$params->{id},$params->{data},$params->{command},$params->{metadata});	
+    	$obj = $ws->saveObject($params->{type},$params->{id},$params->{data},$params->{command},$params->{metadata});	
     }
     $metadata = $obj->metadata($params->{asHash});
 	$self->_clearContext();
