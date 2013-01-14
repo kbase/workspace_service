@@ -1142,7 +1142,6 @@ sub new
     }
 
     my %params;
-    print $ENV{KB_DEPLOYMENT_CONFIG}."\n\n";
     if ((my $e = $ENV{KB_DEPLOYMENT_CONFIG}) && -e $ENV{KB_DEPLOYMENT_CONFIG})
     {
     	
