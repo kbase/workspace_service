@@ -16,7 +16,7 @@ my $test_count = 22;
 my $token = Bio::KBase::AuthToken->new(
     user_id => 'kbasetest', password => '@Suite525'
 );
-#my $url = "http://kbase.us/services/workspace";
+#my $url = "http://localhost:7058";
 my $url = "http://kbase.us/services/workspace";
 my $impl = Bio::KBase::workspaceService::Client->new($url);
 ok( defined $impl, "Did an impl object get defined" );    
@@ -53,8 +53,13 @@ ok($wsmeta1->[5] eq "n", "ws has n global perms");
 # Is the workspace listed
 
 $workspace_list = $impl->list_workspaces({auth=>$oauth_token});
+my $idhash1={};
+foreach my $ws1 (@{$workspace_list}) {
+    $idhash1->{$ws1->[0]} = 1;
+}
 
-ok(@{$workspace_list}[0]->[0] eq "testworkspace1", "name matches");
+ok(defined($idhash1->{testworkspace1}),
+   "list_workspaces returns newly created workspace testworkspace1!");
 
 # Create a few more workspaces
 lives_ok { $impl->create_workspace({workspace=>"testworkspace2",default_permission=>"r",auth=>$oauth_token}); } "create read-only ws";
@@ -64,8 +69,8 @@ lives_ok { $impl->create_workspace({workspace=>"testworkspace5",default_permissi
 
 $workspace_list = $impl->list_workspaces({auth=>$oauth_token});
 
-# Makes sure the length matches
-ok(scalar(@{$workspace_list}) eq 5, "length matches");
+# Makes sure the length matches (at least 5 - there may be other workspaces prior to this test)
+ok(scalar(@{$workspace_list}) >= 5, "length matches");
 
 
 my $idhash={};
@@ -75,7 +80,7 @@ foreach $ws (@{$workspace_list}) {
 }
 
 ok(defined($idhash->{testworkspace3}),
-   "list_workspaces returns newly created workspace testworkspace!");
+   "list_workspaces returns newly created workspace testworkspace3!");
     
 # Does creating a duplicate workspace fail
 
