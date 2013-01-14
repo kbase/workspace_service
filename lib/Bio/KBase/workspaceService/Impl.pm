@@ -1142,8 +1142,10 @@ sub new
     }
 
     my %params;
+    print $ENV{KB_DEPLOYMENT_CONFIG}."\n\n";
     if ((my $e = $ENV{KB_DEPLOYMENT_CONFIG}) && -e $ENV{KB_DEPLOYMENT_CONFIG})
     {
+    	
 	my $service = $ENV{KB_SERVICE_NAME};
 	my $c = Config::Simple->new();
 	$c->read($e);
@@ -1158,7 +1160,7 @@ sub new
 	    }
 	}
     }
-
+	
     if (defined $params{"mongodb-host"}) {
 	$self->{_host} = $params{"mongodb-host"};
     }
