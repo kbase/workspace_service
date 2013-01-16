@@ -254,11 +254,18 @@ sub getObject {
 		}
 		return undef;
 	}
+	my $obj;
 	if (defined($options->{instance})) {
-		return $self->parent()->_getObjectByID($id,$type,$self->id(),$options->{instance},{throwErrorIfMissing => 1});
+		$obj = $self->parent()->_getObjectByID($id,$type,$self->id(),$options->{instance});
+	} else {
+		my $uuid = $objects->{$type}->{$id};
+		$obj = $self->parent()->_getObject($uuid);
 	}
-	my $uuid = $objects->{$type}->{$id};
-	return $self->parent()->_getObject($uuid,{throwErrorIfMissing => 1});
+	if (!defined($obj) && defined($options->{throwErrorIfMissing}) && $options->{throwErrorIfMissing} == 1) {
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object ".$self->id()."/".$type."/".$id." not found in database!",
+							       method_name => 'getObject');
+	}
+	return $obj;
 }
 
 =head3 getObjectHistory
@@ -291,7 +298,7 @@ Description:
 =cut
 
 sub getAllObjects {
-	my ($self,$type) = @_;
+	my ($self,$type,$options) = @_;
 	$self->checkPermissions(["r","w","a"]);
 	my $uuids = [];
 	my $objects = $self->objects();
@@ -306,7 +313,7 @@ sub getAllObjects {
 			push(@{$uuids},$objects->{$type}->{$alias});	
 		}
 	}
-	return $self->parent()->_getObjects($uuids,{throwErrorIfMissing => 1}); 
+	return $self->parent()->_getObjects($uuids,$options); 
 }
 
 =head3 saveObject
@@ -325,12 +332,13 @@ sub saveObject {
 	my $continue = 1;
 	my ($ancestor,$instance,$owner);
 	my $uuid = Data::UUID->new()->create_str();
+	my $olduuid = undef;
 	while($continue == 1) {
 		$ancestor = undef;
 		$instance = 0;
 		$owner = $self->currentUser();
 		my $obj = $self->getObject($type,$id);
-		my $olduuid = undef;
+		$olduuid = undef;
 		if (defined($obj)) {
 			if (!defined($meta)) {
 				$meta = $obj->meta();
@@ -344,20 +352,28 @@ sub saveObject {
 			$continue = 0;
 		};
 	}
-	my $newObject = $self->parent()->_createObject({
-		uuid => $uuid,
-		type => $type,
-		workspace => $self->id(),
-		parent => $self->parent(),
-		ancestor => $ancestor,
-		owner => $owner,
-		lastModifiedBy => $self->currentUser(),
-		command => $command,
-		id => $id,
-		instance => $instance,
-		rawdata => $data,
-		meta => $meta
-	});
+	my $newObject;
+	eval {
+		$newObject = $self->parent()->_createObject({
+			uuid => $uuid,
+			type => $type,
+			workspace => $self->id(),
+			parent => $self->parent(),
+			ancestor => $ancestor,
+			owner => $owner,
+			lastModifiedBy => $self->currentUser(),
+			command => $command,
+			id => $id,
+			instance => $instance,
+			rawdata => $data,
+			meta => $meta
+		});
+	};
+	if (!defined($newObject)) {
+		#Deleting the object to prevent the database from getting into a bad state
+		$self->_updateObjects($type,$id,$olduuid,$uuid);
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Save failed for ".$self->id()."/".$type."/".$id."!",method_name => 'saveObject');
+	}
 	return $newObject;
 }
 
@@ -405,20 +421,28 @@ sub revertObject {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "State of object was altered during revert process. Revert aborted!",
 			method_name => 'revertObject');
 	}
-	my $newObject = $self->parent()->_createObject({
-		uuid => $uuid,
-		type => $type,
-		workspace => $self->id(),
-		parent => $self->parent(),
-		ancestor => $obj->ancestor(),
-		owner => $obj->owner(),
-		lastModifiedBy => $self->currentUser(),
-		command => "revert:".$currInst.":".$obj->instance(),
-		id => $id,
-		instance => ($currInst+1),
-		chsum => $obj->chsum(),
-		meta => $obj->meta()
-	});
+	my $newObject;
+	eval {
+		$newObject = $self->parent()->_createObject({
+			uuid => $uuid,
+			type => $type,
+			workspace => $self->id(),
+			parent => $self->parent(),
+			ancestor => $obj->ancestor(),
+			owner => $obj->owner(),
+			lastModifiedBy => $self->currentUser(),
+			command => "revert:".$currInst.":".$obj->instance(),
+			id => $id,
+			instance => ($currInst+1),
+			chsum => $obj->chsum(),
+			meta => $obj->meta()
+		});
+	};
+	if (!defined($newObject)) {
+		#Restoring the old object if the object generation failed
+		$self->_updateObjects($type,$id,$origObj->uuid(),$uuid);
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Revert failed for ".$self->id()."/".$type."/".$id."!",method_name => 'revertObject');
+	}
 	return $newObject;
 }
 
@@ -444,20 +468,28 @@ sub deleteObject {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "State of object was altered during delete process. Delete aborted!",
 			method_name => 'deleteObject');
 	}
-	my $newObject = $self->parent()->_createObject({
-		uuid => $uuid,
-		type => $type,
-		workspace => $self->id(),
-		parent => $self->parent(),
-		ancestor => $obj->uuid(),
-		owner => $obj->owner(),
-		lastModifiedBy => $self->currentUser(),
-		command => "delete",
-		id => $id,
-		instance => ($obj->instance()+1),
-		chsum => $obj->chsum(),
-		meta => $obj->meta()
-	});
+	my $newObject;
+	eval {
+		$newObject = $self->parent()->_createObject({
+			uuid => $uuid,
+			type => $type,
+			workspace => $self->id(),
+			parent => $self->parent(),
+			ancestor => $obj->uuid(),
+			owner => $obj->owner(),
+			lastModifiedBy => $self->currentUser(),
+			command => "delete",
+			id => $id,
+			instance => ($obj->instance()+1),
+			chsum => $obj->chsum(),
+			meta => $obj->meta()
+		});
+	};
+	if (!defined($newObject)) {
+		#Restoring the old object if the object generation failed
+		$self->_updateObjects($type,$id,$obj->uuid(),$uuid);
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Delete failed for ".$self->id()."/".$type."/".$id."!",method_name => 'deleteObject');
+	}
 	return $newObject;
 }
 
@@ -474,16 +506,23 @@ Description:
 sub deleteObjectPermanently {
 	my ($self,$type,$id) = @_;
 	$self->checkPermissions(["a"]);
-	my $obj = $self->getObject($type,$id,{throwErrorIfMissing => 1});
-	if ($obj->command() ne "delete") {
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object must be in a deleted state before it can be permanently deleted!",
-							       method_name => 'deleteObjectPermanently');
+	my $obj = $self->getObject($type,$id);
+	if (defined($obj)) {
+		if ($obj->command() ne "delete") {
+			Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object must be in a deleted state before it can be permanently deleted!",
+								       method_name => 'deleteObjectPermanently');
+		}
+		if ($self->_updateObjects($type,$id,undef,$obj->uuid()) == 0) {
+			Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "State of object was altered during delete process. Delete aborted!",
+								       method_name => 'deleteObjectPermanently');	
+		}
+		$obj->permanentDelete();
+	} elsif (defined($self->objects()->{$type}->{$id})) {
+		if ($self->_updateObjects($type,$id,undef,$self->objects()->{$type}->{$id}) == 0) {
+			Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "State of object was altered during delete process. Delete aborted!",
+								       method_name => 'deleteObjectPermanently');	
+		}
 	}
-	if ($self->_updateObjects($type,$id,undef,$obj->uuid()) == 0) {
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "State of object was altered during delete process. Delete aborted!",
-							       method_name => 'deleteObjectPermanently');	
-	}
-	$obj->permanentDelete();
 	return $obj;
 }
 
