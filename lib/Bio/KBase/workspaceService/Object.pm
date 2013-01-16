@@ -492,44 +492,58 @@ sub allDependencies {
 	my ($self) = @_;
 	if (!defined($self->{_allDependencies})) {
 		$self->{_allDependencies} = {};
+		my $linkSpecs = {
+			Model => {
+				annotation_uuid => "Annotation",
+				biochemistry_uuid => "Biochemistry",
+				mapping_uuid => "Mapping",
+				fbaFormulation_uuids => "FBA",
+				unintegratedGapgen_uuids => "GapGen",
+				integratedGapgen_uuids => "GapGen",
+				unintegratedGapfilling_uuids => "GapFill",
+				integratedGapfilling_uuids => "GapFill",
+			},
+			Genome => {
+				annotation_uuid => "Annotation",
+				contigs_uuid => "Contigs",
+			},
+			Mapping => {
+				biochemistry_uuid => "Biochemistry"
+			},
+			Annotation => {
+				mapping_uuid => "Mapping"
+			},
+			Media => {
+				biochemistry_uuid => "Biochemistry",
+			},
+			GapGen => {
+				model_uuid => "Model",
+				fbaFormulation_uuids => "FBA",
+			},
+			GapFill => {
+				model_uuid => "Model",
+				fbaFormulation_uuids => "FBA",
+			},
+			FBA => {
+				model_uuid => "Model",
+			},
+			PROMModel => {
+				annotation_uuid => "Annotation"
+			}
+		};
 		my $data = $self->data();
-		if ($self->type() eq "Model") {
-			$self->{_allDependencies}->{$data->{annotation_uuid}} = "Annotation";
-			$self->{_allDependencies}->{$data->{biochemistry_uuid}} = "Biochemistry";
-			$self->{_allDependencies}->{$data->{mapping_uuid}} = "Mapping";
-			my $arrayLinks = {
-				"fbaFormulation_uuids" => "FBA",
-				"unintegratedGapgen_uuids" => "GapGen",
-				"integratedGapgen_uuids" => "GapGen",
-				"unintegratedGapfilling_uuids" => "GapFill",
-				"integratedGapfilling_uuids" => "GapFill",
-			};
-			foreach my $key (keys(%{$arrayLinks})) {
+		if (defined($linkSpecs->{$self->type()})) {
+			foreach my $key (keys(%{$linkSpecs->{$self->type()}})) {
 				if (defined($data->{$key})) {
-					foreach my $uuid (@{$data->{$key}}) {
-						$self->{_allDependencies}->{$uuid} = $arrayLinks->{$key};
+					if (ref($data->{$key}) eq "ARRAY") {
+						foreach my $uuid (@{$data->{$key}}) {
+							$self->{_allDependencies}->{$uuid} = $linkSpecs->{$self->type()}->{$key};
+						}
+					} else {
+						$self->{_allDependencies}->{$data->{$key}} = $linkSpecs->{$self->type()}->{$key};
 					}
 				}
 			}
-		} elsif ($self->type() eq "Genome") {
-			$self->{_allDependencies}->{$data->{annotation_uuid}} = "Annotation";
-			$self->{_allDependencies}->{$data->{contigs_uuid}} = "Contigs";
-		} elsif ($self->type() eq "Mapping") {
-			$self->{_allDependencies}->{$data->{biochemistry_uuid}} = "Biochemistry";
-		} elsif ($self->type() eq "Annotation") {
-			$self->{_allDependencies}->{$data->{mapping_uuid}} = "Mapping";
-		} elsif ($self->type() eq "Media") {
-			$self->{_allDependencies}->{$data->{biochemistry_uuid}} = "Biochemistry";
-		} elsif ($self->type() eq "GapGen") {
-			$self->{_allDependencies}->{$data->{model_uuid}} = "Model";
-			$self->{_allDependencies}->{$data->{fbaFormulation_uuid}} = "FBA";
-		} elsif ($self->type() eq "GapFill") {
-			$self->{_allDependencies}->{$data->{model_uuid}} = "Model";
-			$self->{_allDependencies}->{$data->{fbaFormulation_uuid}} = "FBA";
-		} elsif ($self->type() eq "FBA") {
-			$self->{_allDependencies}->{$data->{model_uuid}} = "Model";
-		} elsif ($self->type() eq "PROMModel") {
-			$self->{_allDependencies}->{$data->{annotation_uuid}} = "Annotation";
 		}
 	}
 	return $self->{_allDependencies};
