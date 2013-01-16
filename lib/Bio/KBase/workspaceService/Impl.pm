@@ -358,7 +358,9 @@ sub _createObject {
 		command => $obj->command(),
 		instance => $obj->instance(),
 		chsum => $obj->chsum(),
-		meta => $obj->meta()
+		meta => $obj->meta(),
+		refdeps => $obj->refDependencies(),
+		iddeps => $obj->idDependencies(),
 	});
 	return $obj;
 }

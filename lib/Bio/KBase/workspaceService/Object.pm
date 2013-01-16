@@ -437,6 +437,104 @@ sub permanentDelete {
 	}
 }
 
+=head3 refDependencies
+
+Definition:
+	{string,string} refDependencies();
+Description:
+	Returns a hash of all reference-type linked objects that this object depends on, with the keys being the IDs and the values being the types
+
+=cut
+
+sub refDependencies {
+	my ($self) = @_;
+	my $deps = $self->allDependencies();
+	my $refdeps = {};
+	foreach my $key (keys(%{$deps})) {
+		if ($key =~ m/[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}/) {
+			$refdeps->{$key} = $deps->{$key};
+		}
+	}
+	return $deps;
+}
+
+=head3 idDependencies
+
+Definition:
+	{string,string} idDependencies();
+Description:
+	Returns a hash of all id-type linked objects that this object depends on, with the keys being the IDs and the values being the types
+
+=cut
+
+sub idDependencies {
+	my ($self) = @_;
+	my $deps = $self->allDependencies();
+	my $iddeps = {};
+	foreach my $key (keys(%{$deps})) {
+		if ($key !~ m/[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}/) {
+			$iddeps->{$key} = $deps->{$key};
+		}
+	}
+	return $deps;
+}
+
+=head3 allDependencies
+
+Definition:
+	void allDependencies();
+Description:
+	Returns a hash of all linked objects that this object depends on, with the keys being the IDs and the values being the types
+
+=cut
+
+sub allDependencies {
+	my ($self) = @_;
+	if (!defined($self->{_allDependencies})) {
+		$self->{_allDependencies} = {};
+		my $data = $self->data();
+		if ($self->type() eq "Model") {
+			$self->{_allDependencies}->{$data->{annotation_uuid}} = "Annotation";
+			$self->{_allDependencies}->{$data->{biochemistry_uuid}} = "Biochemistry";
+			$self->{_allDependencies}->{$data->{mapping_uuid}} = "Mapping";
+			my $arrayLinks = {
+				"fbaFormulation_uuids" => "FBA",
+				"unintegratedGapgen_uuids" => "GapGen",
+				"integratedGapgen_uuids" => "GapGen",
+				"unintegratedGapfilling_uuids" => "GapFill",
+				"integratedGapfilling_uuids" => "GapFill",
+			};
+			foreach my $key (keys(%{$arrayLinks})) {
+				if (defined($data->{$key})) {
+					foreach my $uuid (@{$data->{$key}}) {
+						$self->{_allDependencies}->{$uuid} = $arrayLinks->{$key};
+					}
+				}
+			}
+		} elsif ($self->type() eq "Genome") {
+			$self->{_allDependencies}->{$data->{annotation_uuid}} = "Annotation";
+			$self->{_allDependencies}->{$data->{contigs_uuid}} = "Contigs";
+		} elsif ($self->type() eq "Mapping") {
+			$self->{_allDependencies}->{$data->{biochemistry_uuid}} = "Biochemistry";
+		} elsif ($self->type() eq "Annotation") {
+			$self->{_allDependencies}->{$data->{mapping_uuid}} = "Mapping";
+		} elsif ($self->type() eq "Media") {
+			$self->{_allDependencies}->{$data->{biochemistry_uuid}} = "Biochemistry";
+		} elsif ($self->type() eq "GapGen") {
+			$self->{_allDependencies}->{$data->{model_uuid}} = "Model";
+			$self->{_allDependencies}->{$data->{fbaFormulation_uuid}} = "FBA";
+		} elsif ($self->type() eq "GapFill") {
+			$self->{_allDependencies}->{$data->{model_uuid}} = "Model";
+			$self->{_allDependencies}->{$data->{fbaFormulation_uuid}} = "FBA";
+		} elsif ($self->type() eq "FBA") {
+			$self->{_allDependencies}->{$data->{model_uuid}} = "Model";
+		} elsif ($self->type() eq "PROMModel") {
+			$self->{_allDependencies}->{$data->{annotation_uuid}} = "Annotation";
+		}
+	}
+	return $self->{_allDependencies};
+}
+
 sub _validateID {
 	my ($self,$id) = @_;
 	$self->parent()->_validateObjectID($id);

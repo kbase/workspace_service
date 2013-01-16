@@ -273,7 +273,7 @@ my $data = "This is my data string";
 my %metadata = (a=>1,b=>2,c=>3);
 my $conf = {
         id => "Test1",
-        type => "Genome",
+        type => "TestData",
         data => $data,
         workspace => "testworkspace",
         command => "string",
@@ -282,13 +282,13 @@ my $conf = {
     };
 my $conf1 = {
         id => "Test1",
-        type => "Genome",
+        type => "TestData",
         workspace => "testworkspace",
         auth => $oauth
     };
 my $conf2 = {
         id => "Test2",
-        type => "Genome",
+        type => "TestData",
         workspace => "testworkspace",
         auth => $oauth
     };
@@ -369,7 +369,7 @@ $conf2 = {
 	new_id => "TestCopy",
 	new_workspace => "testworkspace2",
 	source_id => "Test1",
-	type => "Genome",
+	type => "TestData",
 	source_workspace => "testworkspace",
 	auth => $oauth
 };
@@ -391,23 +391,23 @@ ok $objmeta->[0] eq "TestMove",
 note("Delete object TestCopy from testworkspace2");
 $conf2 = {
 	id => "TestCopy",
-	type => "Genome",
+	type => "TestData",
 	workspace => "testworkspace2",
 	auth => $oauth
 };
 #Deleting object
-eval {
+#eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
 	$objmeta = $impl->delete_object($conf2);
-};
+#};
 ok $objmeta->[4] eq "delete",
 	"delete_object successfully returned metadata for deleted object!";
 #Reverting deleted object
-eval {
+#eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
 	$objmeta = $impl->revert_object($conf2);
 	print Dumper($objmeta);
-};
+#};
 ok $objmeta->[4] =~ m/^revert/,"object successfully reverted!";
 #	"revert_object successfully undeleted TestCopy!";
 my $objmetas;
