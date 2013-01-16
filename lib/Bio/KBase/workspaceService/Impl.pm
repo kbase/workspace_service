@@ -245,7 +245,7 @@ Description:
 
 sub _saveObjectByRef {
 	my ($self,$type,$id,$data,$command,$meta) = @_;
-	$self->_validateType($type);
+	$self->_validateObjectType($type);
 	return $self->_createObject({
 		uuid => Data::UUID->new()->create_str(),
 		type => $type,
