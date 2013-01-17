@@ -537,10 +537,13 @@ sub allDependencies {
 				if (defined($data->{$key})) {
 					if (ref($data->{$key}) eq "ARRAY") {
 						foreach my $uuid (@{$data->{$key}}) {
+							$uuid =~ s/\./_DOT_/g;
 							$self->{_allDependencies}->{$uuid} = $linkSpecs->{$self->type()}->{$key};
 						}
 					} else {
-						$self->{_allDependencies}->{$data->{$key}} = $linkSpecs->{$self->type()}->{$key};
+						my $uuid = $data->{$key};
+						$uuid =~ s/\./_DOT_/g;
+						$self->{_allDependencies}->{$uuid} = $linkSpecs->{$self->type()}->{$key};
 					}
 				}
 			}
