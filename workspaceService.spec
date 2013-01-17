@@ -96,7 +96,6 @@ module workspaceService {
 		object_type type - type of the object (e.g. Genome)
 		timestamp moddate - date when the object was modified by the user (e.g. 2012-12-17T23:24:06)
 		int instance - instance of the object, which is equal to the number of times the user has overwritten the object
-		timestamp date_created - time at which the alignment was built/loaded in seconds since the epoch
 		string command - name of the command last used to modify or create the object
 		username lastmodifier - name of the user who last modified the object
 		username owner - name of the user who owns (who created) this object

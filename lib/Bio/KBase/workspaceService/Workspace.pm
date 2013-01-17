@@ -369,10 +369,13 @@ sub saveObject {
 			meta => $meta
 		});
 	};
-	if (!defined($newObject)) {
+	if ($@ || !defined($newObject)) {
+		my $errmsg = $@;
 		#Deleting the object to prevent the database from getting into a bad state
 		$self->_updateObjects($type,$id,$olduuid,$uuid);
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Save failed for ".$self->id()."/".$type."/".$id."!",method_name => 'saveObject');
+		my $msg = "Save failed for ".$self->id()."/".$type."/".$id."!\n";
+		$msg .= $errmsg;
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'saveObject');
 	}
 	return $newObject;
 }
