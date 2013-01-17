@@ -346,6 +346,7 @@ sub _createObject {
 	my ($self,$data) = @_;
 	$data->{parent} = $self;
 	my $obj = Bio::KBase::workspaceService::Object->new($data);
+	$obj->setDefaultMetadata();
 	$self->_mongodb()->workspaceObjects->insert({
 		uuid => $obj->uuid(),
 		id => $obj->id(),

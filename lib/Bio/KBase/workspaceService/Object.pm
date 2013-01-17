@@ -552,6 +552,42 @@ sub allDependencies {
 	return $self->{_allDependencies};
 }
 
+=head3 setDefaultMetadata
+
+Definition:
+	void setDefaultMetadata();
+Description:
+	Sets the metadata portion of the object to a default value based on type
+=cut
+
+sub setDefaultMetadata {
+	my ($self) = @_;
+	my $data = $self->data();
+	if ($self->type() eq "Model") {
+		if (defined($data->{name})) {
+			$self->meta()->{name} = $data->{name};
+		}
+		if (defined($data->{id})) {
+			$self->meta()->{id} = $data->{id};
+		}
+		if (defined($data->{type})) {
+			$self->meta()->{type} = $data->{type};
+		}
+		if (defined($data->{modelcompounds})) {
+			my $num = @{$data->{modelcompounds}};
+			$self->meta()->{number_compounds} = $num;
+		}
+		if (defined($data->{modelreactions})) {
+			my $num = @{$data->{modelreactions}};
+			$self->meta()->{number_reactions} = $num;
+		}
+		if (defined($data->{modelcompartments})) {
+			my $num = @{$data->{modelcompartments}};
+			$self->meta()->{number_compartments} = $num;
+		}
+	}
+}
+
 sub _validateID {
 	my ($self,$id) = @_;
 	$self->parent()->_validateObjectID($id);
