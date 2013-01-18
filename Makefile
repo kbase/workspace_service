@@ -113,8 +113,7 @@ deploy-basic-service:
 
 deploy-docs:
 	if [ ! -d docs ] ; then mkdir -p docs ; fi
-	#$(KB_RUNTIME)/bin/pod2html -t "workspaceService" lib/Bio/KBase/workspaceService/Impl.pm > docs/workspaceService.html
-	$(KB_RUNTIME)/bin/pod2html -t "workspaceService" workspaceService.pod > docs/workspaceService.html
+	$(KB_RUNTIME)/bin/pod2html -t "workspaceService" lib/Bio/KBase/workspaceService/Client.pm > docs/workspaceService.html
 	cp docs/*html $(SERV_SERVICE_DIR)/webroot/.
 
 compile-typespec:
