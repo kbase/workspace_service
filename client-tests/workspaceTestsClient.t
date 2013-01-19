@@ -25,14 +25,9 @@ ok( defined $impl, "Did an impl object get defined" );
 isa_ok( $impl, 'Bio::KBase::workspaceService::Client', "Is it in the right class" );   
 
 my $oauth_token = $token->token();
-my @kbws = `kbws-list`;
-print "DEBUG: KBWS\n@kbws\n\n";
 
 # Can I delete a workspace
 eval { $impl->delete_workspace({workspace=>"testworkspace1",auth=>$oauth_token})  };
-
-my $workspace_list = $impl->list_workspaces({auth=>$oauth_token});
-print Dumper($workspace_list);
 
 # Can I create a test workspace
 my $wsmeta1 = $impl->create_workspace({workspace=>"testworkspace1",default_permission=>"n",auth=>$oauth_token});
@@ -52,7 +47,7 @@ ok($wsmeta1->[5] eq "n", "ws has n global perms");
 
 # Is the workspace listed
 
-$workspace_list = $impl->list_workspaces({auth=>$oauth_token});
+my $workspace_list = $impl->list_workspaces({auth=>$oauth_token});
 my $idhash1={};
 foreach my $ws1 (@{$workspace_list}) {
     $idhash1->{$ws1->[0]} = 1;
@@ -139,11 +134,5 @@ $impl->delete_workspace({workspace=>"testworkspace2", auth=>$oauth_token});
 $impl->delete_workspace({workspace=>"testworkspace3", auth=>$oauth_token});
 $impl->delete_workspace({workspace=>"testworkspace4", auth=>$oauth_token});
 $impl->delete_workspace({workspace=>"testworkspace5", auth=>$oauth_token});
-
-$workspace_list = $impl->list_workspaces({auth=>$oauth_token});
-print "WORKSPACE_LIST=@$workspace_list\n";
-
-@kbws = `kbws-list`;
-print "DEBUG: KBWS\n@kbws\n\n";
 
 done_testing($test_count);
