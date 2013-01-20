@@ -18,6 +18,7 @@ our %return_counts = (
         'delete_object_permanently' => 1,
         'get_object' => 1,
         'get_object_by_ref' => 1,
+        'save_object_by_ref' => 1,
         'get_objectmeta' => 1,
         'get_objectmeta_by_ref' => 1,
         'object_to_html' => 1,
@@ -58,6 +59,7 @@ sub _build_valid_methods
         'delete_object_permanently' => 1,
         'get_object' => 1,
         'get_object_by_ref' => 1,
+        'save_object_by_ref' => 1,
         'get_objectmeta' => 1,
         'get_objectmeta_by_ref' => 1,
         'object_to_html' => 1,
@@ -203,7 +205,7 @@ is available via $context->client_ip.
 
 use base 'Class::Accessor';
 
-__PACKAGE__->mk_accessors(qw(user_id client_ip authenticated token));
+__PACKAGE__->mk_accessors(qw(user_id client_ip authenticated));
 
 sub new
 {

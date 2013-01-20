@@ -124,17 +124,17 @@ ObjectData is a reference to a hash where the following keys are defined:
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -166,17 +166,17 @@ ObjectData is a reference to a hash where the following keys are defined:
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -262,17 +262,17 @@ object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -296,17 +296,17 @@ object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -393,17 +393,17 @@ object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -427,17 +427,17 @@ object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -521,27 +521,26 @@ get_object_params is a reference to a hash where the following keys are defined:
 	instance has a value which is an int
 	auth has a value which is a string
 	asHash has a value which is a bool
+	asJSON has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
-	data has a value which is an ObjectData
+	data has a value which is a string
 	metadata has a value which is an object_metadata
-ObjectData is a reference to a hash where the following keys are defined:
-	version has a value which is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -561,27 +560,26 @@ get_object_params is a reference to a hash where the following keys are defined:
 	instance has a value which is an int
 	auth has a value which is a string
 	asHash has a value which is a bool
+	asJSON has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
-	data has a value which is an ObjectData
+	data has a value which is a string
 	metadata has a value which is an object_metadata
-ObjectData is a reference to a hash where the following keys are defined:
-	version has a value which is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -662,25 +660,24 @@ get_object_by_ref_params is a reference to a hash where the following keys are d
 	reference has a value which is a workspace_ref
 	auth has a value which is a string
 	asHash has a value which is a bool
+	asJSON has a value which is a bool
 workspace_ref is a string
 bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
-	data has a value which is an ObjectData
+	data has a value which is a string
 	metadata has a value which is an object_metadata
-ObjectData is a reference to a hash where the following keys are defined:
-	version has a value which is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 object_id is a string
 object_type is a string
 timestamp is a string
@@ -699,25 +696,24 @@ get_object_by_ref_params is a reference to a hash where the following keys are d
 	reference has a value which is a workspace_ref
 	auth has a value which is a string
 	asHash has a value which is a bool
+	asJSON has a value which is a bool
 workspace_ref is a string
 bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
-	data has a value which is an ObjectData
+	data has a value which is a string
 	metadata has a value which is an object_metadata
-ObjectData is a reference to a hash where the following keys are defined:
-	version has a value which is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 object_id is a string
 object_type is a string
 timestamp is a string
@@ -783,6 +779,156 @@ sub get_object_by_ref
 
 
 
+=head2 save_object_by_ref
+
+  $metadata = $obj->save_object_by_ref($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a save_object_by_ref_params
+$metadata is an object_metadata
+save_object_by_ref_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	data has a value which is an ObjectData
+	command has a value which is a string
+	metadata has a value which is a reference to a hash where the key is a string and the value is a string
+	reference has a value which is a workspace_ref
+	json has a value which is a bool
+	compressed has a value which is a bool
+	retrieveFromURL has a value which is a bool
+	replace has a value which is a bool
+	auth has a value which is a string
+	asHash has a value which is a bool
+object_id is a string
+object_type is a string
+ObjectData is a reference to a hash where the following keys are defined:
+	version has a value which is an int
+workspace_ref is a string
+bool is an int
+object_metadata is a reference to a list containing 11 items:
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
+timestamp is a string
+username is a string
+workspace_id is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a save_object_by_ref_params
+$metadata is an object_metadata
+save_object_by_ref_params is a reference to a hash where the following keys are defined:
+	id has a value which is an object_id
+	type has a value which is an object_type
+	data has a value which is an ObjectData
+	command has a value which is a string
+	metadata has a value which is a reference to a hash where the key is a string and the value is a string
+	reference has a value which is a workspace_ref
+	json has a value which is a bool
+	compressed has a value which is a bool
+	retrieveFromURL has a value which is a bool
+	replace has a value which is a bool
+	auth has a value which is a string
+	asHash has a value which is a bool
+object_id is a string
+object_type is a string
+ObjectData is a reference to a hash where the following keys are defined:
+	version has a value which is an int
+workspace_ref is a string
+bool is an int
+object_metadata is a reference to a list containing 11 items:
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
+timestamp is a string
+username is a string
+workspace_id is a string
+
+
+=end text
+
+=item Description
+
+Retrieves the specified object from the specified workspace.
+Both the object data and metadata are returned.
+This commands provides access to all versions of the object via the instance parameter.
+
+=back
+
+=cut
+
+sub save_object_by_ref
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function save_object_by_ref (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to save_object_by_ref:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'save_object_by_ref');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "workspaceService.save_object_by_ref",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'save_object_by_ref',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method save_object_by_ref",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'save_object_by_ref',
+				       );
+    }
+}
+
+
+
 =head2 get_objectmeta
 
   $metadata = $obj->get_objectmeta($params)
@@ -808,17 +954,17 @@ object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -843,17 +989,17 @@ object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -936,17 +1082,17 @@ get_objectmeta_by_ref_params is a reference to a hash where the following keys a
 workspace_ref is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 object_id is a string
 object_type is a string
 timestamp is a string
@@ -968,17 +1114,17 @@ get_objectmeta_by_ref_params is a reference to a hash where the following keys a
 workspace_ref is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 object_id is a string
 object_type is a string
 timestamp is a string
@@ -1263,17 +1409,17 @@ object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -1298,17 +1444,17 @@ object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -1401,17 +1547,17 @@ workspace_id is a string
 object_type is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -1439,17 +1585,17 @@ workspace_id is a string
 object_type is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -1540,17 +1686,17 @@ workspace_id is a string
 object_type is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -1577,17 +1723,17 @@ workspace_id is a string
 object_type is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -1775,17 +1921,17 @@ object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -1809,17 +1955,17 @@ object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 timestamp is a string
 username is a string
 workspace_ref is a string
@@ -1903,12 +2049,12 @@ workspace_id is a string
 permission is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspace_id
-	1: (owner) a username
-	2: (moddate) a timestamp
-	3: (objects) an int
-	4: (user_permission) a permission
-	5: (global_permission) a permission
+	0: a workspace_id
+	1: a username
+	2: a timestamp
+	3: an int
+	4: a permission
+	5: a permission
 username is a string
 timestamp is a string
 
@@ -1929,12 +2075,12 @@ workspace_id is a string
 permission is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspace_id
-	1: (owner) a username
-	2: (moddate) a timestamp
-	3: (objects) an int
-	4: (user_permission) a permission
-	5: (global_permission) a permission
+	0: a workspace_id
+	1: a username
+	2: a timestamp
+	3: an int
+	4: a permission
+	5: a permission
 username is a string
 timestamp is a string
 
@@ -2015,12 +2161,12 @@ get_workspacemeta_params is a reference to a hash where the following keys are d
 workspace_id is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspace_id
-	1: (owner) a username
-	2: (moddate) a timestamp
-	3: (objects) an int
-	4: (user_permission) a permission
-	5: (global_permission) a permission
+	0: a workspace_id
+	1: a username
+	2: a timestamp
+	3: an int
+	4: a permission
+	5: a permission
 username is a string
 timestamp is a string
 permission is a string
@@ -2040,12 +2186,12 @@ get_workspacemeta_params is a reference to a hash where the following keys are d
 workspace_id is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspace_id
-	1: (owner) a username
-	2: (moddate) a timestamp
-	3: (objects) an int
-	4: (user_permission) a permission
-	5: (global_permission) a permission
+	0: a workspace_id
+	1: a username
+	2: a timestamp
+	3: an int
+	4: a permission
+	5: a permission
 username is a string
 timestamp is a string
 permission is a string
@@ -2219,12 +2365,12 @@ delete_workspace_params is a reference to a hash where the following keys are de
 workspace_id is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspace_id
-	1: (owner) a username
-	2: (moddate) a timestamp
-	3: (objects) an int
-	4: (user_permission) a permission
-	5: (global_permission) a permission
+	0: a workspace_id
+	1: a username
+	2: a timestamp
+	3: an int
+	4: a permission
+	5: a permission
 username is a string
 timestamp is a string
 permission is a string
@@ -2244,12 +2390,12 @@ delete_workspace_params is a reference to a hash where the following keys are de
 workspace_id is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspace_id
-	1: (owner) a username
-	2: (moddate) a timestamp
-	3: (objects) an int
-	4: (user_permission) a permission
-	5: (global_permission) a permission
+	0: a workspace_id
+	1: a username
+	2: a timestamp
+	3: an int
+	4: a permission
+	5: a permission
 username is a string
 timestamp is a string
 permission is a string
@@ -2335,12 +2481,12 @@ workspace_id is a string
 permission is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspace_id
-	1: (owner) a username
-	2: (moddate) a timestamp
-	3: (objects) an int
-	4: (user_permission) a permission
-	5: (global_permission) a permission
+	0: a workspace_id
+	1: a username
+	2: a timestamp
+	3: an int
+	4: a permission
+	5: a permission
 username is a string
 timestamp is a string
 
@@ -2363,12 +2509,12 @@ workspace_id is a string
 permission is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspace_id
-	1: (owner) a username
-	2: (moddate) a timestamp
-	3: (objects) an int
-	4: (user_permission) a permission
-	5: (global_permission) a permission
+	0: a workspace_id
+	1: a username
+	2: a timestamp
+	3: an int
+	4: a permission
+	5: a permission
 username is a string
 timestamp is a string
 
@@ -2447,12 +2593,12 @@ list_workspaces_params is a reference to a hash where the following keys are def
 	asHash has a value which is a bool
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspace_id
-	1: (owner) a username
-	2: (moddate) a timestamp
-	3: (objects) an int
-	4: (user_permission) a permission
-	5: (global_permission) a permission
+	0: a workspace_id
+	1: a username
+	2: a timestamp
+	3: an int
+	4: a permission
+	5: a permission
 workspace_id is a string
 username is a string
 timestamp is a string
@@ -2471,12 +2617,12 @@ list_workspaces_params is a reference to a hash where the following keys are def
 	asHash has a value which is a bool
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspace_id
-	1: (owner) a username
-	2: (moddate) a timestamp
-	3: (objects) an int
-	4: (user_permission) a permission
-	5: (global_permission) a permission
+	0: a workspace_id
+	1: a username
+	2: a timestamp
+	3: an int
+	4: a permission
+	5: a permission
 workspace_id is a string
 username is a string
 timestamp is a string
@@ -2561,17 +2707,17 @@ list_workspace_objects_params is a reference to a hash where the following keys 
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 object_id is a string
 object_type is a string
 timestamp is a string
@@ -2595,17 +2741,17 @@ list_workspace_objects_params is a reference to a hash where the following keys 
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) an object_id
-	1: (type) an object_type
-	2: (moddate) a timestamp
-	3: (instance) an int
-	4: (command) a string
-	5: (lastmodifier) a username
-	6: (owner) a username
-	7: (workspace) a workspace_id
-	8: (ref) a workspace_ref
-	9: (chsum) a string
-	10: (metadata) a reference to a hash where the key is a string and the value is a string
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
 object_id is a string
 object_type is a string
 timestamp is a string
@@ -2691,12 +2837,12 @@ permission is a string
 workspace_id is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspace_id
-	1: (owner) a username
-	2: (moddate) a timestamp
-	3: (objects) an int
-	4: (user_permission) a permission
-	5: (global_permission) a permission
+	0: a workspace_id
+	1: a username
+	2: a timestamp
+	3: an int
+	4: a permission
+	5: a permission
 username is a string
 timestamp is a string
 
@@ -2717,12 +2863,12 @@ permission is a string
 workspace_id is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspace_id
-	1: (owner) a username
-	2: (moddate) a timestamp
-	3: (objects) an int
-	4: (user_permission) a permission
-	5: (global_permission) a permission
+	0: a workspace_id
+	1: a username
+	2: a timestamp
+	3: an int
+	4: a permission
+	5: a permission
 username is a string
 timestamp is a string
 
@@ -3082,7 +3228,6 @@ $params is a queue_job_params
 $success is a bool
 queue_job_params is a reference to a hash where the following keys are defined:
 	jobid has a value which is a string
-	jobws has a value which is a string
 	auth has a value which is a string
 bool is an int
 
@@ -3096,7 +3241,6 @@ $params is a queue_job_params
 $success is a bool
 queue_job_params is a reference to a hash where the following keys are defined:
 	jobid has a value which is a string
-	jobws has a value which is a string
 	auth has a value which is a string
 bool is an int
 
@@ -3173,7 +3317,6 @@ $params is a set_job_status_params
 $success is a bool
 set_job_status_params is a reference to a hash where the following keys are defined:
 	jobid has a value which is a string
-	jobws has a value which is a string
 	status has a value which is a string
 	auth has a value which is a string
 bool is an int
@@ -3188,7 +3331,6 @@ $params is a set_job_status_params
 $success is a bool
 set_job_status_params is a reference to a hash where the following keys are defined:
 	jobid has a value which is a string
-	jobws has a value which is a string
 	status has a value which is a string
 	auth has a value which is a string
 bool is an int
@@ -3901,7 +4043,6 @@ a string
 =item Description
 
 Generic definition for object data stored in the workspace
-
 Data objects stored in the workspace could be either a string or a reference to a complex perl data structure. So we can't really formulate a strict type definition for this data.
 
 version - for complex data structures, the datastructure should include a version number to enable tracking of changes that may occur to the structure of the data over time
@@ -3960,17 +4101,17 @@ Meta data associated with an object stored in a workspace.
 
 <pre>
 a reference to a list containing 11 items:
-0: (id) an object_id
-1: (type) an object_type
-2: (moddate) a timestamp
-3: (instance) an int
-4: (command) a string
-5: (lastmodifier) a username
-6: (owner) a username
-7: (workspace) a workspace_id
-8: (ref) a workspace_ref
-9: (chsum) a string
-10: (metadata) a reference to a hash where the key is a string and the value is a string
+0: an object_id
+1: an object_type
+2: a timestamp
+3: an int
+4: a string
+5: a username
+6: a username
+7: a workspace_id
+8: a workspace_ref
+9: a string
+10: a reference to a hash where the key is a string and the value is a string
 
 </pre>
 
@@ -3979,17 +4120,17 @@ a reference to a list containing 11 items:
 =begin text
 
 a reference to a list containing 11 items:
-0: (id) an object_id
-1: (type) an object_type
-2: (moddate) a timestamp
-3: (instance) an int
-4: (command) a string
-5: (lastmodifier) a username
-6: (owner) a username
-7: (workspace) a workspace_id
-8: (ref) a workspace_ref
-9: (chsum) a string
-10: (metadata) a reference to a hash where the key is a string and the value is a string
+0: an object_id
+1: an object_type
+2: a timestamp
+3: an int
+4: a string
+5: a username
+6: a username
+7: a workspace_id
+8: a workspace_ref
+9: a string
+10: a reference to a hash where the key is a string and the value is a string
 
 
 =end text
@@ -4022,12 +4163,12 @@ Meta data associated with a workspace.
 
 <pre>
 a reference to a list containing 6 items:
-0: (id) a workspace_id
-1: (owner) a username
-2: (moddate) a timestamp
-3: (objects) an int
-4: (user_permission) a permission
-5: (global_permission) a permission
+0: a workspace_id
+1: a username
+2: a timestamp
+3: an int
+4: a permission
+5: a permission
 
 </pre>
 
@@ -4036,12 +4177,12 @@ a reference to a list containing 6 items:
 =begin text
 
 a reference to a list containing 6 items:
-0: (id) a workspace_id
-1: (owner) a username
-2: (moddate) a timestamp
-3: (objects) an int
-4: (user_permission) a permission
-5: (global_permission) a permission
+0: a workspace_id
+1: a username
+2: a timestamp
+3: an int
+4: a permission
+5: a permission
 
 
 =end text
@@ -4268,6 +4409,7 @@ Input parameters for the "get_object" function.
         int instance - Version of the object to be retrieved, enabling retrieval of any previous version of an object (an optional argument; the current version is retrieved if no version is provides)
         string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument; user is "public" if auth is not provided)
         bool asHash - a boolean indicating if metadata should be returned as a hash
+        bool asJSON - indicates that data should be returned in JSON format (an optional argument; default is '0')
 
 
 =item Definition
@@ -4282,6 +4424,7 @@ workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
 asHash has a value which is a bool
+asJSON has a value which is a bool
 
 </pre>
 
@@ -4296,6 +4439,7 @@ workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
 asHash has a value which is a bool
+asJSON has a value which is a bool
 
 
 =end text
@@ -4314,7 +4458,7 @@ asHash has a value which is a bool
 
 Output generated by the "get_object" function.
 
-        ObjectData data - data for object retrieved (an essential argument)
+        string data - data for object retrieved in json format (an essential argument)
         object_metadata metadata - metadata for object retrieved (an essential argument)
 
 
@@ -4324,7 +4468,7 @@ Output generated by the "get_object" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-data has a value which is an ObjectData
+data has a value which is a string
 metadata has a value which is an object_metadata
 
 </pre>
@@ -4334,7 +4478,7 @@ metadata has a value which is an object_metadata
 =begin text
 
 a reference to a hash where the following keys are defined:
-data has a value which is an ObjectData
+data has a value which is a string
 metadata has a value which is an object_metadata
 
 
@@ -4357,6 +4501,7 @@ Input parameters for the "get_object_by_ref" function.
         workspace_ref reference - reference to a specific instance of a specific object in a workspace (an essential argument)
         string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument; user is "public" if auth is not provided)
         bool asHash - a boolean indicating if metadata should be returned as a hash
+        bool asJSON - indicates that data should be returned in JSON format (an optional argument; default is '0')
 
 
 =item Definition
@@ -4368,6 +4513,7 @@ a reference to a hash where the following keys are defined:
 reference has a value which is a workspace_ref
 auth has a value which is a string
 asHash has a value which is a bool
+asJSON has a value which is a bool
 
 </pre>
 
@@ -4377,6 +4523,77 @@ asHash has a value which is a bool
 
 a reference to a hash where the following keys are defined:
 reference has a value which is a workspace_ref
+auth has a value which is a string
+asHash has a value which is a bool
+asJSON has a value which is a bool
+
+
+=end text
+
+=back
+
+
+
+=head2 save_object_by_ref_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "save_object_by_ref" function.
+
+        object_id id - ID to which the model should be saved (an essential argument)
+        object_type type - type of the object for which metadata is to be retrieved (an essential argument)
+        ObjectData data - string or reference to complex datastructure to be saved in the workspace (an essential argument)
+        string command - the name of the KBase command that is calling the "save_object" function (an optional argument with default "unknown")
+        mapping<string,string> metadata - a hash of metadata to be associated with the object (an optional argument with default "{}")
+        workspace_ref reference - reference the object should be saved in
+        bool json - a flag indicating if the input data is encoded as a JSON string (an optional argument with default "0")
+        bool compressed - a flag indicating if the input data in zipped (an optional argument with default "0")
+        bool retrieveFromURL - a flag indicating that the "data" argument contains a URL from which the actual data should be downloaded (an optional argument with default "0")
+        bool replace - a flag indicating any existing object located at the specified reference should be overwritten (an optional argument with default "0")
+        string auth - the authentication token of the KBase account to associate this save command (an optional argument, user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+type has a value which is an object_type
+data has a value which is an ObjectData
+command has a value which is a string
+metadata has a value which is a reference to a hash where the key is a string and the value is a string
+reference has a value which is a workspace_ref
+json has a value which is a bool
+compressed has a value which is a bool
+retrieveFromURL has a value which is a bool
+replace has a value which is a bool
+auth has a value which is a string
+asHash has a value which is a bool
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+id has a value which is an object_id
+type has a value which is an object_type
+data has a value which is an ObjectData
+command has a value which is a string
+metadata has a value which is a reference to a hash where the key is a string and the value is a string
+reference has a value which is a workspace_ref
+json has a value which is a bool
+compressed has a value which is a bool
+retrieveFromURL has a value which is a bool
+replace has a value which is a bool
 auth has a value which is a string
 asHash has a value which is a bool
 
@@ -5342,7 +5559,6 @@ auth has a value which is a string
 Input parameters for the "queue_job" function.
 
         string jobid - ID of the job to be queued (an essential argument)
-        string jobws - Workspace containing the job to be queued (an essential argument)
         string auth - the authentication token of the KBase account queuing the job; must have access to the job being queued (an optional argument; user is "public" if auth is not provided)
 
 
@@ -5353,7 +5569,6 @@ Input parameters for the "queue_job" function.
 <pre>
 a reference to a hash where the following keys are defined:
 jobid has a value which is a string
-jobws has a value which is a string
 auth has a value which is a string
 
 </pre>
@@ -5364,7 +5579,6 @@ auth has a value which is a string
 
 a reference to a hash where the following keys are defined:
 jobid has a value which is a string
-jobws has a value which is a string
 auth has a value which is a string
 
 
@@ -5385,7 +5599,6 @@ auth has a value which is a string
 Input parameters for the "set_job_status" function.
 
         string jobid - ID of the job to be have status changed (an essential argument)
-        string jobws - Workspace containing the job to have status changed (an essential argument)
         string status - Status to which job should be changed; accepted values are 'queued', 'running', and 'done' (an essential argument)
         string auth - the authentication token of the KBase account requesting job status; only status for owned jobs can be retrieved (an optional argument; user is "public" if auth is not provided)
 
@@ -5397,7 +5610,6 @@ Input parameters for the "set_job_status" function.
 <pre>
 a reference to a hash where the following keys are defined:
 jobid has a value which is a string
-jobws has a value which is a string
 status has a value which is a string
 auth has a value which is a string
 
@@ -5409,7 +5621,6 @@ auth has a value which is a string
 
 a reference to a hash where the following keys are defined:
 jobid has a value which is a string
-jobws has a value which is a string
 status has a value which is a string
 auth has a value which is a string
 

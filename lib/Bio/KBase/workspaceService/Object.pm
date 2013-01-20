@@ -573,9 +573,16 @@ sub setDefaultMetadata {
 		if (defined($data->{type})) {
 			$self->meta()->{type} = $data->{type};
 		}
+		if (defined($data->{annotation_uuid})) {
+			$self->meta()->{annotation_uuid} = $data->{annotation_uuid};
+		}
 		if (defined($data->{modelcompounds})) {
 			my $num = @{$data->{modelcompounds}};
 			$self->meta()->{number_compounds} = $num;
+		}
+		if (defined($data->{biomasses}->[0])) {
+			my $num = @{$data->{biomasses}->[0]->{biomasscompounds}};
+			$self->meta()->{number_biomasscpd} = $num;
 		}
 		if (defined($data->{modelreactions})) {
 			my $num = @{$data->{modelreactions}};
@@ -585,6 +592,81 @@ sub setDefaultMetadata {
 			my $num = @{$data->{modelcompartments}};
 			$self->meta()->{number_compartments} = $num;
 		}
+		if (defined($data->{modelreactions})) {
+			my $genehash = {};
+			for (my $i=0; $i < @{$data->{modelreactions}}; $i++) {
+				my $rxn = $data->{modelreactions}->[$i];
+				if (defined($rxn->{modelReactionProteins})) {
+					for (my $j=0; $j < @{$rxn->{modelReactionProteins}}; $j++) {
+						my $prot = $rxn->{modelReactionProteins}->[$j];
+						if (defined($prot->{modelReactionProteinSubunits})) {
+							for (my $k=0; $k < @{$prot->{modelReactionProteinSubunits}}; $k++) {
+								my $subunit = $prot->{modelReactionProteinSubunitGenes}->[$k];
+								if (defined($subunit->{modelReactionProteinSubunitGenes})) {
+									for (my $m=0; $m < @{$subunit->{modelReactionProteinSubunitGenes}}; $m++) {
+										my $gene = $subunit->{modelReactionProteinSubunitGenes}->[$m];
+										if (defined($gene->{role_uuid})) {
+											$genehash->{$gene->{role_uuid}} = 1;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			$self->meta()->{number_genes} = keys(%{$genehash});
+		}
+	} elsif ($self->type() eq "FBA") {
+		if (defined($data->{media_uuid})) {
+			$self->meta()->{media_uuid} = $data->{media_uuid};
+		}
+		if (defined($data->{notes})) {
+			$self->meta()->{notes} = $data->{notes};
+		}
+		if (defined($data->{fbaResults}->[0]->{objectiveValue})) {
+			$self->meta()->{object_value} = $data->{fbaResults}->[0]->{objectiveValue};
+		}
+	} elsif ($self->type() eq "Media") {
+		if (defined($data->{id})) {
+			$self->meta()->{id} = $data->{id};
+		}
+		if (defined($data->{name})) {
+			$self->meta()->{name} = $data->{name};
+		}
+		if (defined($data->{type})) {
+			$self->meta()->{type} = $data->{type};
+		}
+		if (defined($data->{isMinimal})) {
+			$self->meta()->{isMinimal} = $data->{isMinimal};
+		}
+		if (defined($data->{isDefined})) {
+			$self->meta()->{isDefined} = $data->{isDefined};
+		}
+		if (defined($data->{mediacompounds})) {
+			my $num = @{$data->{mediacompounds}};
+			$self->meta()->{number_compounds} = $num;
+		}	
+	} elsif ($self->type() eq "Genome") {
+		if (defined($data->{domain})) {
+			$self->meta()->{domain} = $data->{domain};
+		}
+		if (defined($data->{gc})) {
+			$self->meta()->{gc} = $data->{gc};
+		}
+		if (defined($data->{scientific_name})) {
+			$self->meta()->{scientific_name} = $data->{scientific_name};
+		}
+		if (defined($data->{size})) {
+			$self->meta()->{size} = $data->{size};
+		}
+		if (defined($data->{id})) {
+			$self->meta()->{id} = $data->{id};
+		}
+		if (defined($data->{features})) {
+			my $num = @{$data->{features}};
+			$self->meta()->{number_features} = $num;
+		}	
 	}
 }
 
