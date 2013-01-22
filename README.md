@@ -18,11 +18,13 @@ By default this is assumed to run on `localhost`.
 
 Create the `/data` directory if it doesn't already exist.
 
-    mkdir -p /data/db
+    # don't do this on Magellan instances
+    mkdir -p /data/db 
 
 On Magellan instances it is advisable to have this on the
 `/mnt` partition for performance reasons:
 
+    mkdir /data
     mkdir -p /mnt/db
     ln -s /mnt/db /data/db
 
