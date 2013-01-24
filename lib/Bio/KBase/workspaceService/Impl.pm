@@ -1062,7 +1062,7 @@ sub _validateWorkspaceID {
 sub _validateUserID {
 	my ($self,$id) = @_;
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Username must contain only alphanumeric characters!",
-		method_name => '_validateUserID') if ($id !~ m/^\w+$/);
+		method_name => '_validateUserID') if ($id !~ m/^[\w-]+$/);
 }
 
 sub _validateObjectID {

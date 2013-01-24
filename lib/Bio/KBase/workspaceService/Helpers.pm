@@ -50,7 +50,7 @@ sub workspace {
 	    		open(my $fh, ">", $filename) || return;
 		        print $fh $CurrentWorkspace;
 		        close($fh);
-    		} elsif ($ENV{KB_WORKSPACE}) {
+    		} else {
     			$ENV{KB_WORKSPACE} = $CurrentWorkspace;
     		}
     	} else {
