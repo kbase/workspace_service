@@ -27,7 +27,7 @@ sub auth {
         }
     } else {
     	my $filename = "$ENV{HOME}/.kbase_auth";
-    	if (defined($ENV{KB_NO_FILE_ENVIRONMENT}) && defined($ENV{KB_AUTH_TOKEN})) {
+    	if (defined($ENV{KB_NO_FILE_ENVIRONMENT})) {
         	$token = $ENV{KB_AUTH_TOKEN};
         } elsif ( -e $filename ) {
         	open(my $fh, "<", $filename) || return;
