@@ -1227,7 +1227,6 @@ sub _initializeWorkspace {
 		    }
 			my $dataString = $file->slurp();
 			if ($dataString ne $obj->data()) {
-				print "Missmatch:".$obj->compressed()."/".$obj->json()."\n";
 				$numberMismatch++;
 			}
 		}
@@ -1237,12 +1236,18 @@ sub _initializeWorkspace {
 			$self->_createWorkspace("kbase","r");
 			$ws = $self->_getWorkspace("kbase");
 		}
+		$ws = $self->_getWorkspace("KBaseMedia");
+		if (!defined($ws)) {
+			$self->_createWorkspace("KBaseMedia","r");
+			$ws = $self->_getWorkspace("KBaseMedia");
+		}
 		my ($fh1, $compressed_filename) = tempfile();
 		my ($fh2, $uncompressed_filename) = tempfile();
 		close($fh1);
 		close($fh2);
 		my ($url,$fh,$status,@lines,$string,$data);
-		if (!defined($self->_getObjectByID("default","Biochemistry","kbase",0))) {
+		my $biochem = $self->_getObjectByID("default","Biochemistry","kbase",0);
+		if (!defined($biochem)) {
 			$url = "http://bioseed.mcs.anl.gov/~chenry/exampleObjects/defaultBiochem.json.gz";
 			$status = getstore($url, $compressed_filename);
 			die "Unable to fetch from model_seed\n" unless($status == 200);
@@ -1253,6 +1258,7 @@ sub _initializeWorkspace {
 			$string = join("\n",@lines);
 			$data = JSON::XS->new->utf8->decode($string);
 			$data->{uuid} = "kbase/default";
+			$biochem = $data;
 			$self->save_object({
 				id => "default",
 				type => "Biochemistry",
@@ -1260,6 +1266,20 @@ sub _initializeWorkspace {
 				workspace => "kbase",
 				command => "_loadBiochemToDB"
 			});
+		}
+		if (defined($biochem->{media})) {
+			my $media = $biochem->{media};
+			for (my $i=0; $i < @{$media};$i++) {
+				if (!defined($self->_getObjectByID($media->[$i]->{id},"Media","KBaseMedia",0))) {
+					$self->save_object({
+						id => $media->[$i]->{id},
+						type => "Media",
+						data => $media->[$i],
+						workspace => "KBaseMedia",
+						command => "_initializeWorkspace"
+					});
+				}
+			}
 		}
 		if (!defined($self->_getObjectByID("default","Mapping","kbase",0))) {
 			$url = "http://bioseed.mcs.anl.gov/~chenry/exampleObjects/defaultMap.json.gz";	
@@ -1371,7 +1391,7 @@ sub new
 	print STDERR "mongodb-database configuration not found, using 'workspace_service'\n";
 	$self->{_db} = "workspace_service";
     }
-
+	$self->_initializeWorkspace();
     #END_CONSTRUCTOR
 
     if ($self->can('_init_instance'))

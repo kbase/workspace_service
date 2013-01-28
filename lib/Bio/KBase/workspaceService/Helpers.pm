@@ -11,6 +11,10 @@ my $CurrentWorkspace;
 my $CurrentURL;
 
 sub get_ws_client {
+	if (workspaceURL() eq "impl") {
+		require "Bio/KBase/workspaceService/Impl.pm";
+		return Bio::KBase::workspaceService::Impl->new();
+	}
     return Bio::KBase::workspaceService::Client->new(workspaceURL());
 }
 
