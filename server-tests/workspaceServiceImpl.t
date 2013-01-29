@@ -212,7 +212,13 @@ eval {
 	}); 
 };
 ok (defined($output),"clone succeeds");
-$impl->delete_workspace({workspace=>"clonetestworkspace2", auth=>$oauth});
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$impl->delete_workspace({
+		workspace=>"clonetestworkspace2",
+		auth=>$oauth
+	});
+}
 $output = undef;
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
@@ -241,6 +247,7 @@ is $output, undef, "clone a non-existent workspace should fail";
 #Test 30-32: Cannot make workspace with bad or no permissions, and must use hash ref
 ################################################################################ 
 eval{
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
 	$meta = $impl->create_workspace({
 		workspace=>"testworkspace6",
 		default_permission=>"g",
@@ -263,6 +270,7 @@ isnt($@,'',"Attempt to create workspace without a hash reference  fails");
 note("Test Adding Objects to the workspace testworkspace");
 my $wsmeta;
 eval{
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
 	$wsmeta = $impl->create_workspace({
 		workspace=>"testworkspace",
 		default_permission=>"n",
