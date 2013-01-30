@@ -129,6 +129,6 @@ compile-typespec:
 	-js javascript/workspaceService/Client \
 	-py biokbase/workspaceService/client \
 	workspaceService.spec lib
-	-rm lib/workspaceServiceImpl.py
-	-rm lib/workspaceServiceServer.py
-	-rm -r Bio
+	rm -f lib/workspaceServiceImpl.py
+	rm -f lib/workspaceServiceServer.py
+	rm -rf Bio
