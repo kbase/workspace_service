@@ -218,7 +218,7 @@ eval {
 		workspace=>"clonetestworkspace2",
 		auth=>$oauth
 	});
-}
+};
 $output = undef;
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
