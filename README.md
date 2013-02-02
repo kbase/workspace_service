@@ -14,6 +14,9 @@ Development / Testing Deployment
 This module requires a working MongoDB instance.
 By default this is assumed to run on `localhost`.
 
+NOTE: MongoDB must be running on localhost for server-tests,
+unless configs/test.cfg is edited to point to another host.
+
 ### Setup MongoDB ###
 
 Create the `/data` directory if it doesn't already exist.
