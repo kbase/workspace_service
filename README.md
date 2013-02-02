@@ -18,7 +18,7 @@ By default this is assumed to run on `localhost`.
 
 Create the `/data` directory if it doesn't already exist.
 
-    # don't do this on Magellan instances
+    # DON'T DO THIS ON MAGELLAN INSTANCES
     mkdir -p /data/db 
 
 On Magellan instances it is advisable to have this on the
@@ -48,7 +48,19 @@ Otherwise the service will default to running against mongodb on localhost.
     cd /kb/deployment/services/workspaceService
     ./start_service
 
-NOTE: service writes stderr to ./error.log
+NOTE: service writes stderr to /kb/deployment/services/workspaceService/error.log
+
+NOTE: If the file /kb/deployment/deployment.cfg is not created, the workspace
+service will not be able to run. error.log will show the following message:
+
+Error while loading /kb/deployment/lib/workspaceService.psgi: $ENV{KB_DEPLOYMENT_CONFIG} points 
+to an unreadable file: /kb/deployment/deployment.cfg at /kb/deployment/lib/Bio/KBase/Auth.pm line 18.
+
+You will need to stop the workspace service (./stop_service), create the deployment.cfg, e.g.,:
+
+cp /kb/dev_container/modules/workspace_service/deploy.cfg /kb/deployment/deployment.cfg
+
+then restart the service (./start_service).
 
 ### Run Tests
 
