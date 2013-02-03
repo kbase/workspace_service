@@ -185,7 +185,7 @@ sub _mongodb {
     	Bio::KBase::Exceptions::KBaseException->throw(error => "Unable to connect: $@",
 							       method_name => 'workspaceDocumentDB::_mongodb') if (!defined($conn));
     	my $db_name = $self->{_db};
-    	$self->{_mongodb} = $conn->get_database("'".$db_name."'");
+    	$self->{_mongodb} = $conn->get_database($db_name);
     }    
     return $self->{_mongodb};
 }
