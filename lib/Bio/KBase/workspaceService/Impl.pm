@@ -138,7 +138,7 @@ sub _setContext {
 					$self->_getContext()->{_override}->{_authentication} = $params->{auth};
 					$self->_getContext()->{_override}->{_currentUser} = $token->user_id;
 				} else {
-					Bio::KBase::Exceptions::KBaseException->throw(error => "Invalid authorization token!",
+					Bio::KBase::Exceptions::KBaseException->throw(error => "Invalid authorization token:".$params->{auth},
 					method_name => '_setContext');
 				}
 			}
