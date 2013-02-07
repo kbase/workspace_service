@@ -354,46 +354,6 @@ module workspaceService {
 	*/
 	funcdef get_objectmeta_by_ref(get_objectmeta_by_ref_params params) returns (object_metadata metadata);
 	
-	/* Input parameters for the "object_to_html" function.
-	
-		object_type type - type of the object for which metadata is to be retrieved (an essential argument)
-		workspace_id workspace - ID of the workspace containing the object for which metadata is to be retrieved (an essential argument)
-		object_id id - ID of the object for which metadata is to be retrieved (an essential argument)
-		int instance - Version of the object for which metadata is to be retrieved, enabling retrieval of any previous version of an object (an optional argument; the current metadata is retrieved if no version is provides)
-		string auth - the authentication token of the KBase account to associate with this object metadata retrieval command (an optional argument; user is "public" if auth is not provided)
-		bool asHash - a boolean indicating if metadata should be returned as a hash
-			
-	*/
-	typedef structure { 
-		object_id id;
-		object_type type;
-		workspace_id workspace;
-		int instance;
-		string auth;
-		bool asHash;
-	} object_to_html_params;
-	/*
-		Returns an HTML view of the specified input object
-	*/
-	funcdef object_to_html(object_to_html_params params) returns (string html);
-	
-	/* Input parameters for the "objectref_to_html" function.
-	
-		workspace_ref reference - reference to a specific instance of a specific object in a workspace (an essential argument)
-		string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument; user is "public" if auth is not provided)
-		bool asHash - a boolean indicating if metadata should be returned as a hash
-			
-	*/
-	typedef structure { 
-		workspace_ref reference;
-		string auth;
-		bool asHash;
-	} objectref_to_html_params;
-	/*
-		Returns an HTML view of the specified input object
-	*/
-	funcdef objectref_to_html(objectref_to_html_params params) returns (string html);
-	
 	/* Input parameters for the "revert_object" function.
 	
 		object_type type - type of the object to be reverted (an essential argument)

@@ -199,46 +199,6 @@ class workspaceService:
         else:
             raise ServerError('Unknown', 0, 'An unknown server error occurred')
 
-    def object_to_html(self, params):
-
-        arg_hash = { 'method': 'workspaceService.object_to_html',
-                     'params': [params],
-                     'version': '1.1'
-                     }
-
-        body = json.dumps(arg_hash)
-        ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
-        if ret.code != httplib.OK:
-            raise URLError('Received bad response code from server:' + ret.code)
-        resp = json.loads(ret.read())
-
-        if 'result' in resp:
-            return resp['result'][0]
-        elif 'error' in resp:
-            raise ServerError(**resp['error'])
-        else:
-            raise ServerError('Unknown', 0, 'An unknown server error occurred')
-
-    def objectref_to_html(self, params):
-
-        arg_hash = { 'method': 'workspaceService.objectref_to_html',
-                     'params': [params],
-                     'version': '1.1'
-                     }
-
-        body = json.dumps(arg_hash)
-        ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
-        if ret.code != httplib.OK:
-            raise URLError('Received bad response code from server:' + ret.code)
-        resp = json.loads(ret.read())
-
-        if 'result' in resp:
-            return resp['result'][0]
-        elif 'error' in resp:
-            raise ServerError(**resp['error'])
-        else:
-            raise ServerError('Unknown', 0, 'An unknown server error occurred')
-
     def revert_object(self, params):
 
         arg_hash = { 'method': 'workspaceService.revert_object',
