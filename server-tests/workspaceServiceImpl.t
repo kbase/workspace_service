@@ -60,8 +60,6 @@ my @impl_methods = qw(
 	get_objectmeta_by_ref
 	get_workspacemeta
 	get_workspacepermissions
-	object_to_html
-	objectref_to_html
 	object_history
 	get_user_settings
 	set_user_settings
