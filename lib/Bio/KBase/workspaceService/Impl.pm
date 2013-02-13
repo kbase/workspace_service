@@ -4696,6 +4696,7 @@ $success is a bool
 queue_job_params is a reference to a hash where the following keys are defined:
 	jobid has a value which is a string
 	auth has a value which is a string
+	state has a value which is a string
 bool is an int
 
 </pre>
@@ -4709,6 +4710,7 @@ $success is a bool
 queue_job_params is a reference to a hash where the following keys are defined:
 	jobid has a value which is a string
 	auth has a value which is a string
+	state has a value which is a string
 bool is an int
 
 
@@ -4742,7 +4744,9 @@ sub queue_job
     my($success);
     #BEGIN queue_job
     $self->_setContext($ctx,$params);
-    $self->_validateargs($params,["jobid"],{});
+    $params = $self->_validateargs($params,["jobid"],{
+    	"state" => "queued"
+    });
     #Checking that job doesn't already exist
     my $cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $params->{jobid}});
     if (my $object = $cursor->next) {
@@ -4753,7 +4757,7 @@ sub queue_job
     $self->_mongodb()->get_collection('jobObjects')->insert({
 		id => $params->{jobid},
 		auth => $params->{auth},
-		status => "queued",
+		status => $params->{"state"},
 		queuetime => time(),
 		owner => $self->_getUsername()
     });
@@ -4790,6 +4794,7 @@ set_job_status_params is a reference to a hash where the following keys are defi
 	jobid has a value which is a string
 	status has a value which is a string
 	auth has a value which is a string
+	currentStatus has a value which is a string
 bool is an int
 
 </pre>
@@ -4804,6 +4809,7 @@ set_job_status_params is a reference to a hash where the following keys are defi
 	jobid has a value which is a string
 	status has a value which is a string
 	auth has a value which is a string
+	currentStatus has a value which is a string
 bool is an int
 
 
@@ -4837,18 +4843,26 @@ sub set_job_status
     my($success);
     #BEGIN set_job_status
     $self->_setContext($ctx,$params);
-    $self->_validateargs($params,["jobid","status"],{});
-    my $peviousStatus;
-    my $timevar = "requeuetime";
+    $self->_validateargs($params,["jobid","status"],{
+    	currentStatus => undef
+    });
+    my $peviousStatus = $params->{currentStatus};
+    my $timevar;
     #Checking status validity
+    if (!defined($peviousStatus)) {
+	    if ($params->{status} eq "queued") {
+	    	$peviousStatus = "done";
+	    } elsif ($params->{status} eq "running") {
+	    	$peviousStatus = "queued";
+	    } elsif ($params->{status} eq "done") {
+	    	$peviousStatus = "running";
+	    }
+    }
     if ($params->{status} eq "queued") {
-    	$peviousStatus = "none";
     	$timevar = "queuetime";
     } elsif ($params->{status} eq "running") {
     	$timevar = "starttime";
-    	$peviousStatus = "queued";
     } elsif ($params->{status} eq "done") {
-    	$peviousStatus = "running";
     	$timevar = "completetime";
     } else {
     	my $msg = "Input status not valid!";
@@ -6950,6 +6964,7 @@ Input parameters for the "queue_job" function.
 
         string jobid - ID of the job to be queued (an essential argument)
         string auth - the authentication token of the KBase account queuing the job; must have access to the job being queued (an optional argument; user is "public" if auth is not provided)
+        string state - the initial state to assign to the job being queued (an optional argument; default is "queued")
 
 
 =item Definition
@@ -6960,6 +6975,7 @@ Input parameters for the "queue_job" function.
 a reference to a hash where the following keys are defined:
 jobid has a value which is a string
 auth has a value which is a string
+state has a value which is a string
 
 </pre>
 
@@ -6970,6 +6986,7 @@ auth has a value which is a string
 a reference to a hash where the following keys are defined:
 jobid has a value which is a string
 auth has a value which is a string
+state has a value which is a string
 
 
 =end text
@@ -6991,6 +7008,7 @@ Input parameters for the "set_job_status" function.
         string jobid - ID of the job to be have status changed (an essential argument)
         string status - Status to which job should be changed; accepted values are 'queued', 'running', and 'done' (an essential argument)
         string auth - the authentication token of the KBase account requesting job status; only status for owned jobs can be retrieved (an optional argument; user is "public" if auth is not provided)
+        string currentStatus - Indicates the current statues of the selected job (an optional argument; default is "undef")
 
 
 =item Definition
@@ -7002,6 +7020,7 @@ a reference to a hash where the following keys are defined:
 jobid has a value which is a string
 status has a value which is a string
 auth has a value which is a string
+currentStatus has a value which is a string
 
 </pre>
 
@@ -7013,6 +7032,7 @@ a reference to a hash where the following keys are defined:
 jobid has a value which is a string
 status has a value which is a string
 auth has a value which is a string
+currentStatus has a value which is a string
 
 
 =end text
