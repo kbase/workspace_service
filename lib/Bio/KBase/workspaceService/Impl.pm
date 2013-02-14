@@ -1798,9 +1798,17 @@ sub delete_object_permanently
     $self->_validateargs($params,["id","type","workspace"],{
     	asHash => 0
     });
-    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
-    my $obj = $ws->deleteObjectPermanently($params->{type},$params->{id});
-    $metadata = $obj->metadata($params->{asHash});
+    if ($params->{workspace} eq "NO_WORKSPACE") {
+    	my $obj = $self->_getObject($params->{id},{throwErrorIfMissing => 1});
+    	$metadata = $obj->metadata($params->{asHash});
+    	if ($obj->owner() eq $self->_getUsername()) {
+    		$obj->permanentDelete();
+    	}
+    } else {
+	    my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
+	    my $obj = $ws->deleteObjectPermanently($params->{type},$params->{id});
+	    $metadata = $obj->metadata($params->{asHash});
+    }
     $self->_clearContext();
     #END delete_object_permanently
     my @_bad_returns;
