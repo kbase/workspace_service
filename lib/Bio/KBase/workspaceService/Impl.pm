@@ -4878,7 +4878,7 @@ sub set_job_status
     	my $msg = "Input status not valid!";
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'set_job_status');
     }
-    if (params->{status} eq "delete") {
+    if ($params->{status} eq "delete") {
     	my $query = {status => $peviousStatus,id => $params->{jobid}};
 	    if ($self->_getUsername() ne "workspaceroot") {
 	    	$query->{owner} = $self->_getUsername();
