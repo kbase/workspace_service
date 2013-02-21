@@ -4872,6 +4872,8 @@ sub set_job_status
     	$timevar = "starttime";
     } elsif ($params->{status} eq "done") {
     	$timevar = "completetime";
+    } elsif ($params->{status} =~ m/error/) {
+    	$timevar = "completetime";
     } else {
     	my $msg = "Input status not valid!";
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'set_job_status');
