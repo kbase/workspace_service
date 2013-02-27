@@ -4872,19 +4872,31 @@ sub set_job_status
     	$timevar = "starttime";
     } elsif ($params->{status} eq "done") {
     	$timevar = "completetime";
+    } elsif ($params->{status} =~ m/error/) {
+    	$timevar = "completetime";
+    } elsif ($params->{status} eq "delete") {
+    	$timevar = "completetime";
     } else {
     	my $msg = "Input status not valid!";
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'set_job_status');
     }
-    #Checking that job doesn't already exist
-    my $cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $params->{jobid}});
-    my $object = $cursor->next;
-    if (!defined($object)) {
-    	my $msg = "Job not found!";
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'set_job_status');
-    }
-    #Updating job
-    my $success = $self->_updateDB("jobObjects",{status => $peviousStatus,id => $params->{jobid}},{'$set' => {'status' => $params->{status},$timevar => time()}});
+    if ($params->{status} eq "delete") {
+    	my $query = {status => $peviousStatus,id => $params->{jobid}};
+	    if ($self->_getUsername() ne "workspaceroot") {
+	    	$query->{owner} = $self->_getUsername();
+	    }
+	    $success = $self->_mongodb()->get_collection('jobObjects')->remove($query);
+    } else {
+	    #Checking that job doesn't already exist
+	    my $cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $params->{jobid}});
+	    my $object = $cursor->next;
+	    if (!defined($object)) {
+	    	my $msg = "Job not found!";
+			Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'set_job_status');
+	    }
+	    #Updating job
+	    $success = $self->_updateDB("jobObjects",{status => $peviousStatus,id => $params->{jobid}},{'$set' => {'status' => $params->{status},$timevar => time()}});
+	}
 	$self->_clearContext();
     #END set_job_status
     my @_bad_returns;
@@ -4970,7 +4982,7 @@ sub get_jobs
     if (defined($params->{status})) {
     	$query->{status} = $params->{status};
     }
-    if ($self->_getUsername() ne "chenry" && $self->_getUsername() ne "workspaceroot") {
+    if ($self->_getUsername() ne "workspaceroot") {
     	$query->{owner} = $self->_getUsername();
     }
     my $cursor = $self->_mongodb()->get_collection('jobObjects')->find($query);
