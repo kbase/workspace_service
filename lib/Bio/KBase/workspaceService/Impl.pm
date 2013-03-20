@@ -4753,7 +4753,8 @@ sub queue_job
     #BEGIN queue_job
     $self->_setContext($ctx,$params);
     $params = $self->_validateargs($params,["jobid"],{
-    	"state" => "queued"
+    	"state" => "queued",
+    	jobdata => {}
     });
     #Checking that job doesn't already exist
     my $cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $params->{jobid}});
@@ -4766,6 +4767,7 @@ sub queue_job
 		id => $params->{jobid},
 		auth => $params->{auth},
 		status => $params->{"state"},
+		jobdata => $params->{jobdata},
 		queuetime => time(),
 		owner => $self->_getUsername()
     });
@@ -4852,7 +4854,8 @@ sub set_job_status
     #BEGIN set_job_status
     $self->_setContext($ctx,$params);
     $self->_validateargs($params,["jobid","status"],{
-    	currentStatus => undef
+    	currentStatus => undef,
+    	jobdata => {}
     });
     my $peviousStatus = $params->{currentStatus};
     my $timevar;
@@ -4870,11 +4873,7 @@ sub set_job_status
     	$timevar = "queuetime";
     } elsif ($params->{status} eq "running") {
     	$timevar = "starttime";
-    } elsif ($params->{status} eq "done") {
-    	$timevar = "completetime";
-    } elsif ($params->{status} =~ m/error/) {
-    	$timevar = "completetime";
-    } elsif ($params->{status} eq "delete") {
+    } elsif ($params->{status} eq "done" || $params->{status} eq "error" || $params->{status} eq "crash" || $params->{status} eq "delete") {
     	$timevar = "completetime";
     } else {
     	my $msg = "Input status not valid!";
@@ -4895,7 +4894,12 @@ sub set_job_status
 			Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'set_job_status');
 	    }
 	    #Updating job
-	    $success = $self->_updateDB("jobObjects",{status => $peviousStatus,id => $params->{jobid}},{'$set' => {'status' => $params->{status},$timevar => time()}});
+	    if (defined($params->{jobdata})) {
+		    foreach my $key (keys(%{$params->{jobdata}})) {
+		    	$object->{jobdata}->{$key} = $params->{jobdata}->{$key};
+		    }
+	    }
+	    $success = $self->_updateDB("jobObjects",{status => $peviousStatus,id => $params->{jobid}},{'$set' => {'status' => $params->{status},$timevar => time(),'jobdata' => $object->{jobdata}}});
 	}
 	$self->_clearContext();
     #END set_job_status

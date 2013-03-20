@@ -700,12 +700,14 @@ module workspaceService {
 		string jobid - ID of the job to be queued (an essential argument)
 		string auth - the authentication token of the KBase account queuing the job; must have access to the job being queued (an optional argument; user is "public" if auth is not provided)
 		string state - the initial state to assign to the job being queued (an optional argument; default is "queued")
+		mapping<string,string> jobdata - hash of data associated with job
 			
 	*/
 	typedef structure {
 		string jobid;
 		string auth;
 		string state;
+		mapping<string,string> jobdata;
 	} queue_job_params;
 	
 	/*
@@ -720,6 +722,7 @@ module workspaceService {
 		string status - Status to which job should be changed; accepted values are 'queued', 'running', and 'done' (an essential argument)
 		string auth - the authentication token of the KBase account requesting job status; only status for owned jobs can be retrieved (an optional argument; user is "public" if auth is not provided)
 		string currentStatus - Indicates the current statues of the selected job (an optional argument; default is "undef")
+		mapping<string,string> jobdata - hash of data associated with job
 		
 	*/
 	typedef structure {
@@ -727,6 +730,7 @@ module workspaceService {
 		string status;
 		string auth;
 		string currentStatus;
+		mapping<string,string> jobdata;
 	} set_job_status_params;
 	
 	/*
