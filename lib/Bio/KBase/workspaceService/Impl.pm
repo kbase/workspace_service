@@ -4993,7 +4993,7 @@ sub get_jobs
 	$jobs = [];
 	while (my $object = $cursor->next) {
         my $keys = [qw(
-        	id ws auth status queuetime owner requeuetime starttime completetime
+        	id ws auth status queuetime owner requeuetime starttime completetime jobdata
         )];
         my $newobj = {};
         foreach my $key (@{$keys}) {
