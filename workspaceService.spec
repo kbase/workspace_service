@@ -740,12 +740,14 @@ module workspaceService {
 	funcdef set_job_status(set_job_status_params params) returns (bool success);
 	
 	/* Input parameters for the "get_jobs" function.
-	
+		
+		list<string> jobids - list of specific jobs to be retrieved (an optional argument; default is an empty list)
 		string status - Status of all jobs to be retrieved; accepted values are 'queued', 'running', and 'done' (an essential argument)
 		string auth - the authentication token of the KBase account accessing job list; only owned jobs will be returned (an optional argument; user is "public" if auth is not provided)
 			
 	*/
 	typedef structure {
+		list<string> jobids;
 		string status;
 		string auth;
 	} get_jobs_params;

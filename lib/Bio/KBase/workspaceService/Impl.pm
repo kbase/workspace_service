@@ -4980,11 +4980,15 @@ sub get_jobs
     #BEGIN get_jobs
     $self->_setContext($ctx,$params);
     $self->_validateargs($params,[],{
-    	status => undef
+    	status => undef,
+    	jobids => undef
     });
     my $query = {};
     if (defined($params->{status})) {
     	$query->{status} = $params->{status};
+    }
+    if (defined($params->{jobids})) {
+    	$query->{id} = {'$in' => $params->{jobids}};
     }
     if ($self->_getUsername() ne "workspaceroot") {
     	$query->{owner} = $self->_getUsername();
