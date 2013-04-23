@@ -1409,7 +1409,7 @@ sub new
 		my $service = $ENV{KB_SERVICE_NAME};
 		my $c = Config::Simple->new();
 		$c->read($e);
-		my @params = qw(mongodb-host mongodb-database);
+		my @params = qw(accounttype mongodb-host mongodb-database);
 		for my $p (@params) {
 		    my $v = $c->param("$service.$p");
 		    if ($v) {
