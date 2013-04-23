@@ -123,25 +123,72 @@ sub _getCurrentUserObj {
 	return $self->_getContext->{_override}->{_currentUserObj};
 }
 
+sub _accountType {
+	my ($self) = @_;
+	if (!defined($self->{_accounttype})) {
+		$self->{_accounttype} = "kbase";
+	}
+	return $self->{_accounttype};	
+}
+
+sub _authenticate {
+	my ($self,$auth) = @_;
+	if ($self->{_accounttype} eq "kbase") {
+		if ($params->{auth} =~ m/^IRIS-/) {
+			return {
+				authentication => $auth,
+				user => $auth
+			};
+		} else {
+			my $token = Bio::KBase::AuthToken->new(
+				token => $params->{auth},
+			);
+			if ($token->validate()) {
+				return {
+					authentication => $params->{auth},
+					user => $token->user_id
+				};
+			} else {
+				Bio::KBase::Exceptions::KBaseException->throw(error => "Invalid authorization token:".$params->{auth},
+				method_name => '_setContext');
+			}
+		}
+	} elsif ($self->{_accounttype} eq "seed") { {
+		require "ModelSEED/Client/MSSeedSupport.pm";
+		my $svr = ModelSEED::Client::MSSeedSupport->new();
+		my $token = $svr->authenticate({
+			token => $auth
+		});
+		if (!defined($token) || $token =~ m/ERROR:/) {
+			Bio::KBase::Exceptions::KBaseException->throw(error => $token,
+			method_name => '_setContext');
+		}
+		print "Logged user:".split(/\t/,$token)[0]."\n";
+		return {
+			authentication => $token,
+			user => split(/\t/,$token)[0]
+		};
+	} elsif ($self->{_accounttype} eq "modelseed") { {
+		require "ModelSEED/utilities.pm";
+		my $config = ModelSEED::utilities::config();
+		my $username = $config->authenticate({
+			token => $auth
+		});
+		return {
+			authentication => $auth,
+			user => $username;
+		};
+	}
+}
+
 sub _setContext {
 	my ($self,$context,$params) = @_;
     if (defined($params->{auth}) && length($params->{auth}) > 0) {
 		if (!defined($self->_getContext()->{_override}) || $self->_getContext()->{_override}->{_authentication} ne $params->{auth}) {
-			if ($params->{auth} =~ m/^IRIS-/) {
-				$self->_getContext()->{_override}->{_authentication} = $params->{auth};
-				$self->_getContext()->{_override}->{_currentUser} = $params->{auth};
-			} else {
-				my $token = Bio::KBase::AuthToken->new(
-					token => $params->{auth},
-				);
-				if ($token->validate()) {
-					$self->_getContext()->{_override}->{_authentication} = $params->{auth};
-					$self->_getContext()->{_override}->{_currentUser} = $token->user_id;
-				} else {
-					Bio::KBase::Exceptions::KBaseException->throw(error => "Invalid authorization token:".$params->{auth},
-					method_name => '_setContext');
-				}
-			}
+			my $output = _authenticate($params->{auth});
+			$self->_getContext()->{_override}->{_authentication} = $output->{authentication};
+			$self->_getContext()->{_override}->{_currentUser} = $output->{user};
+			
 		}
     }
 }
@@ -1356,47 +1403,39 @@ sub new
     if (defined($options->{testuser})) {
     	$self->{_testuser} = $options->{testuser};
     }
-
     my %params;
-    if ((my $e = $ENV{KB_DEPLOYMENT_CONFIG}) && -e $ENV{KB_DEPLOYMENT_CONFIG})
-    {
-    	
-	my $service = $ENV{KB_SERVICE_NAME};
-	my $c = Config::Simple->new();
-	$c->read($e);
-	my @params = qw(mongodb-host mongodb-database);
-	for my $p (@params)
-	{
-	    my $v = $c->param("$service.$p");
-
-	    if ($v)
-	    {
-		$params{$p} = $v;
-	    }
-	}
+    if ((my $e = $ENV{KB_DEPLOYMENT_CONFIG}) && -e $ENV{KB_DEPLOYMENT_CONFIG}) {	
+		my $service = $ENV{KB_SERVICE_NAME};
+		my $c = Config::Simple->new();
+		$c->read($e);
+		my @params = qw(mongodb-host mongodb-database);
+		for my $p (@params) {
+		    my $v = $c->param("$service.$p");
+		    if ($v) {
+				$params{$p} = $v;
+		    }
+		}
     }
-	
     if (defined $params{"mongodb-host"}) {
-	$self->{_host} = $params{"mongodb-host"};
+		$self->{_host} = $params{"mongodb-host"};
     }
-    else {
-	print STDERR "mongodb-host configuration not found, using 'localhost'\n";
-	$self->{_host} = "localhost";
+    if (defined $params{accounttype}) {
+		$self->{_accounttype} = $params{accounttype};
+    } else {
+		print STDERR "mongodb-host configuration not found, using 'localhost'\n";
+		$self->{_host} = "localhost";
     }
-
     if (defined $params{"mongodb-database"}) {
-	$self->{_db} = $params{"mongodb-database"};
-    }
-    else {
-	print STDERR "mongodb-database configuration not found, using 'workspace_service'\n";
-	$self->{_db} = "workspace_service";
+		$self->{_db} = $params{"mongodb-database"};
+    } else {
+		print STDERR "mongodb-database configuration not found, using 'workspace_service'\n";
+		$self->{_db} = "workspace_service";
     }
 	$self->_initializeWorkspace();
     #END_CONSTRUCTOR
 
-    if ($self->can('_init_instance'))
-    {
-	$self->_init_instance();
+    if ($self->can('_init_instance')) {
+		$self->_init_instance();
     }
     return $self;
 }
