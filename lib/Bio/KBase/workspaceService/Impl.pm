@@ -1417,11 +1417,11 @@ sub new
 		    }
 		}
     }
-    if (defined $params{"mongodb-host"}) {
-		$self->{_host} = $params{"mongodb-host"};
-    }
     if (defined $params{accounttype}) {
 		$self->{_accounttype} = $params{accounttype};
+    } 
+    if (defined $params{"mongodb-host"}) {
+		$self->{_host} = $params{"mongodb-host"};
     } else {
 		print STDERR "mongodb-host configuration not found, using 'localhost'\n";
 		$self->{_host} = "localhost";
