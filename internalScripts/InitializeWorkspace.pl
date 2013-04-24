@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use Getopt::Long::Descriptive;
 use Text::Table;
-use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta);
+use Bio::KBase::workspaceService::Helpers qw(printObjectMeta auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta);
 
 my ($opt, $usage) = describe_options(
     'InitializeWorkspace %o',
@@ -66,6 +66,7 @@ if (defined($opt->{"map"})) {
 if (defined($opt->{testmap})) {
 	$output = $serv->import_map({
 		bioid => "testdefault",
+		mapid => "testdefault",
 		url => "http://bioseed.mcs.anl.gov/~chenry/KbaseFiles/mapping.test.json",
 		compressed => 0,
 		auth => auth(),

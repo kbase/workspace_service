@@ -1390,16 +1390,21 @@ sub load_media_from_bio
     	asHash => 0
     });
     #Creating the workspace if not already existing
+    my $biows = $self->_getWorkspace($params->{bioWS});
+    if (!defined($biows)) {
+    	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Biochemistry workspace not found!",
+							       method_name => 'load_media_from_bio');
+    }
     my $ws = $self->_getWorkspace($params->{mediaWS});
 	if (!defined($ws)) {
 		$self->_createWorkspace($params->{mediaWS},"r");
 		$ws = $self->_getWorkspace($params->{mediaWS});
 	}
-	my $bio = $self->_getObjectByID($params->{bioid},"Biochemistry",$params->{bioWS},0);
+	my $bio = $biows->getObject("Biochemistry",$params->{bioid});
 	if (defined($bio->data()->{media})) {
 		my $media = $bio->{media};
 		for (my $i=0; $i < @{$media};$i++) {
-			my $obj = $self->_getObjectByID($media->[$i]->{id},"Media",$params->{mediaWS},0);
+			my $obj = $ws->getObject("Media",$media->[$i]->{id});
 			if (!defined($obj) || $params->{overwrite} == 1) {
 				$obj = $ws->saveObject("Media",$media->[$i]->{id},$media->[$i],"load_media_from_bio",{});	
 			}
