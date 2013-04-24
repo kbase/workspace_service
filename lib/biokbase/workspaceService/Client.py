@@ -39,6 +39,66 @@ class workspaceService:
         if self.timeout < 1:
             raise ValueError('Timeout value must be at least 1 second')
 
+    def load_media_from_bio(self, params):
+
+        arg_hash = { 'method': 'workspaceService.load_media_from_bio',
+                     'params': [params],
+                     'version': '1.1'
+                     }
+
+        body = json.dumps(arg_hash)
+        ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
+        if ret.code != httplib.OK:
+            raise URLError('Received bad response code from server:' + ret.code)
+        resp = json.loads(ret.read())
+
+        if 'result' in resp:
+            return resp['result'][0]
+        elif 'error' in resp:
+            raise ServerError(**resp['error'])
+        else:
+            raise ServerError('Unknown', 0, 'An unknown server error occurred')
+
+    def import_bio(self, params):
+
+        arg_hash = { 'method': 'workspaceService.import_bio',
+                     'params': [params],
+                     'version': '1.1'
+                     }
+
+        body = json.dumps(arg_hash)
+        ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
+        if ret.code != httplib.OK:
+            raise URLError('Received bad response code from server:' + ret.code)
+        resp = json.loads(ret.read())
+
+        if 'result' in resp:
+            return resp['result'][0]
+        elif 'error' in resp:
+            raise ServerError(**resp['error'])
+        else:
+            raise ServerError('Unknown', 0, 'An unknown server error occurred')
+
+    def import_map(self, params):
+
+        arg_hash = { 'method': 'workspaceService.import_map',
+                     'params': [params],
+                     'version': '1.1'
+                     }
+
+        body = json.dumps(arg_hash)
+        ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
+        if ret.code != httplib.OK:
+            raise URLError('Received bad response code from server:' + ret.code)
+        resp = json.loads(ret.read())
+
+        if 'result' in resp:
+            return resp['result'][0]
+        elif 'error' in resp:
+            raise ServerError(**resp['error'])
+        else:
+            raise ServerError('Unknown', 0, 'An unknown server error occurred')
+
     def save_object(self, params):
 
         arg_hash = { 'method': 'workspaceService.save_object',

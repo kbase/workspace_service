@@ -1222,175 +1222,6 @@ sub _decode {
 	return JSON::XS->new->decode($data);	
 }
 
-sub _initializeWorkspace {
-	my ($self) = @_;
-	#Need to ensure that only one processor initializes the workspace
-	my $wsmeta;
-	eval{
-		$wsmeta = $self->_createWorkspace("initializationWorkspace","n");
-	};
-	if (defined($wsmeta)) {
-		my $mongodb = $self->_mongodb();
-		my $gridfs = $self->_gridfs();
-		#Rerieving all data objects from the old style database
-		my $cursor = $mongodb->get_collection('workspaceDataObjects')->find({});
-		my $objHash = {};
-		while (my $object = $cursor->next) {
-			my $newObject = Bio::KBase::workspaceService::DataObject->new({
-				parent => $self,
-				compressed => $object->{compressed},
-				json => $object->{json},
-				chsum => $object->{chsum},
-				data => $object->{data},
-				creationDate => $object->{creationDate}	
-			});
-			$objHash->{$newObject->chsum()} = $newObject;
-		}
-		#Saving all data objects in the gridfs store
-		foreach my $key (keys(%{$objHash})) {
-			my $obj = $objHash->{$key};
-			my $file = $gridfs->find_one({chsum => $obj->chsum()});
-			if (!defined($file)) {
-				my $dataString = $obj->data();
-				open(my $basic_fh, "<", \$dataString);
-				my $fh = FileHandle->new;
-				$fh->fdopen($basic_fh, 'r');
-				$gridfs->insert($fh, {
-					creationDate => $obj->creationDate(),
-					chsum => $obj->chsum(),
-					compressed => $obj->compressed(),
-					json => $obj->json()
-				});
-			}
-		}
-		#Checking that files were saved intact
-		my $numberObjects = 0;
-		my $numberMismatch = 0;
-		foreach my $key (keys(%{$objHash})) {
-			$numberObjects++;
-			my $obj = $objHash->{$key};
-			my $file = $gridfs->find_one({chsum => $obj->chsum()});
-		    if (!defined($file)) {
-		    	die "Missing file!\n";
-		    }
-			my $dataString = $file->slurp();
-			if ($dataString ne $obj->data()) {
-				$numberMismatch++;
-			}
-		}
-		#Checking if kbase workspace exists and creating if not
-		my $ws = $self->_getWorkspace("kbase");
-		if (!defined($ws)) {
-			$self->_createWorkspace("kbase","r");
-			$ws = $self->_getWorkspace("kbase");
-		}
-		$ws = $self->_getWorkspace("KBaseMedia");
-		if (!defined($ws)) {
-			$self->_createWorkspace("KBaseMedia","r");
-			$ws = $self->_getWorkspace("KBaseMedia");
-		}
-		my ($fh1, $compressed_filename) = tempfile();
-		my ($fh2, $uncompressed_filename) = tempfile();
-		close($fh1);
-		close($fh2);
-		my ($url,$fh,$status,@lines,$string,$data);
-		my $biochem = $self->_getObjectByID("default","Biochemistry","kbase",0);
-		if (!defined($biochem)) {
-			$url = "http://bioseed.mcs.anl.gov/~chenry/exampleObjects/defaultBiochem.json.gz";
-			$status = getstore($url, $compressed_filename);
-			die "Unable to fetch from model_seed\n" unless($status == 200);
-			gunzip $compressed_filename => $uncompressed_filename;
-			open($fh, "<", $uncompressed_filename) || die "$!: $@";
-			@lines = <$fh>;
-			close($fh);
-			$string = join("\n",@lines);
-			$data = JSON::XS->new->utf8->decode($string);
-			$data->{uuid} = "kbase/default";
-			$biochem = $data;
-			$self->save_object({
-				id => "default",
-				type => "Biochemistry",
-				data => $data,
-				workspace => "kbase",
-				command => "_loadBiochemToDB"
-			});
-		}
-		if (defined($biochem->{media})) {
-			my $media = $biochem->{media};
-			for (my $i=0; $i < @{$media};$i++) {
-				if (!defined($self->_getObjectByID($media->[$i]->{id},"Media","KBaseMedia",0))) {
-					$self->save_object({
-						id => $media->[$i]->{id},
-						type => "Media",
-						data => $media->[$i],
-						workspace => "KBaseMedia",
-						command => "_initializeWorkspace"
-					});
-				}
-			}
-		}
-		if (!defined($self->_getObjectByID("default","Mapping","kbase",0))) {
-			$url = "http://bioseed.mcs.anl.gov/~chenry/exampleObjects/defaultMap.json.gz";	
-			$status = getstore($url, $compressed_filename);
-			die "Unable to fetch from model_seed\n" unless($status == 200);
-			gunzip $compressed_filename => $uncompressed_filename;
-			open($fh, "<", $uncompressed_filename) || die "$!: $@";
-			@lines = <$fh>;
-			close($fh);
-			$string = join("\n",@lines);
-			$data = JSON::XS->new->utf8->decode($string);
-			$data->{biochemistry_uuid} = "kbase/default";
-			$data->{uuid} = "kbase/default";
-			$self->save_object({
-				id => "default",
-				type => "Mapping",
-				data => $data,
-				workspace => "kbase",
-				command => "_loadBiochemToDB"
-			});
-		}
-		if (!defined($self->_getObjectByID("testdefault","Biochemistry","kbase",0))) {
-			$url = "http://bioseed.mcs.anl.gov/~chenry/KbaseFiles/biochemistry.test.json";
-			$status = getstore($url, $uncompressed_filename);
-			die "Unable to fetch from model_seed\n" unless($status == 200);
-			open($fh, "<", $uncompressed_filename) || die "$!: $@";
-			@lines = <$fh>;
-			close($fh);
-			$string = join("\n",@lines);
-			$data = JSON::XS->new->utf8->decode($string);
-			$data->{uuid} = "kbase/testdefault";
-			$self->save_object({
-				id => "testdefault",
-				type => "Biochemistry",
-				data => $data,
-				workspace => "kbase",
-				command => "_loadBiochemToDB"
-			});
-		}
-		if (!defined($self->_getObjectByID("testdefault","Mapping","kbase",0))) {
-			$url = "http://bioseed.mcs.anl.gov/~chenry/KbaseFiles/mapping.test.json";
-			$status = getstore($url, $uncompressed_filename);
-			die "Unable to fetch from model_seed\n" unless($status == 200);
-			open($fh, "<", $uncompressed_filename) || die "$!: $@";
-			@lines = <$fh>;
-			close($fh);
-			$string = join("\n",@lines);
-			$data = JSON::XS->new->utf8->decode($string);
-			$data->{biochemistry_uuid} = "kbase/testdefault";
-			$data->{uuid} = "kbase/testdefault";
-			$self->save_object({
-				id => "testdefault",
-				type => "Mapping",
-				data => $data,
-				workspace => "kbase",
-				command => "_loadBiochemToDB"
-			});
-		}
-		#Clearing the initialization workspace 
-		$self->_deleteWorkspace("initializationWorkspace");
-	}
-}
-
 #END_HEADER
 
 sub new
@@ -1433,16 +1264,496 @@ sub new
 		print STDERR "mongodb-database configuration not found, using 'workspace_service'\n";
 		$self->{_db} = "workspace_service";
     }
-	$self->_initializeWorkspace();
     #END_CONSTRUCTOR
 
-    if ($self->can('_init_instance')) {
-		$self->_init_instance();
+    if ($self->can('_init_instance'))
+    {
+	$self->_init_instance();
     }
     return $self;
 }
 
 =head1 METHODS
+
+
+
+=head2 load_media_from_bio
+
+  $mediaMetas = $obj->load_media_from_bio($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a load_media_from_bio_params
+$mediaMetas is a reference to a list where each element is an object_metadata
+load_media_from_bio_params is a reference to a hash where the following keys are defined:
+	mediaWS has a value which is a workspace_id
+	bioid has a value which is an object_id
+	bioWS has a value which is a workspace_id
+	clearExisting has a value which is a bool
+	overwrite has a value which is a bool
+	auth has a value which is a string
+workspace_id is a string
+object_id is a string
+bool is an int
+object_metadata is a reference to a list containing 11 items:
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a load_media_from_bio_params
+$mediaMetas is a reference to a list where each element is an object_metadata
+load_media_from_bio_params is a reference to a hash where the following keys are defined:
+	mediaWS has a value which is a workspace_id
+	bioid has a value which is an object_id
+	bioWS has a value which is a workspace_id
+	clearExisting has a value which is a bool
+	overwrite has a value which is a bool
+	auth has a value which is a string
+workspace_id is a string
+object_id is a string
+bool is an int
+object_metadata is a reference to a list containing 11 items:
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
+
+
+=end text
+
+
+
+=item Description
+
+Creates "Media" objects in the workspace for all media contained in the specified biochemistry
+
+=back
+
+=cut
+
+sub load_media_from_bio
+{
+    my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to load_media_from_bio:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'load_media_from_bio');
+    }
+
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($mediaMetas);
+    #BEGIN load_media_from_bio
+    $self->_setContext($ctx,$params);
+    $params = $self->_validateargs($params,[],{
+    	mediaWS => "KBaseMedia",
+    	bioid => "default",
+    	bioWS => "kbase",
+    	clearExisting => 0,
+    	overwrite => 0,
+    	asHash => 0
+    });
+    #Creating the workspace if not already existing
+    my $ws = $self->_getWorkspace($params->{mediaWS});
+	if (!defined($ws)) {
+		$self->_createWorkspace($params->{mediaWS},"r");
+		$ws = $self->_getWorkspace($params->{mediaWS});
+	}
+	my $bio = $self->_getObjectByID($params->{bioid},"Biochemistry",$params->{bioWS},0);
+	if (defined($bio->data()->{media})) {
+		my $media = $biochem->{media};
+		for (my $i=0; $i < @{$media};$i++) {
+			my $obj = $self->_getObjectByID($media->[$i]->{id},"Media",$params->{mediaWS},0);
+			if (!defined($obj) || $params->{overwrite} == 1) {
+				$obj = $ws->saveObject("Media",$media->[$i]->{id},$media->[$i],"load_media_from_bio",{});	
+			}
+			push(@{$mediaMetas},$obj->metadata($params->{asHash}));
+		}
+	}
+	$self->_clearContext();
+    #END load_media_from_bio
+    my @_bad_returns;
+    (ref($mediaMetas) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"mediaMetas\" (value was \"$mediaMetas\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to load_media_from_bio:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'load_media_from_bio');
+    }
+    return($mediaMetas);
+}
+
+
+
+
+=head2 import_bio
+
+  $metadata = $obj->import_bio($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is an import_bio_params
+$metadata is an object_metadata
+import_bio_params is a reference to a hash where the following keys are defined:
+	bioid has a value which is an object_id
+	bioWS has a value which is a workspace_id
+	url has a value which is a string
+	compressed has a value which is a bool
+	clearExisting has a value which is a bool
+	overwrite has a value which is a bool
+	auth has a value which is a string
+object_id is a string
+workspace_id is a string
+bool is an int
+object_metadata is a reference to a list containing 11 items:
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is an import_bio_params
+$metadata is an object_metadata
+import_bio_params is a reference to a hash where the following keys are defined:
+	bioid has a value which is an object_id
+	bioWS has a value which is a workspace_id
+	url has a value which is a string
+	compressed has a value which is a bool
+	clearExisting has a value which is a bool
+	overwrite has a value which is a bool
+	auth has a value which is a string
+object_id is a string
+workspace_id is a string
+bool is an int
+object_metadata is a reference to a list containing 11 items:
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
+
+
+=end text
+
+
+
+=item Description
+
+Imports a biochemistry from a URL
+
+=back
+
+=cut
+
+sub import_bio
+{
+    my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to import_bio:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'import_bio');
+    }
+
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN import_bio
+    $self->_setContext($ctx,$params);
+    $params = $self->_validateargs($params,[],{
+    	bioid => "default",
+    	bioWS => "kbase",
+    	url => "http://bioseed.mcs.anl.gov/~chenry/exampleObjects/defaultBiochem.json.gz",
+    	compressed => 1,
+    	overwrite => 0,
+    	asHash => 0
+    });
+    #Creating the workspace if not already existing
+    my $ws = $self->_getWorkspace($params->{bioWS});
+	if (!defined($ws)) {
+		$self->_createWorkspace($params->{bioWS},"r");
+		$ws = $self->_getWorkspace($params->{bioWS});
+	}
+	#Checking for existing object
+	my $obj = $self->_getObjectByID("default","Biochemistry","kbase",0);
+	if (defined($obj) && $params->{overwrite} == 0) {
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Biochemistry exists, and overwrite not requested",
+							       method_name => 'import_bio');
+	}
+	#Retreiving object from url
+	my ($fh1, $compressed_filename) = tempfile();
+	my $status = getstore($url, $compressed_filename);
+	if ($status != 200) {
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Unable to fetch from URL",
+							       method_name => 'import_bio');
+	}
+	#Uncompressing
+	if ($params->{overwrite} == 1) {
+		my ($fh2, $uncompressed_filename) = tempfile();
+		close($fh1);
+		close($fh2);
+		gunzip $compressed_filename => $uncompressed_filename;
+		$compressed_filename = $uncompressed_filename;
+	}
+	#Saving object
+	open($fh, "<", $compressed_filename) || die "$!: $@";
+	@lines = <$fh>;
+	close($fh);
+	$string = join("\n",@lines);
+	$data = JSON::XS->new->utf8->decode($string);
+	$data->{uuid} = $params->{bioWS}."/".$params->{bioid};
+	$obj = $ws->saveObject("Biochemistry",$params->{bioid},$data,"import_bio",{});
+    $metadata = $obj->metadata($params->{asHash});
+    $self->_clearContext();
+    #END import_bio
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to import_bio:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'import_bio');
+    }
+    return($metadata);
+}
+
+
+
+
+=head2 import_map
+
+  $metadata = $obj->import_map($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is an import_map_params
+$metadata is an object_metadata
+import_map_params is a reference to a hash where the following keys are defined:
+	bioid has a value which is an object_id
+	bioWS has a value which is a workspace_id
+	url has a value which is a string
+	compressed has a value which is a bool
+	clearExisting has a value which is a bool
+	overwrite has a value which is a bool
+	auth has a value which is a string
+object_id is a string
+workspace_id is a string
+bool is an int
+object_metadata is a reference to a list containing 11 items:
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is an import_map_params
+$metadata is an object_metadata
+import_map_params is a reference to a hash where the following keys are defined:
+	bioid has a value which is an object_id
+	bioWS has a value which is a workspace_id
+	url has a value which is a string
+	compressed has a value which is a bool
+	clearExisting has a value which is a bool
+	overwrite has a value which is a bool
+	auth has a value which is a string
+object_id is a string
+workspace_id is a string
+bool is an int
+object_metadata is a reference to a list containing 11 items:
+	0: an object_id
+	1: an object_type
+	2: a timestamp
+	3: an int
+	4: a string
+	5: a username
+	6: a username
+	7: a workspace_id
+	8: a workspace_ref
+	9: a string
+	10: a reference to a hash where the key is a string and the value is a string
+object_type is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
+
+
+=end text
+
+
+
+=item Description
+
+Imports a mapping from a URL
+
+=back
+
+=cut
+
+sub import_map
+{
+    my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to import_map:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'import_map');
+    }
+
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN import_map
+    $self->_setContext($ctx,$params);
+    $params = $self->_validateargs($params,[],{
+    	bioid => "default",
+    	bioWS => "kbase",
+    	mapid => "default",
+    	mapWS => "kbase",
+    	url => "http://bioseed.mcs.anl.gov/~chenry/exampleObjects/defaultMap.json.gz",
+    	compressed => 1,
+    	overwrite => 0,
+    	asHash => 0
+    });
+    #Creating the workspace if not already existing
+    my $ws = $self->_getWorkspace($params->{mapWS});
+	if (!defined($ws)) {
+		$self->_createWorkspace($params->{mapWS},"r");
+		$ws = $self->_getWorkspace($params->{mapWS});
+	}
+	#Checking for existing object
+	my $obj = $self->_getObjectByID("default","Mapping","kbase",0);
+	if (defined($obj) && $params->{overwrite} == 0) {
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Mapping exists, and overwrite not requested",
+							       method_name => 'import_map');
+	}
+	#Retreiving object from url
+	my ($fh1, $compressed_filename) = tempfile();
+	my $status = getstore($url, $compressed_filename);
+	if ($status != 200) {
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Unable to fetch from URL",
+							       method_name => 'import_map');
+	}
+	#Uncompressing
+	if ($params->{overwrite} == 1) {
+		my ($fh2, $uncompressed_filename) = tempfile();
+		close($fh1);
+		close($fh2);
+		gunzip $compressed_filename => $uncompressed_filename;
+		$compressed_filename = $uncompressed_filename;
+	}
+	#Saving object
+	open($fh, "<", $compressed_filename) || die "$!: $@";
+	@lines = <$fh>;
+	close($fh);
+	$string = join("\n",@lines);
+	$data = JSON::XS->new->utf8->decode($string);
+	$data->{biochemistry_uuid} = $params->{bioWS}."/".$params->{bioid};
+	$data->{uuid} = $params->{mapWS}."/".$params->{mapid};
+	$obj = $ws->saveObject("Mapping",$params->{mapid},$data,"import_map",{});
+    $metadata = $obj->metadata($params->{asHash});
+    $self->_clearContext();
+    #END import_map
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to import_map:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'import_map');
+    }
+    return($metadata);
+}
+
 
 
 
@@ -4746,6 +5057,7 @@ queue_job_params is a reference to a hash where the following keys are defined:
 	jobid has a value which is a string
 	auth has a value which is a string
 	state has a value which is a string
+	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 bool is an int
 
 </pre>
@@ -4760,6 +5072,7 @@ queue_job_params is a reference to a hash where the following keys are defined:
 	jobid has a value which is a string
 	auth has a value which is a string
 	state has a value which is a string
+	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 bool is an int
 
 
@@ -4846,6 +5159,7 @@ set_job_status_params is a reference to a hash where the following keys are defi
 	status has a value which is a string
 	auth has a value which is a string
 	currentStatus has a value which is a string
+	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 bool is an int
 
 </pre>
@@ -4861,6 +5175,7 @@ set_job_status_params is a reference to a hash where the following keys are defi
 	status has a value which is a string
 	auth has a value which is a string
 	currentStatus has a value which is a string
+	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 bool is an int
 
 
@@ -4971,6 +5286,7 @@ sub set_job_status
 $params is a get_jobs_params
 $jobs is a reference to a list where each element is an ObjectData
 get_jobs_params is a reference to a hash where the following keys are defined:
+	jobids has a value which is a reference to a list where each element is a string
 	status has a value which is a string
 	auth has a value which is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -4985,6 +5301,7 @@ ObjectData is a reference to a hash where the following keys are defined:
 $params is a get_jobs_params
 $jobs is a reference to a list where each element is an ObjectData
 get_jobs_params is a reference to a hash where the following keys are defined:
+	jobids has a value which is a reference to a list where each element is a string
 	status has a value which is a string
 	auth has a value which is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -5788,6 +6105,164 @@ workspace has a value which is a workspace_id
 
 a reference to a hash where the following keys are defined:
 workspace has a value which is a workspace_id
+
+
+=end text
+
+=back
+
+
+
+=head2 load_media_from_bio_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "load_media_from_bio" function.
+
+        object_type type - type of the object to be saved (an essential argument)
+        workspace_id mediaWS - ID of workspace where media will be loaded (an optional argument with default "KBaseMedia")
+        object_id bioid - ID of biochemistry from which media will be loaded (an optional argument with default "default")
+        workspace_id bioWS - ID of workspace with biochemistry from which media will be loaded (an optional argument with default "kbase")
+        bool clearExisting - A boolean indicating if existing media in the specified workspace should be cleared (an optional argument with default "0")
+        bool overwrite - A boolean indicating if a matching existing media should be overwritten (an optional argument with default "0")
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+mediaWS has a value which is a workspace_id
+bioid has a value which is an object_id
+bioWS has a value which is a workspace_id
+clearExisting has a value which is a bool
+overwrite has a value which is a bool
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+mediaWS has a value which is a workspace_id
+bioid has a value which is an object_id
+bioWS has a value which is a workspace_id
+clearExisting has a value which is a bool
+overwrite has a value which is a bool
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 import_bio_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "import_bio" function.
+
+        object_id bioid - ID of biochemistry to be imported (an optional argument with default "default")
+        workspace_id bioWS - ID of workspace to which biochemistry will be imported (an optional argument with default "kbase")
+        string url - URL from which biochemistry should be retrieved
+        bool compressed - boolean indicating if biochemistry is compressed
+        bool overwrite - A boolean indicating if a matching existing biochemistry should be overwritten (an optional argument with default "0")
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+bioid has a value which is an object_id
+bioWS has a value which is a workspace_id
+url has a value which is a string
+compressed has a value which is a bool
+clearExisting has a value which is a bool
+overwrite has a value which is a bool
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+bioid has a value which is an object_id
+bioWS has a value which is a workspace_id
+url has a value which is a string
+compressed has a value which is a bool
+clearExisting has a value which is a bool
+overwrite has a value which is a bool
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 import_map_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "import_map" function.
+
+        object_id mapid - ID of mapping to be imported (an optional argument with default "default")
+        workspace_id mapWS - ID of workspace to which mapping will be imported (an optional argument with default "kbase")
+        string url - URL from which mapping should be retrieved
+        bool compressed - boolean indicating if mapping is compressed
+        bool overwrite - A boolean indicating if a matching existing mapping should be overwritten (an optional argument with default "0")
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+bioid has a value which is an object_id
+bioWS has a value which is a workspace_id
+url has a value which is a string
+compressed has a value which is a bool
+clearExisting has a value which is a bool
+overwrite has a value which is a bool
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+bioid has a value which is an object_id
+bioWS has a value which is a workspace_id
+url has a value which is a string
+compressed has a value which is a bool
+clearExisting has a value which is a bool
+overwrite has a value which is a bool
+auth has a value which is a string
 
 
 =end text
@@ -7034,6 +7509,7 @@ Input parameters for the "queue_job" function.
         string jobid - ID of the job to be queued (an essential argument)
         string auth - the authentication token of the KBase account queuing the job; must have access to the job being queued (an optional argument; user is "public" if auth is not provided)
         string state - the initial state to assign to the job being queued (an optional argument; default is "queued")
+        mapping<string,string> jobdata - hash of data associated with job
 
 
 =item Definition
@@ -7045,6 +7521,7 @@ a reference to a hash where the following keys are defined:
 jobid has a value which is a string
 auth has a value which is a string
 state has a value which is a string
+jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 
 </pre>
 
@@ -7056,6 +7533,7 @@ a reference to a hash where the following keys are defined:
 jobid has a value which is a string
 auth has a value which is a string
 state has a value which is a string
+jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 
 
 =end text
@@ -7078,6 +7556,7 @@ Input parameters for the "set_job_status" function.
         string status - Status to which job should be changed; accepted values are 'queued', 'running', and 'done' (an essential argument)
         string auth - the authentication token of the KBase account requesting job status; only status for owned jobs can be retrieved (an optional argument; user is "public" if auth is not provided)
         string currentStatus - Indicates the current statues of the selected job (an optional argument; default is "undef")
+        mapping<string,string> jobdata - hash of data associated with job
 
 
 =item Definition
@@ -7090,6 +7569,7 @@ jobid has a value which is a string
 status has a value which is a string
 auth has a value which is a string
 currentStatus has a value which is a string
+jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 
 </pre>
 
@@ -7102,6 +7582,7 @@ jobid has a value which is a string
 status has a value which is a string
 auth has a value which is a string
 currentStatus has a value which is a string
+jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 
 
 =end text
@@ -7120,8 +7601,9 @@ currentStatus has a value which is a string
 
 Input parameters for the "get_jobs" function.
 
-        string status - Status of all jobs to be retrieved; accepted values are 'queued', 'running', and 'done' (an essential argument)
-        string auth - the authentication token of the KBase account accessing job list; only owned jobs will be returned (an optional argument; user is "public" if auth is not provided)
+list<string> jobids - list of specific jobs to be retrieved (an optional argument; default is an empty list)
+string status - Status of all jobs to be retrieved; accepted values are 'queued', 'running', and 'done' (an essential argument)
+string auth - the authentication token of the KBase account accessing job list; only owned jobs will be returned (an optional argument; user is "public" if auth is not provided)
 
 
 =item Definition
@@ -7130,6 +7612,7 @@ Input parameters for the "get_jobs" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
+jobids has a value which is a reference to a list where each element is a string
 status has a value which is a string
 auth has a value which is a string
 
@@ -7140,6 +7623,7 @@ auth has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
+jobids has a value which is a reference to a list where each element is a string
 status has a value which is a string
 auth has a value which is a string
 

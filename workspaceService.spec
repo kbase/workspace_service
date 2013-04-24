@@ -131,6 +131,81 @@ module workspaceService {
 	/* WORKSPACE FUNCTIONS */
 	/* *********************************************************************************************** */
 	
+	/* Input parameters for the "load_media_from_bio" function.
+	
+		workspace_id mediaWS - ID of workspace where media will be loaded (an optional argument with default "KBaseMedia")
+		object_id bioid - ID of biochemistry from which media will be loaded (an optional argument with default "default")
+		workspace_id bioWS - ID of workspace with biochemistry from which media will be loaded (an optional argument with default "kbase")
+		bool clearExisting - A boolean indicating if existing media in the specified workspace should be cleared (an optional argument with default "0")
+		bool overwrite - A boolean indicating if a matching existing media should be overwritten (an optional argument with default "0")
+		
+	*/
+	typedef structure { 
+		workspace_id mediaWS;
+		object_id bioid;
+		workspace_id bioWS;
+		bool clearExisting;
+		bool overwrite;
+		string auth;
+		bool asHash;
+	} load_media_from_bio_params;
+	
+	/*
+		Creates "Media" objects in the workspace for all media contained in the specified biochemistry
+	*/
+	funcdef load_media_from_bio(load_media_from_bio_params params) returns (list<object_metadata> mediaMetas);
+	
+	/* Input parameters for the "import_bio" function.
+	
+		object_id bioid - ID of biochemistry to be imported (an optional argument with default "default")
+		workspace_id bioWS - ID of workspace to which biochemistry will be imported (an optional argument with default "kbase")
+		string url - URL from which biochemistry should be retrieved
+		bool compressed - boolean indicating if biochemistry is compressed
+		bool overwrite - A boolean indicating if a matching existing biochemistry should be overwritten (an optional argument with default "0")
+		
+	*/
+	typedef structure {
+		object_id bioid;
+		workspace_id bioWS;
+		string url;
+		bool compressed;
+		bool clearExisting;
+		bool overwrite;
+		string auth;
+		bool asHash;
+	} import_bio_params;
+	
+	/*
+		Imports a biochemistry from a URL
+	*/
+	funcdef import_bio(import_bio_params params) returns (object_metadata metadata);
+	
+	/* Input parameters for the "import_map" function.
+	
+		object_id mapid - ID of mapping to be imported (an optional argument with default "default")
+		workspace_id mapWS - ID of workspace to which mapping will be imported (an optional argument with default "kbase")
+		string url - URL from which mapping should be retrieved
+		bool compressed - boolean indicating if mapping is compressed
+		bool overwrite - A boolean indicating if a matching existing mapping should be overwritten (an optional argument with default "0")
+		
+	*/
+	typedef structure {
+		object_id bioid;
+		workspace_id bioWS;
+		object_id mapid;
+		workspace_id mapWS;
+		string url;
+		bool compressed;
+		bool overwrite;
+		string auth;
+		bool asHash;
+	} import_map_params;
+	
+	/*
+		Imports a mapping from a URL
+	*/
+	funcdef import_map(import_map_params params) returns (object_metadata metadata);
+	
 	/* Input parameters for the "save_objects function.
 	
 		object_type type - type of the object to be saved (an essential argument)
