@@ -1551,7 +1551,7 @@ sub import_bio
 	}
 	#Retreiving object from url
 	my ($fh1, $compressed_filename) = tempfile();
-	my $status = getstore($url, $compressed_filename);
+	my $status = getstore($params->{url}, $compressed_filename);
 	if ($status != 200) {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Unable to fetch from URL",
 							       method_name => 'import_bio');
@@ -1565,11 +1565,11 @@ sub import_bio
 		$compressed_filename = $uncompressed_filename;
 	}
 	#Saving object
-	open($fh, "<", $compressed_filename) || die "$!: $@";
-	@lines = <$fh>;
+	open(my $fh, "<", $compressed_filename) || die "$!: $@";
+	my @lines = <$fh>;
 	close($fh);
-	$string = join("\n",@lines);
-	$data = JSON::XS->new->utf8->decode($string);
+	my $string = join("\n",@lines);
+	my $data = JSON::XS->new->utf8->decode($string);
 	$data->{uuid} = $params->{bioWS}."/".$params->{bioid};
 	$obj = $ws->saveObject("Biochemistry",$params->{bioid},$data,"import_bio",{});
     $metadata = $obj->metadata($params->{asHash});
@@ -1719,7 +1719,7 @@ sub import_map
 	}
 	#Retreiving object from url
 	my ($fh1, $compressed_filename) = tempfile();
-	my $status = getstore($url, $compressed_filename);
+	my $status = getstore($params->{url}, $compressed_filename);
 	if ($status != 200) {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Unable to fetch from URL",
 							       method_name => 'import_map');
@@ -1733,11 +1733,11 @@ sub import_map
 		$compressed_filename = $uncompressed_filename;
 	}
 	#Saving object
-	open($fh, "<", $compressed_filename) || die "$!: $@";
-	@lines = <$fh>;
+	open(my $fh, "<", $compressed_filename) || die "$!: $@";
+	my @lines = <$fh>;
 	close($fh);
-	$string = join("\n",@lines);
-	$data = JSON::XS->new->utf8->decode($string);
+	my $string = join("\n",@lines);
+	my $data = JSON::XS->new->utf8->decode($string);
 	$data->{biochemistry_uuid} = $params->{bioWS}."/".$params->{bioid};
 	$data->{uuid} = $params->{mapWS}."/".$params->{mapid};
 	$obj = $ws->saveObject("Mapping",$params->{mapid},$data,"import_map",{});
