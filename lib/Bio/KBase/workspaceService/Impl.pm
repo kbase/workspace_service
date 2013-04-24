@@ -1543,7 +1543,7 @@ sub import_bio
 		$ws = $self->_getWorkspace($params->{bioWS});
 	}
 	#Checking for existing object
-	my $obj = $self->_getObjectByID("default","Biochemistry","kbase",0);
+	my $obj = $ws->getObject("Biochemistry",$params->{bioid});
 	if (defined($obj) && $params->{overwrite} == 0) {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Biochemistry exists, and overwrite not requested",
 							       method_name => 'import_bio');
@@ -1711,7 +1711,7 @@ sub import_map
 		$ws = $self->_getWorkspace($params->{mapWS});
 	}
 	#Checking for existing object
-	my $obj = $self->_getObjectByID("default","Mapping","kbase",0);
+	my $obj = $ws->getObject("Mapping",$params->{mapid});
 	if (defined($obj) && $params->{overwrite} == 0) {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Mapping exists, and overwrite not requested",
 							       method_name => 'import_map');

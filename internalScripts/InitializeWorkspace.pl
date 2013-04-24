@@ -27,18 +27,18 @@ if (defined($opt->{help})) {
 
 my $serv = get_ws_client();
 my $output;
-eval {
-	$output = $serv->import_bio({
-		auth => auth(),
-		overwrite => 0
-	});
-};
+if (defined($opt->{bio})) {
+$output = $serv->import_bio({
+	auth => auth(),
+	overwrite => 0
+});
 if (!defined($output)) {
 	print "Biochemistry could not be imported!\n";
 } else {
 	print "Biochemistry saved:\n".printObjectMeta($output)."\n";
 }
-eval {
+}
+if (defined($opt->{testbio})) {
 	$output = $serv->import_bio({
 		bioid => "testdefault",
 		url => "http://bioseed.mcs.anl.gov/~chenry/KbaseFiles/biochemistry.test.json",
@@ -46,24 +46,24 @@ eval {
 		auth => auth(),
 		overwrite => 0
 	});
-};
-if (!defined($output)) {
-	print "Test biochemistry could not be imported!\n";
-} else {
-	print "Test biochemistry saved:\n".printObjectMeta($output)."\n";
+	if (!defined($output)) {
+		print "Test biochemistry could not be imported!\n";
+	} else {
+		print "Test biochemistry saved:\n".printObjectMeta($output)."\n";
+	}
 }
-eval {
+if (defined($opt->{"map"})) {
 	$output = $serv->import_map({
 		auth => auth(),
 		overwrite => 0
 	});
-};
-if (!defined($output)) {
-	print "Mapping could not be imported!\n";
-} else {
-	print "Mapping saved:\n".printObjectMeta($output)."\n";
+	if (!defined($output)) {
+		print "Mapping could not be imported!\n";
+	} else {
+		print "Mapping saved:\n".printObjectMeta($output)."\n";
+	}
 }
-eval {
+if (defined($opt->{testmap})) {
 	$output = $serv->import_map({
 		bioid => "testdefault",
 		url => "http://bioseed.mcs.anl.gov/~chenry/KbaseFiles/mapping.test.json",
@@ -71,20 +71,20 @@ eval {
 		auth => auth(),
 		overwrite => 0
 	});
-};
-if (!defined($output)) {
-	print "Test mapping could not be imported!\n";
-} else {
-	print "Test mapping saved:\n".printObjectMeta($output)."\n";
+	if (!defined($output)) {
+		print "Test mapping could not be imported!\n";
+	} else {
+		print "Test mapping saved:\n".printObjectMeta($output)."\n";
+	}
 }
-eval {
+if (defined($opt->{media})) {
 	$output = $serv->load_media_from_bio({
 		auth => auth(),
 		overwrite => 0
 	});
-};
-if (!defined($output)) {
-	print "Media load failed!\n";
-} else {
-	print @{$output}." media loaded!"\n";
+	if (!defined($output)) {
+		print "Media load failed!\n";
+	} else {
+		print @{$output}." media loaded!\n";
+	}
 }
