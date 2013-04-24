@@ -12,7 +12,7 @@ my $auth = auth();
 if (!defined($auth)) {
 	print "Logged in as:\npublic\n";
 } else {
-	if (auth() =~ m/^(\w+)\s(\S+)$/) {
+	if (auth() =~ m/^(\w+)\t(\S+)$/) {
 		print "Logged in as:\n".$1."\n";  
 	} else {
 		my $token = Bio::KBase::AuthToken->new(token => auth());
