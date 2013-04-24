@@ -1402,7 +1402,7 @@ sub load_media_from_bio
 	}
 	my $bio = $biows->getObject("Biochemistry",$params->{bioid});
 	if (defined($bio->data()->{media})) {
-		my $media = $bio->{media};
+		my $media = $bio->data()->{media};
 		for (my $i=0; $i < @{$media};$i++) {
 			my $obj = $ws->getObject("Media",$media->[$i]->{id});
 			if (!defined($obj) || $params->{overwrite} == 1) {
