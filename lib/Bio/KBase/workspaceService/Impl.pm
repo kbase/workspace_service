@@ -1550,15 +1550,15 @@ sub import_bio
 	}
 	#Retreiving object from url
 	my ($fh1, $compressed_filename) = tempfile();
+	close($fh1);
 	my $status = getstore($params->{url}, $compressed_filename);
 	if ($status != 200) {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Unable to fetch from URL",
 							       method_name => 'import_bio');
 	}
 	#Uncompressing
-	if ($params->{overwrite} == 1) {
+	if ($params->{compressed} == 1) {
 		my ($fh2, $uncompressed_filename) = tempfile();
-		close($fh1);
 		close($fh2);
 		gunzip $compressed_filename => $uncompressed_filename;
 		$compressed_filename = $uncompressed_filename;
@@ -1718,15 +1718,15 @@ sub import_map
 	}
 	#Retreiving object from url
 	my ($fh1, $compressed_filename) = tempfile();
+	close($fh1);
 	my $status = getstore($params->{url}, $compressed_filename);
 	if ($status != 200) {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Unable to fetch from URL",
 							       method_name => 'import_map');
 	}
 	#Uncompressing
-	if ($params->{overwrite} == 1) {
+	if ($params->{compressed} == 1) {
 		my ($fh2, $uncompressed_filename) = tempfile();
-		close($fh1);
 		close($fh2);
 		gunzip $compressed_filename => $uncompressed_filename;
 		$compressed_filename = $uncompressed_filename;
