@@ -13,6 +13,9 @@ has 'valid_methods' => (is => 'ro', isa => 'HashRef', lazy => 1,
 our $CallContext;
 
 our %return_counts = (
+        'load_media_from_bio' => 1,
+        'import_bio' => 1,
+        'import_map' => 1,
         'save_object' => 1,
         'delete_object' => 1,
         'delete_object_permanently' => 1,
@@ -52,6 +55,9 @@ sub _build_valid_methods
 {
     my($self) = @_;
     my $methods = {
+        'load_media_from_bio' => 1,
+        'import_bio' => 1,
+        'import_map' => 1,
         'save_object' => 1,
         'delete_object' => 1,
         'delete_object_permanently' => 1,
