@@ -46,6 +46,7 @@ our %return_counts = (
         'get_types' => 1,
         'add_type' => 1,
         'remove_type' => 1,
+        'patch' => 1,
         'version' => 1,
 );
 
@@ -88,6 +89,7 @@ sub _build_valid_methods
         'get_types' => 1,
         'add_type' => 1,
         'remove_type' => 1,
+        'patch' => 1,
         'version' => 1,
     };
     return $methods;

@@ -112,6 +112,7 @@ load_media_from_bio_params is a reference to a hash where the following keys are
 	clearExisting has a value which is a bool
 	overwrite has a value which is a bool
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
 object_id is a string
 bool is an int
@@ -147,6 +148,7 @@ load_media_from_bio_params is a reference to a hash where the following keys are
 	clearExisting has a value which is a bool
 	overwrite has a value which is a bool
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
 object_id is a string
 bool is an int
@@ -245,6 +247,7 @@ import_bio_params is a reference to a hash where the following keys are defined:
 	clearExisting has a value which is a bool
 	overwrite has a value which is a bool
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 bool is an int
@@ -281,6 +284,7 @@ import_bio_params is a reference to a hash where the following keys are defined:
 	clearExisting has a value which is a bool
 	overwrite has a value which is a bool
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 bool is an int
@@ -374,11 +378,13 @@ $metadata is an object_metadata
 import_map_params is a reference to a hash where the following keys are defined:
 	bioid has a value which is an object_id
 	bioWS has a value which is a workspace_id
+	mapid has a value which is an object_id
+	mapWS has a value which is a workspace_id
 	url has a value which is a string
 	compressed has a value which is a bool
-	clearExisting has a value which is a bool
 	overwrite has a value which is a bool
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 bool is an int
@@ -410,11 +416,13 @@ $metadata is an object_metadata
 import_map_params is a reference to a hash where the following keys are defined:
 	bioid has a value which is an object_id
 	bioWS has a value which is a workspace_id
+	mapid has a value which is an object_id
+	mapWS has a value which is a workspace_id
 	url has a value which is a string
 	compressed has a value which is a bool
-	clearExisting has a value which is a bool
 	overwrite has a value which is a bool
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 bool is an int
@@ -3421,7 +3429,7 @@ sub set_user_settings
 
 =head2 queue_job
 
-  $success = $obj->queue_job($params)
+  $jobid = $obj->queue_job($params)
 
 =over 4
 
@@ -3431,13 +3439,12 @@ sub set_user_settings
 
 <pre>
 $params is a queue_job_params
-$success is a bool
+$jobid is a string
 queue_job_params is a reference to a hash where the following keys are defined:
-	jobid has a value which is a string
 	auth has a value which is a string
 	state has a value which is a string
+	type has a value which is a string
 	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
-bool is an int
 
 </pre>
 
@@ -3446,13 +3453,12 @@ bool is an int
 =begin text
 
 $params is a queue_job_params
-$success is a bool
+$jobid is a string
 queue_job_params is a reference to a hash where the following keys are defined:
-	jobid has a value which is a string
 	auth has a value which is a string
 	state has a value which is a string
+	type has a value which is a string
 	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
-bool is an int
 
 
 =end text
@@ -3622,6 +3628,7 @@ $params is a get_jobs_params
 $jobs is a reference to a list where each element is an ObjectData
 get_jobs_params is a reference to a hash where the following keys are defined:
 	jobids has a value which is a reference to a list where each element is a string
+	type has a value which is a string
 	status has a value which is a string
 	auth has a value which is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -3637,6 +3644,7 @@ $params is a get_jobs_params
 $jobs is a reference to a list where each element is an ObjectData
 get_jobs_params is a reference to a hash where the following keys are defined:
 	jobids has a value which is a reference to a list where each element is a string
+	type has a value which is a string
 	status has a value which is a string
 	auth has a value which is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -3945,6 +3953,94 @@ sub remove_type
 
 
 
+=head2 patch
+
+  $success = $obj->patch($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a patch_params
+$success is a bool
+patch_params is a reference to a hash where the following keys are defined:
+	patch_id has a value which is a string
+	auth has a value which is a string
+bool is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a patch_params
+$success is a bool
+patch_params is a reference to a hash where the following keys are defined:
+	patch_id has a value which is a string
+	auth has a value which is a string
+bool is an int
+
+
+=end text
+
+=item Description
+
+This function patches the database after an update. Called remotely, but only callable by the admin user.
+
+=back
+
+=cut
+
+sub patch
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function patch (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to patch:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'patch');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "workspaceService.patch",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{code},
+					       method_name => 'patch',
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method patch",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'patch',
+				       );
+    }
+}
+
+
+
 sub version {
     my ($self) = @_;
     my $result = $self->{client}->call($self->{url}, {
@@ -3956,16 +4052,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'remove_type',
+                method_name => 'patch',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method remove_type",
+            error => "Error invoking method patch",
             status_line => $self->{client}->status_line,
-            method_name => 'remove_type',
+            method_name => 'patch',
         );
     }
 }
@@ -4454,7 +4550,6 @@ workspace has a value which is a workspace_id
 
 Input parameters for the "load_media_from_bio" function.
 
-        object_type type - type of the object to be saved (an essential argument)
         workspace_id mediaWS - ID of workspace where media will be loaded (an optional argument with default "KBaseMedia")
         object_id bioid - ID of biochemistry from which media will be loaded (an optional argument with default "default")
         workspace_id bioWS - ID of workspace with biochemistry from which media will be loaded (an optional argument with default "kbase")
@@ -4474,6 +4569,7 @@ bioWS has a value which is a workspace_id
 clearExisting has a value which is a bool
 overwrite has a value which is a bool
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4488,6 +4584,7 @@ bioWS has a value which is a workspace_id
 clearExisting has a value which is a bool
 overwrite has a value which is a bool
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4526,6 +4623,7 @@ compressed has a value which is a bool
 clearExisting has a value which is a bool
 overwrite has a value which is a bool
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4541,6 +4639,7 @@ compressed has a value which is a bool
 clearExisting has a value which is a bool
 overwrite has a value which is a bool
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -4574,11 +4673,13 @@ Input parameters for the "import_map" function.
 a reference to a hash where the following keys are defined:
 bioid has a value which is an object_id
 bioWS has a value which is a workspace_id
+mapid has a value which is an object_id
+mapWS has a value which is a workspace_id
 url has a value which is a string
 compressed has a value which is a bool
-clearExisting has a value which is a bool
 overwrite has a value which is a bool
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -4589,11 +4690,13 @@ auth has a value which is a string
 a reference to a hash where the following keys are defined:
 bioid has a value which is an object_id
 bioWS has a value which is a workspace_id
+mapid has a value which is an object_id
+mapWS has a value which is a workspace_id
 url has a value which is a string
 compressed has a value which is a bool
-clearExisting has a value which is a bool
 overwrite has a value which is a bool
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -5837,9 +5940,9 @@ auth has a value which is a string
 
 Input parameters for the "queue_job" function.
 
-        string jobid - ID of the job to be queued (an essential argument)
         string auth - the authentication token of the KBase account queuing the job; must have access to the job being queued (an optional argument; user is "public" if auth is not provided)
         string state - the initial state to assign to the job being queued (an optional argument; default is "queued")
+        string type - the type of the job being queued
         mapping<string,string> jobdata - hash of data associated with job
 
 
@@ -5849,9 +5952,9 @@ Input parameters for the "queue_job" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-jobid has a value which is a string
 auth has a value which is a string
 state has a value which is a string
+type has a value which is a string
 jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 
 </pre>
@@ -5861,9 +5964,9 @@ jobdata has a value which is a reference to a hash where the key is a string and
 =begin text
 
 a reference to a hash where the following keys are defined:
-jobid has a value which is a string
 auth has a value which is a string
 state has a value which is a string
+type has a value which is a string
 jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 
 
@@ -5944,6 +6047,7 @@ string auth - the authentication token of the KBase account accessing job list; 
 <pre>
 a reference to a hash where the following keys are defined:
 jobids has a value which is a reference to a list where each element is a string
+type has a value which is a string
 status has a value which is a string
 auth has a value which is a string
 
@@ -5955,6 +6059,7 @@ auth has a value which is a string
 
 a reference to a hash where the following keys are defined:
 jobids has a value which is a reference to a list where each element is a string
+type has a value which is a string
 status has a value which is a string
 auth has a value which is a string
 
@@ -6036,6 +6141,46 @@ auth has a value which is a string
 
 a reference to a hash where the following keys are defined:
 type has a value which is a string
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 patch_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "patch" function.
+
+string patch_id - ID of the patch that should be run on the workspace
+string auth - the authentication token of the KBase account removing a custom type (an optional argument; user is "public" if auth is not provided)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+patch_id has a value which is a string
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+patch_id has a value which is a string
 auth has a value which is a string
 
 

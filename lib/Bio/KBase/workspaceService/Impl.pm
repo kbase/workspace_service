@@ -238,6 +238,37 @@ sub _mongodb {
     return $self->{_mongodb};
 }
 
+=head3 _idServer
+
+Definition:
+	Bio::KBase::IDServer::Client = _idServer();
+Description:
+	Returns ID server client
+
+=cut
+sub _idServer {
+	my $self = shift;
+	if (!defined($self->{_idserver})) {
+		$self->{_idserver} = Bio::KBase::IDServer::Client->new('http://bio-data-1.mcs.anl.gov/services/idserver');
+	}
+    return $self->{_idserver};
+}
+
+=head3 _get_new_id
+
+Definition:
+	string id = _get_new_id(string prefix);
+Description:
+	Returns ID with given prefix
+
+=cut
+sub _get_new_id {
+	my ($self,$prefix) = @_;
+	my $id = $self->_idServer()->allocate_id_range( $prefix, 1 );
+    $id = $prefix.$id;
+	return $id;
+};
+
 =head3 _gridfs
 
 Definition:
@@ -453,6 +484,7 @@ sub _createObject {
 		meta => $obj->meta(),
 		refdeps => $obj->refDependencies(),
 		iddeps => $obj->idDependencies(),
+		moddate => $obj->moddate()
 	});
 	return $obj;
 }
@@ -1158,7 +1190,8 @@ sub _permanentTypes {
         PROMModel => 1,
         ProbAnno => 1,
         GenomeContigs => 1,
-        PromConstraints => 1
+        PromConstraints => 1,
+        ModelTemplate => 1
 	};
 }
 
@@ -1222,6 +1255,78 @@ sub _decode {
 	return JSON::XS->new->decode($data);	
 }
 
+=head3 _patch
+
+Definition:
+	0/1 =  _patch({});
+Description:
+	This function permits the remote application of data patches to handle correction and adjustments in the database
+
+=cut
+sub _patch {
+	my($self, $params) = @_;
+	#Correcting the modification date on all objects
+	if ($params->{patch_id} eq "moddate") {
+		my $cursor = $self->_mongodb()->get_collection('workspaceObjects')->find();
+		my $grid = $self->_gridfs();
+		while (my $object = $cursor->next) {
+	        my $file = $grid->find_one({chsum => $object->{chsum}});
+	        my $date = $file->{info}->{creationDate};
+	        $self->_updateDB("workspaceObjects",{uuid => $object->{uuid}},{'$set' => {'moddate' => $date}})
+	    }
+	#Correcting the gene count on all models
+	} elsif ($params->{patch_id} eq "genenum") {
+		my $cursor = $self->_mongodb()->get_collection('workspaceObjects')->find();
+		while (my $object = $cursor->next) {
+	        if ($object->{type} eq "Model") {
+		        my $newObject = Bio::KBase::workspaceService::Object->new({
+					parent => $self,
+					uuid => $object->{uuid},
+					id => $object->{id},
+					workspace => $object->{workspace},
+					type => $object->{type},
+					ancestor => $object->{ancestor},
+					revertAncestors => $object->{revertAncestors},
+					owner => $object->{owner},
+					lastModifiedBy => $object->{lastModifiedBy},
+					command => $object->{command},
+					instance => $object->{instance},
+					chsum => $object->{chsum},
+					meta => $object->{meta},
+					moddate => $object->{moddate}
+		        });
+		        my $data = $newObject->data();
+		        if (defined($data->{modelreactions})) {
+					my $genehash = {};
+					for (my $i=0; $i < @{$data->{modelreactions}}; $i++) {
+						my $rxn = $data->{modelreactions}->[$i];
+						if (defined($rxn->{modelReactionProteins})) {
+							for (my $j=0; $j < @{$rxn->{modelReactionProteins}}; $j++) {
+								my $prot = $rxn->{modelReactionProteins}->[$j];
+								if (defined($prot->{modelReactionProteinSubunits})) {
+									for (my $k=0; $k < @{$prot->{modelReactionProteinSubunits}}; $k++) {
+										my $subunit = $prot->{modelReactionProteinSubunits}->[$k];
+										if (defined($subunit->{modelReactionProteinSubunitGenes})) {
+											for (my $m=0; $m < @{$subunit->{modelReactionProteinSubunitGenes}}; $m++) {
+												my $gene = $subunit->{modelReactionProteinSubunitGenes}->[$m];
+												if (defined($gene->{role_uuid})) {
+													$genehash->{$gene->{role_uuid}} = 1;
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					my $numgenes = keys(%{$genehash});
+		        	$self->_updateDB("workspaceObjects",{uuid => $object->{uuid}},{'$set' => {'meta.number_genes' => $numgenes}});
+		        }
+			}
+	    }
+	}
+};
+
 #END_HEADER
 
 sub new
@@ -1240,16 +1345,22 @@ sub new
 		my $service = $ENV{KB_SERVICE_NAME};
 		my $c = Config::Simple->new();
 		$c->read($e);
-		my @params = qw(accounttype mongodb-host mongodb-database);
-		for my $p (@params) {
+		my @list = qw(accounttype mongodb-host mongodb-database);
+		for my $p (@list) {
 		    my $v = $c->param("$service.$p");
 		    if ($v) {
 				$params{$p} = $v;
 		    }
 		}
     }
+    my @list = qw(accounttype mongodb-host mongodb-database);
+	for my $p (@list) {
+	  	if (defined($options->{$p})) {
+			$params{$p} = $options->{$p};
+	    }
+	}
     if (defined $params{accounttype}) {
-		print STDERR "Setting account type to:".$params{accounttype}."\n";
+		#print STDERR "Setting account type to:".$params{accounttype}."\n";
 		$self->{_accounttype} = $params{accounttype};
     } 
     if (defined $params{"mongodb-host"}) {
@@ -1297,6 +1408,7 @@ load_media_from_bio_params is a reference to a hash where the following keys are
 	clearExisting has a value which is a bool
 	overwrite has a value which is a bool
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
 object_id is a string
 bool is an int
@@ -1332,6 +1444,7 @@ load_media_from_bio_params is a reference to a hash where the following keys are
 	clearExisting has a value which is a bool
 	overwrite has a value which is a bool
 	auth has a value which is a string
+	asHash has a value which is a bool
 workspace_id is a string
 object_id is a string
 bool is an int
@@ -1448,6 +1561,7 @@ import_bio_params is a reference to a hash where the following keys are defined:
 	clearExisting has a value which is a bool
 	overwrite has a value which is a bool
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 bool is an int
@@ -1484,6 +1598,7 @@ import_bio_params is a reference to a hash where the following keys are defined:
 	clearExisting has a value which is a bool
 	overwrite has a value which is a bool
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 bool is an int
@@ -1609,11 +1724,13 @@ $metadata is an object_metadata
 import_map_params is a reference to a hash where the following keys are defined:
 	bioid has a value which is an object_id
 	bioWS has a value which is a workspace_id
+	mapid has a value which is an object_id
+	mapWS has a value which is a workspace_id
 	url has a value which is a string
 	compressed has a value which is a bool
-	clearExisting has a value which is a bool
 	overwrite has a value which is a bool
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 bool is an int
@@ -1645,11 +1762,13 @@ $metadata is an object_metadata
 import_map_params is a reference to a hash where the following keys are defined:
 	bioid has a value which is an object_id
 	bioWS has a value which is a workspace_id
+	mapid has a value which is an object_id
+	mapWS has a value which is a workspace_id
 	url has a value which is a string
 	compressed has a value which is a bool
-	clearExisting has a value which is a bool
 	overwrite has a value which is a bool
 	auth has a value which is a string
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 bool is an int
@@ -5047,7 +5166,7 @@ sub set_user_settings
 
 =head2 queue_job
 
-  $success = $obj->queue_job($params)
+  $jobid = $obj->queue_job($params)
 
 =over 4
 
@@ -5057,13 +5176,12 @@ sub set_user_settings
 
 <pre>
 $params is a queue_job_params
-$success is a bool
+$jobid is a string
 queue_job_params is a reference to a hash where the following keys are defined:
-	jobid has a value which is a string
 	auth has a value which is a string
 	state has a value which is a string
+	type has a value which is a string
 	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
-bool is an int
 
 </pre>
 
@@ -5072,13 +5190,12 @@ bool is an int
 =begin text
 
 $params is a queue_job_params
-$success is a bool
+$jobid is a string
 queue_job_params is a reference to a hash where the following keys are defined:
-	jobid has a value which is a string
 	auth has a value which is a string
 	state has a value which is a string
+	type has a value which is a string
 	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
-bool is an int
 
 
 =end text
@@ -5108,39 +5225,42 @@ sub queue_job
     }
 
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-    my($success);
+    my($jobid);
     #BEGIN queue_job
     $self->_setContext($ctx,$params);
-    $params = $self->_validateargs($params,["jobid"],{
+    $params = $self->_validateargs($params,["type"],{
     	"state" => "queued",
     	jobdata => {}
     });
+    #Obtaining new job ID
+    my $id = $self->_get_new_id("kb-job");
     #Checking that job doesn't already exist
-    my $cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $params->{jobid}});
+    my $cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $id});
     if (my $object = $cursor->next) {
     	my $msg = "Trying to queue job that already exists!";
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'queue_job');
     }
     #Inserting jobs in database
     $self->_mongodb()->get_collection('jobObjects')->insert({
-		id => $params->{jobid},
+		id => $id,
+		type => $params->{type},
 		auth => $params->{auth},
 		status => $params->{"state"},
 		jobdata => $params->{jobdata},
 		queuetime => time(),
 		owner => $self->_getUsername()
     });
-    $success = 1;
+    $jobid = $id;
 	$self->_clearContext();  
     #END queue_job
     my @_bad_returns;
-    (!ref($success)) or push(@_bad_returns, "Invalid type for return variable \"success\" (value was \"$success\")");
+    (!ref($jobid)) or push(@_bad_returns, "Invalid type for return variable \"jobid\" (value was \"$jobid\")");
     if (@_bad_returns) {
 	my $msg = "Invalid returns passed to queue_job:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'queue_job');
     }
-    return($success);
+    return($jobid);
 }
 
 
@@ -5292,6 +5412,7 @@ $params is a get_jobs_params
 $jobs is a reference to a list where each element is an ObjectData
 get_jobs_params is a reference to a hash where the following keys are defined:
 	jobids has a value which is a reference to a list where each element is a string
+	type has a value which is a string
 	status has a value which is a string
 	auth has a value which is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -5307,6 +5428,7 @@ $params is a get_jobs_params
 $jobs is a reference to a list where each element is an ObjectData
 get_jobs_params is a reference to a hash where the following keys are defined:
 	jobids has a value which is a reference to a list where each element is a string
+	type has a value which is a string
 	status has a value which is a string
 	auth has a value which is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -5344,11 +5466,15 @@ sub get_jobs
     $self->_setContext($ctx,$params);
     $self->_validateargs($params,[],{
     	status => undef,
-    	jobids => undef
+    	jobids => undef,
+    	type => undef
     });
     my $query = {};
     if (defined($params->{status})) {
     	$query->{status} = $params->{status};
+    }
+    if (defined($params->{type})) {
+    	$query->{type} = $params->{type};
     }
     if (defined($params->{jobids})) {
     	$query->{id} = {'$in' => $params->{jobids}};
@@ -5360,7 +5486,7 @@ sub get_jobs
 	$jobs = [];
 	while (my $object = $cursor->next) {
         my $keys = [qw(
-        	id ws auth status queuetime owner requeuetime starttime completetime jobdata
+        	type id ws auth status queuetime owner requeuetime starttime completetime jobdata
         )];
         my $newobj = {};
         foreach my $key (@{$keys}) {
@@ -5631,6 +5757,89 @@ sub remove_type
 	my $msg = "Invalid returns passed to remove_type:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'remove_type');
+    }
+    return($success);
+}
+
+
+
+
+=head2 patch
+
+  $success = $obj->patch($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a patch_params
+$success is a bool
+patch_params is a reference to a hash where the following keys are defined:
+	patch_id has a value which is a string
+	auth has a value which is a string
+bool is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a patch_params
+$success is a bool
+patch_params is a reference to a hash where the following keys are defined:
+	patch_id has a value which is a string
+	auth has a value which is a string
+bool is an int
+
+
+=end text
+
+
+
+=item Description
+
+This function patches the database after an update. Called remotely, but only callable by the admin user.
+
+=back
+
+=cut
+
+sub patch
+{
+    my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to patch:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'patch');
+    }
+
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($success);
+    #BEGIN patch
+    $self->_setContext($ctx,$params);
+    $self->_validateargs($params,[],{});
+    if ($self->_getUsername() ne "workspaceroot") {
+    	my $msg = "Only root user can run the patch command!";
+		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'add_type');
+    }
+    $self->_patch($params);
+   	$self->_clearContext();
+   	$success = 1;
+    #END patch
+    my @_bad_returns;
+    (!ref($success)) or push(@_bad_returns, "Invalid type for return variable \"success\" (value was \"$success\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to patch:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'patch');
     }
     return($success);
 }
@@ -6128,7 +6337,6 @@ workspace has a value which is a workspace_id
 
 Input parameters for the "load_media_from_bio" function.
 
-        object_type type - type of the object to be saved (an essential argument)
         workspace_id mediaWS - ID of workspace where media will be loaded (an optional argument with default "KBaseMedia")
         object_id bioid - ID of biochemistry from which media will be loaded (an optional argument with default "default")
         workspace_id bioWS - ID of workspace with biochemistry from which media will be loaded (an optional argument with default "kbase")
@@ -6148,6 +6356,7 @@ bioWS has a value which is a workspace_id
 clearExisting has a value which is a bool
 overwrite has a value which is a bool
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -6162,6 +6371,7 @@ bioWS has a value which is a workspace_id
 clearExisting has a value which is a bool
 overwrite has a value which is a bool
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -6200,6 +6410,7 @@ compressed has a value which is a bool
 clearExisting has a value which is a bool
 overwrite has a value which is a bool
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -6215,6 +6426,7 @@ compressed has a value which is a bool
 clearExisting has a value which is a bool
 overwrite has a value which is a bool
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -6248,11 +6460,13 @@ Input parameters for the "import_map" function.
 a reference to a hash where the following keys are defined:
 bioid has a value which is an object_id
 bioWS has a value which is a workspace_id
+mapid has a value which is an object_id
+mapWS has a value which is a workspace_id
 url has a value which is a string
 compressed has a value which is a bool
-clearExisting has a value which is a bool
 overwrite has a value which is a bool
 auth has a value which is a string
+asHash has a value which is a bool
 
 </pre>
 
@@ -6263,11 +6477,13 @@ auth has a value which is a string
 a reference to a hash where the following keys are defined:
 bioid has a value which is an object_id
 bioWS has a value which is a workspace_id
+mapid has a value which is an object_id
+mapWS has a value which is a workspace_id
 url has a value which is a string
 compressed has a value which is a bool
-clearExisting has a value which is a bool
 overwrite has a value which is a bool
 auth has a value which is a string
+asHash has a value which is a bool
 
 
 =end text
@@ -7511,9 +7727,9 @@ auth has a value which is a string
 
 Input parameters for the "queue_job" function.
 
-        string jobid - ID of the job to be queued (an essential argument)
         string auth - the authentication token of the KBase account queuing the job; must have access to the job being queued (an optional argument; user is "public" if auth is not provided)
         string state - the initial state to assign to the job being queued (an optional argument; default is "queued")
+        string type - the type of the job being queued
         mapping<string,string> jobdata - hash of data associated with job
 
 
@@ -7523,9 +7739,9 @@ Input parameters for the "queue_job" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-jobid has a value which is a string
 auth has a value which is a string
 state has a value which is a string
+type has a value which is a string
 jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 
 </pre>
@@ -7535,9 +7751,9 @@ jobdata has a value which is a reference to a hash where the key is a string and
 =begin text
 
 a reference to a hash where the following keys are defined:
-jobid has a value which is a string
 auth has a value which is a string
 state has a value which is a string
+type has a value which is a string
 jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 
 
@@ -7618,6 +7834,7 @@ string auth - the authentication token of the KBase account accessing job list; 
 <pre>
 a reference to a hash where the following keys are defined:
 jobids has a value which is a reference to a list where each element is a string
+type has a value which is a string
 status has a value which is a string
 auth has a value which is a string
 
@@ -7629,6 +7846,7 @@ auth has a value which is a string
 
 a reference to a hash where the following keys are defined:
 jobids has a value which is a reference to a list where each element is a string
+type has a value which is a string
 status has a value which is a string
 auth has a value which is a string
 
@@ -7710,6 +7928,46 @@ auth has a value which is a string
 
 a reference to a hash where the following keys are defined:
 type has a value which is a string
+auth has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 patch_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "patch" function.
+
+string patch_id - ID of the patch that should be run on the workspace
+string auth - the authentication token of the KBase account removing a custom type (an optional argument; user is "public" if auth is not provided)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+patch_id has a value which is a string
+auth has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+patch_id has a value which is a string
 auth has a value which is a string
 
 
