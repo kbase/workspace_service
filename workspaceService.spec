@@ -772,16 +772,16 @@ module workspaceService {
 
 	/* Input parameters for the "queue_job" function.
 	
-		string jobid - ID of the job to be queued (an essential argument)
 		string auth - the authentication token of the KBase account queuing the job; must have access to the job being queued (an optional argument; user is "public" if auth is not provided)
 		string state - the initial state to assign to the job being queued (an optional argument; default is "queued")
+		string type - the type of the job being queued
 		mapping<string,string> jobdata - hash of data associated with job
 			
 	*/
 	typedef structure {
-		string jobid;
 		string auth;
 		string state;
+		string type;
 		mapping<string,string> jobdata;
 	} queue_job_params;
 	
@@ -789,7 +789,7 @@ module workspaceService {
 		Queues a new job in the workspace.
 		Workspace job queues handles jobs that don't get submitted to large clusters.
 	*/
-	funcdef queue_job(queue_job_params params) returns (bool success);
+	funcdef queue_job(queue_job_params params) returns (string jobid);
 
 	/* Input parameters for the "set_job_status" function.
 	
@@ -823,6 +823,7 @@ module workspaceService {
 	*/
 	typedef structure {
 		list<string> jobids;
+		string type;
 		string status;
 		string auth;
 	} get_jobs_params;
@@ -867,6 +868,22 @@ module workspaceService {
 		Permanent types cannot be removed.
 	*/
 	funcdef remove_type(remove_type_params params) returns (bool success);
+
+	/* Input parameters for the "patch" function.
+		
+		string patch_id - ID of the patch that should be run on the workspace
+		string auth - the authentication token of the KBase account removing a custom type (an optional argument; user is "public" if auth is not provided)
+			
+	*/
+	typedef structure {
+		string patch_id;
+		string auth;
+	} patch_params;
+	
+	/*
+		This function patches the database after an update. Called remotely, but only callable by the admin user.
+	*/
+	funcdef patch(patch_params params) returns (bool success);
 	
 	/* *********************************************************************************************** */
 	/* COMMAND LINE API/WEB API CORRESPONDENCE */

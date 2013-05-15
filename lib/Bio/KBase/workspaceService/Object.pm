@@ -493,6 +493,9 @@ sub allDependencies {
 	if (!defined($self->{_allDependencies})) {
 		$self->{_allDependencies} = {};
 		my $linkSpecs = {
+			ProbAnno => {
+				probmodel_uuid => "ProbModel",
+			},
 			Model => {
 				annotation_uuid => "Annotation",
 				biochemistry_uuid => "Biochemistry",
@@ -601,7 +604,7 @@ sub setDefaultMetadata {
 						my $prot = $rxn->{modelReactionProteins}->[$j];
 						if (defined($prot->{modelReactionProteinSubunits})) {
 							for (my $k=0; $k < @{$prot->{modelReactionProteinSubunits}}; $k++) {
-								my $subunit = $prot->{modelReactionProteinSubunitGenes}->[$k];
+								my $subunit = $prot->{modelReactionProteinSubunits}->[$k];
 								if (defined($subunit->{modelReactionProteinSubunitGenes})) {
 									for (my $m=0; $m < @{$subunit->{modelReactionProteinSubunitGenes}}; $m++) {
 										my $gene = $subunit->{modelReactionProteinSubunitGenes}->[$m];
