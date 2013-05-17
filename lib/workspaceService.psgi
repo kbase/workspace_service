@@ -1,6 +1,7 @@
 use Bio::KBase::workspaceService::Impl;
 
 use Bio::KBase::workspaceService::Server;
+use Plack::Middleware::CrossOrigin;
 
 
 
@@ -18,4 +19,4 @@ my $server = Bio::KBase::workspaceService::Server->new(instance_dispatch => { @d
 
 my $handler = sub { $server->handle_input(@_) };
 
-$handler;
+$handler = Plack::Middleware::CrossOrigin->wrap( $handler, origins => "*", headers => "*");
