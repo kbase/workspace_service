@@ -5320,9 +5320,10 @@ sub queue_job
     my $id = $self->_get_new_id("job.");
     #Checking that job doesn't already exist
     my $cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $id});
-    if (my $object = $cursor->next) {
-    	my $msg = "Trying to queue job that already exists!";
-		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'queue_job');
+    while (my $object = $cursor->next) {
+    	$id++;
+    	print stderr "Getting new ID:".$id."\n";
+    	$cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $id});
     }
     #Inserting jobs in database
     $job = {
