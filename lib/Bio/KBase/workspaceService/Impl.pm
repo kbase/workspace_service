@@ -5321,7 +5321,11 @@ sub queue_job
     #Checking that job doesn't already exist
     my $cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $id});
     while (my $object = $cursor->next) {
-    	$id++;
+    	if ($id =~ m/job\.(\d+)/) {
+    		my $num = $1;
+    		$num++;
+    		$id = "job.".$num;
+    	}
     	print stderr "Getting new ID:".$id."\n";
     	$cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $id});
     }
