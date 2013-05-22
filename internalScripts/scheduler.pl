@@ -191,7 +191,7 @@ sub queueJob {
 	my $jobdir = $self->printJobFile($job);
 	my $pid;
 	my $executable = $self->executable()." ".$jobdir;
-	if ($self->queuetype() eq "qsub") {
+	if ($self->queuetype() eq "sge") {
 		my $cmd = "qsub -l arch=lx26-amd64 -m aes -M \"chenry\@mcs.anl.gov\" -b yes -e ".$self->jobdirectory()."/errors/ -o ".$self->jobdirectory()."/output/ ".$executable;	
 		my $execOut = $self->runexecutable($cmd);
 		foreach my $line (@{$execOut}) {
@@ -225,7 +225,7 @@ sub haltalljobs {
     my($self) = @_; 
 	my $runningJobs = $self->runningJobs();
 	foreach my $key (keys(%{$runningJobs})) {
-		if ($self->queuetype() eq "qsub") {
+		if ($self->queuetype() eq "sge") {
 			system("qdel ".$key);
 		} elsif ($self->queuetype() eq "nohup") {
 			system("kill -9 ".$key);
