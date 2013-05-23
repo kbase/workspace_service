@@ -608,8 +608,8 @@ sub setDefaultMetadata {
 								if (defined($subunit->{modelReactionProteinSubunitGenes})) {
 									for (my $m=0; $m < @{$subunit->{modelReactionProteinSubunitGenes}}; $m++) {
 										my $gene = $subunit->{modelReactionProteinSubunitGenes}->[$m];
-										if (defined($gene->{role_uuid})) {
-											$genehash->{$gene->{role_uuid}} = 1;
+										if (defined($gene->{feature_uuid})) {
+											$genehash->{$gene->{feature_uuid}} = 1;
 										}
 									}
 								}

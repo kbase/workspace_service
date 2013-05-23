@@ -8,15 +8,15 @@ use strict;
 use warnings;
 use Getopt::Long::Descriptive;
 use Text::Table;
-use Bio::KBase::workspaceService::Helpers qw(printJobData auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta);
+use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta);
 my $serv = get_ws_client();
 #Defining globals describing behavior
-my $primaryArgs = ["Job ID"];
-my $servercommand = "get_jobs";
-my $script = "kbws-checkjob";
+my $primaryArgs = ["patch id"];
+my $servercommand = "patch";
+my $script = "patch";
 #Defining usage and options
 my ($opt, $usage) = describe_options(
-    'kbws-checkjob <Job ID> %o',
+    'patch <patch id> %o',
     [ 'showerror|e', 'Use flag to show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]
 );
@@ -35,7 +35,7 @@ foreach my $arg (@{$primaryArgs}) {
 #Instantiating parameters
 my $params = {
 	auth => auth(),
-	jobids => [$opt->{"Job ID"}]
+	patch_id => $opt->{"patch id"}
 };
 #Calling the server
 my $output;
@@ -46,9 +46,8 @@ if ($opt->{showerror} == 0){
 }else{
     $output = $serv->$servercommand($params);
 }
-#Checking output and report results
 if (!defined($output)) {
-	print "Could not retreive job!\n";
+	print "Workspace patch failed!\n";
 } else {
-    printJobData($output->[0]);
+	print "Workspace patch successful!\n";
 }

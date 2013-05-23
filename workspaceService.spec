@@ -57,7 +57,10 @@ module workspaceService {
 	
 	/* indicates true or false values, false <= 0, true >=1 */
 	typedef int bool;
-	
+
+	/* ID of a job object */
+	typedef string job_id;
+		
 	/* A string used as an ID for a workspace. Any string consisting of alphanumeric characters and "-" is acceptable  */
 	typedef string workspace_id;
 	
@@ -117,6 +120,33 @@ module workspaceService {
 			
 	*/
 	typedef tuple<workspace_id id,username owner,timestamp moddate,int objects,permission user_permission,permission global_permission> workspace_metadata;
+	
+	/* Data structures for a job object
+		
+		job_id id - ID of the job object
+		string type - type of the job
+		string auth - authentication token of job owner
+		string status - current status of job
+		mapping<string,string> jobdata;
+		string queuetime - time when job was queued
+		string starttime - time when job started running
+		string completetime - time when the job was completed
+		string owner - owner of the job
+		string queuecommand - command used to queue job
+			
+	*/
+    typedef structure {
+		job_id id;
+		string type;
+		string auth;
+		string status;
+		mapping<string,string> jobdata;
+		string queuetime;
+		string starttime;
+		string completetime;
+		string owner;
+		string queuecommand;
+    } JobObject;
 	
 	/* Settings for user accounts stored in the workspace
 	
@@ -782,14 +812,14 @@ module workspaceService {
 		string auth;
 		string state;
 		string type;
+		string queuecommand;
 		mapping<string,string> jobdata;
 	} queue_job_params;
 	
 	/*
 		Queues a new job in the workspace.
-		Workspace job queues handles jobs that don't get submitted to large clusters.
 	*/
-	funcdef queue_job(queue_job_params params) returns (string jobid);
+	funcdef queue_job(queue_job_params params) returns (JobObject job);
 
 	/* Input parameters for the "set_job_status" function.
 	
@@ -812,7 +842,7 @@ module workspaceService {
 		Changes the current status of a currently queued jobs 
 		Used to manage jobs by ensuring multiple server don't claim the same job.
 	*/
-	funcdef set_job_status(set_job_status_params params) returns (bool success);
+	funcdef set_job_status(set_job_status_params params) returns (JobObject job);
 	
 	/* Input parameters for the "get_jobs" function.
 		
@@ -827,7 +857,7 @@ module workspaceService {
 		string status;
 		string auth;
 	} get_jobs_params;
-	funcdef get_jobs(get_jobs_params params) returns (list<ObjectData> jobs);
+	funcdef get_jobs(get_jobs_params params) returns (list<JobObject> jobs);
 	
 	/*
 		Returns a list of all permanent and optional types currently accepted by the workspace service.

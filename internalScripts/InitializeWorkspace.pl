@@ -17,6 +17,7 @@ my ($opt, $usage) = describe_options(
     [ 'map|m', 'Import mapping' ],
     [ 'testmap|e', 'Import test mapping' ],
     [ 'media|d', 'Load media from biochemistry' ],
+    [ 'overwrite|o', 'Overwrite on import' ],
     [ 'help|h|?', 'Print this usage information' ]
 );
 
@@ -30,7 +31,7 @@ my $output;
 if (defined($opt->{bio})) {
 $output = $serv->import_bio({
 	auth => auth(),
-	overwrite => 0
+	overwrite => $opt->{overwrite}
 });
 if (!defined($output)) {
 	print "Biochemistry could not be imported!\n";
@@ -44,7 +45,7 @@ if (defined($opt->{testbio})) {
 		url => "http://bioseed.mcs.anl.gov/~chenry/KbaseFiles/biochemistry.test.json",
 		compressed => 0,
 		auth => auth(),
-		overwrite => 0
+		overwrite => $opt->{overwrite}
 	});
 	if (!defined($output)) {
 		print "Test biochemistry could not be imported!\n";
@@ -55,7 +56,7 @@ if (defined($opt->{testbio})) {
 if (defined($opt->{"map"})) {
 	$output = $serv->import_map({
 		auth => auth(),
-		overwrite => 0
+		overwrite => $opt->{overwrite}
 	});
 	if (!defined($output)) {
 		print "Mapping could not be imported!\n";
@@ -70,7 +71,7 @@ if (defined($opt->{testmap})) {
 		url => "http://bioseed.mcs.anl.gov/~chenry/KbaseFiles/mapping.test.json",
 		compressed => 0,
 		auth => auth(),
-		overwrite => 0
+		overwrite => $opt->{overwrite}
 	});
 	if (!defined($output)) {
 		print "Test mapping could not be imported!\n";
@@ -81,7 +82,7 @@ if (defined($opt->{testmap})) {
 if (defined($opt->{media})) {
 	$output = $serv->load_media_from_bio({
 		auth => auth(),
-		overwrite => 0
+		overwrite => $opt->{overwrite}
 	});
 	if (!defined($output)) {
 		print "Media load failed!\n";

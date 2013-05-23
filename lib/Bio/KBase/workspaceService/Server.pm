@@ -209,7 +209,7 @@ is available via $context->client_ip.
 
 use base 'Class::Accessor';
 
-__PACKAGE__->mk_accessors(qw(user_id client_ip authenticated));
+__PACKAGE__->mk_accessors(qw(user_id client_ip authenticated token));
 
 sub new
 {
