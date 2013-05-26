@@ -30,17 +30,17 @@ if (!defined($ARGV[0]) || $ARGV[0] eq "help") {
 }
 my $sched = scheduler->new();
 $sched->readconfig($ARGV[0]);
-if (!-d $self->jobdirectory()) {
-	mkdir $self->jobdirectory();
+if (!-d $sched->jobdirectory()) {
+	mkdir $sched->jobdirectory();
 }
-if (!-d $self->jobdirectory()."/jobs/") {
-	mkdir $self->jobdirectory()."/jobs/";
+if (!-d $sched->jobdirectory()."/jobs/") {
+	mkdir $sched->jobdirectory()."/jobs/";
 }
-if (!-d $self->jobdirectory()."/errors/") {
-	mkdir $self->jobdirectory()."/errors/";
+if (!-d $sched->jobdirectory()."/errors/") {
+	mkdir $sched->jobdirectory()."/errors/";
 }
-if (!-d $self->jobdirectory()."/output/") {
-	mkdir $self->jobdirectory()."/output/";
+if (!-d $sched->jobdirectory()."/output/") {
+	mkdir $sched->jobdirectory()."/output/";
 }
 if (-e $sched->jobdirectory()."/schedulerPID") {
 	unlink($sched->jobdirectory()."/schedulerPID");
