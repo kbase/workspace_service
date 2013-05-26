@@ -198,6 +198,9 @@ sub printJobFile {
 	my $JSON = JSON::XS->new();
     my $data = $JSON->encode($job);
 	my $directory = $self->jobdirectory()."/jobs/".$job->{id}."/";
+	if (!-d $directory) {
+		mkdir $directory;
+	}
 	if (-e $directory."jobfile.json") {
 		unlink $directory."jobfile.json";
 	}
