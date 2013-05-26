@@ -30,6 +30,11 @@ if (!defined($ARGV[0]) || $ARGV[0] eq "help") {
 }
 my $sched = scheduler->new();
 $sched->readconfig($ARGV[0]);
+if (-e $self->jobdirectory()."/schedulerPID") {
+	unlink($self->jobdirectory()."/schedulerPID");
+}
+my $cmd = "echo \$\$ >> ".$self->jobdirectory()."/schedulerPID";
+`$cmd`;
 $sched->monitor();
 
 #Declaring scheduler package
@@ -132,6 +137,7 @@ sub monitor {
 								currentStatus => "running"
 							};
 							my $filename = $self->jobdirectory()."/errors/".$self->script().".e".$id;
+							print $filename."\n";
 							if (-e $filename) {
 								my $error = "";
 								open (INPUT, "<", $filename);
