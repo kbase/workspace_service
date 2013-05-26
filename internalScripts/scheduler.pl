@@ -188,6 +188,7 @@ sub printJobFile {
 
 sub queueJob {
 	my ($self,$job) = @_;
+	$job->{accounttype} = $self->accounttype();
 	my $jobdir = $self->printJobFile($job);
 	my $pid;
 	my $executable = $self->executable()." ".$jobdir;
@@ -244,7 +245,8 @@ sub readconfig {
 	$self->{_queuetype} = $c->param("scheduler.queuetype");
 	$self->{_wsurl} = $c->param("scheduler.wsurl");
 	$self->{_auth} = $c->param("scheduler.auth");
-	$self->{_jobstatus} = $c->param("scheduler.jobstatus")
+	$self->{_jobstatus} = $c->param("scheduler.jobstatus");
+	$self->{_accounttype} = $c->param("scheduler.accounttype");
 }
 
 sub threads {
@@ -293,6 +295,11 @@ sub auth {
 sub jobstatus {
 	my($self) = @_;
 	return $self->{_jobstatus};
+}
+
+sub accounttype {
+	my($self) = @_;
+	return $self->{_accounttype};
 }
 
 1;
