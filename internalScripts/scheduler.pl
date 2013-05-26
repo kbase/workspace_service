@@ -30,10 +30,10 @@ if (!defined($ARGV[0]) || $ARGV[0] eq "help") {
 }
 my $sched = scheduler->new();
 $sched->readconfig($ARGV[0]);
-if (-e $self->jobdirectory()."/schedulerPID") {
-	unlink($self->jobdirectory()."/schedulerPID");
+if (-e $sched->jobdirectory()."/schedulerPID") {
+	unlink($sched->jobdirectory()."/schedulerPID");
 }
-my $cmd = "echo \$\$ >> ".$self->jobdirectory()."/schedulerPID";
+my $cmd = "echo \$\$ >> ".$sched->jobdirectory()."/schedulerPID";
 `$cmd`;
 $sched->monitor();
 
