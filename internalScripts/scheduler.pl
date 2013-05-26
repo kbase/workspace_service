@@ -30,6 +30,18 @@ if (!defined($ARGV[0]) || $ARGV[0] eq "help") {
 }
 my $sched = scheduler->new();
 $sched->readconfig($ARGV[0]);
+if (!-d $self->jobdirectory()) {
+	mkdir $self->jobdirectory();
+}
+if (!-d $self->jobdirectory()."/jobs/") {
+	mkdir $self->jobdirectory()."/jobs/";
+}
+if (!-d $self->jobdirectory()."/errors/") {
+	mkdir $self->jobdirectory()."/errors/";
+}
+if (!-d $self->jobdirectory()."/output/") {
+	mkdir $self->jobdirectory()."/output/";
+}
 if (-e $sched->jobdirectory()."/schedulerPID") {
 	unlink($sched->jobdirectory()."/schedulerPID");
 }
@@ -185,7 +197,13 @@ sub printJobFile {
 	$job->{wsurl} = $self->wsurl();
 	my $JSON = JSON::XS->new();
     my $data = $JSON->encode($job);
-	my $directory = File::Temp::tempdir(DIR => $self->jobdirectory()."/")."/";
+	my $directory = $self->jobdirectory()."/jobs/".$job->{id}."/";
+	if (-e $directory."jobfile.json") {
+		unlink $directory."jobfile.json";
+	}
+	if (-e $directory."pid") {
+		unlink $directory."pid";
+	}
 	open(my $fh, ">", $directory."jobfile.json") || return;
 	print $fh $data;
 	close($fh);
