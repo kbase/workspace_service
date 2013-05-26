@@ -283,7 +283,7 @@ sub executable {
 
 sub script {
 	my($self) = @_;
-	if ($self->executable() =~ m/([^\/]+)/) {
+	if ($self->executable() =~ m/([^\/]+)$/) {
 		return $1;
 	}
 	return "";
