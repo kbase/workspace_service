@@ -138,9 +138,7 @@ sub monitor {
 								currentStatus => "running"
 							};
 							my $filename = $self->jobdirectory()."/errors/".$self->script().".e".$id;
-							print $filename."\n";
 							if (-e $filename) {
-								print "File found!\n";
 								my $error = "";
 								open (INPUT, "<", $filename);
 							    while (my $Line = <INPUT>) {
