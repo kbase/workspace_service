@@ -33,8 +33,9 @@ $sched->readconfig($ARGV[0]);
 if (-e $sched->jobdirectory()."/schedulerPID") {
 	unlink($sched->jobdirectory()."/schedulerPID");
 }
-my $cmd = "echo \$\$ >> ".$sched->jobdirectory()."/schedulerPID";
-exec($cmd);
+open(PID, "> ".$sched->jobdirectory()."/schedulerPID") || die "could not open PID file!"; 
+print PID "$$\n"; 
+close(PID);
 $sched->monitor();
 
 #Declaring scheduler package
