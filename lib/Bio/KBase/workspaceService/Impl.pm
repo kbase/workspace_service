@@ -5473,7 +5473,12 @@ sub set_job_status
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'set_job_status');
     }
     my $cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $params->{jobid}});
-	$job = $cursor->next;
+    my $obj = $cursor->next;
+	$job = {};
+	my $attributes = [qw(id type auth status jobdata queuetime starttime completetime owner queuecommand)];
+	foreach my $attribute (@{$attributes}) {
+		$job->{$attribute} = $obj->{$attribute};
+	}
     if ($params->{status} eq "delete") {
     	my $query = {status => $peviousStatus,id => $params->{jobid}};
 	    if ($self->_getUsername() ne "workspaceroot") {
