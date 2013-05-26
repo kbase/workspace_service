@@ -34,7 +34,7 @@ if (-e $sched->jobdirectory()."/schedulerPID") {
 	unlink($sched->jobdirectory()."/schedulerPID");
 }
 my $cmd = "echo \$\$ >> ".$sched->jobdirectory()."/schedulerPID";
-`$cmd`;
+exec($cmd);
 $sched->monitor();
 
 #Declaring scheduler package
