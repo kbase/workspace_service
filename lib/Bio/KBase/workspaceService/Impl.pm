@@ -5473,7 +5473,14 @@ sub set_job_status
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'set_job_status');
     }
     my $cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $params->{jobid}});
-	$job = $cursor->next;
+    my $obj = $cursor->next;
+	$job = {};
+	my $attributes = [qw(id type auth status jobdata queuetime starttime completetime owner queuecommand)];
+	foreach my $attribute (@{$attributes}) {
+		if (defined($obj->{$attribute})) {
+			$job->{$attribute} = $obj->{$attribute};
+		}
+	}
     if ($params->{status} eq "delete") {
     	my $query = {status => $peviousStatus,id => $params->{jobid}};
 	    if ($self->_getUsername() ne "workspaceroot") {
@@ -5495,8 +5502,10 @@ sub set_job_status
 	    }
 	    $job->{status} = $params->{status};
 	    $job->{$timevar} = DateTime->now()->datetime();
-	    $self->_updateDB("jobObjects",{status => $peviousStatus,id => $params->{jobid}},{'$set' => {'status' => $params->{status},$timevar => DateTime->now()->datetime(),'jobdata' => $job->{jobdata}}});
+	    $self->_updateDB("jobObjects",{status => $peviousStatus,id => $params->{jobid}},{'$set' => {'status' => $params->{status},$timevar => $job->{$timevar},'jobdata' => $job->{jobdata}}});
 	}
+	my $JSON = JSON::XS->new->utf8(1);
+    $job = $JSON->decode($JSON->encode($job));
 	$self->_clearContext();
     #END set_job_status
     my @_bad_returns;

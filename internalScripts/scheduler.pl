@@ -30,6 +30,24 @@ if (!defined($ARGV[0]) || $ARGV[0] eq "help") {
 }
 my $sched = scheduler->new();
 $sched->readconfig($ARGV[0]);
+if (!-d $sched->jobdirectory()) {
+	mkdir $sched->jobdirectory();
+}
+if (!-d $sched->jobdirectory()."/jobs/") {
+	mkdir $sched->jobdirectory()."/jobs/";
+}
+if (!-d $sched->jobdirectory()."/errors/") {
+	mkdir $sched->jobdirectory()."/errors/";
+}
+if (!-d $sched->jobdirectory()."/output/") {
+	mkdir $sched->jobdirectory()."/output/";
+}
+if (-e $sched->jobdirectory()."/schedulerPID") {
+	unlink($sched->jobdirectory()."/schedulerPID");
+}
+open(PID, "> ".$sched->jobdirectory()."/schedulerPID") || die "could not open PID file!"; 
+print PID "$$\n"; 
+close(PID);
 $sched->monitor();
 
 #Declaring scheduler package
@@ -179,7 +197,16 @@ sub printJobFile {
 	$job->{wsurl} = $self->wsurl();
 	my $JSON = JSON::XS->new();
     my $data = $JSON->encode($job);
-	my $directory = File::Temp::tempdir(DIR => $self->jobdirectory()."/")."/";
+	my $directory = $self->jobdirectory()."/jobs/".$job->{id}."/";
+	if (!-d $directory) {
+		mkdir $directory;
+	}
+	if (-e $directory."jobfile.json") {
+		unlink $directory."jobfile.json";
+	}
+	if (-e $directory."pid") {
+		unlink $directory."pid";
+	}
 	open(my $fh, ">", $directory."jobfile.json") || return;
 	print $fh $data;
 	close($fh);
@@ -188,6 +215,7 @@ sub printJobFile {
 
 sub queueJob {
 	my ($self,$job) = @_;
+	$job->{accounttype} = $self->accounttype();
 	my $jobdir = $self->printJobFile($job);
 	my $pid;
 	my $executable = $self->executable()." ".$jobdir;
@@ -244,7 +272,8 @@ sub readconfig {
 	$self->{_queuetype} = $c->param("scheduler.queuetype");
 	$self->{_wsurl} = $c->param("scheduler.wsurl");
 	$self->{_auth} = $c->param("scheduler.auth");
-	$self->{_jobstatus} = $c->param("scheduler.jobstatus")
+	$self->{_jobstatus} = $c->param("scheduler.jobstatus");
+	$self->{_accounttype} = $c->param("scheduler.accounttype");
 }
 
 sub threads {
@@ -274,7 +303,7 @@ sub executable {
 
 sub script {
 	my($self) = @_;
-	if ($self->executable() =~ m/([^\/]+)/) {
+	if ($self->executable() =~ m/([^\/]+)$/) {
 		return $1;
 	}
 	return "";
@@ -293,6 +322,11 @@ sub auth {
 sub jobstatus {
 	my($self) = @_;
 	return $self->{_jobstatus};
+}
+
+sub accounttype {
+	my($self) = @_;
+	return $self->{_accounttype};
 }
 
 1;
