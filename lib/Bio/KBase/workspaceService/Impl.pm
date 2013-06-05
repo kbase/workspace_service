@@ -154,17 +154,21 @@ sub _authenticate {
 			}
 		}
 	} elsif ($self->{_accounttype} eq "seed") {
-		require "ModelSEED/Client/MSSeedSupport.pm";
-		my $svr = ModelSEED::Client::MSSeedSupport->new();
+		require "Bio/ModelSEED/MSSeedSupportServer/Client.pm";
+		$auth =~ s/\s/\t/;
+		my $split = [split(/\t/,$auth)];
+		my $svr = $self->_mssServer();
 		my $token = $svr->authenticate({
-			token => $auth
+			username => $split->[0],
+			password => $split->[1]
 		});
 		if (!defined($token) || $token =~ m/ERROR:/) {
 			Bio::KBase::Exceptions::KBaseException->throw(error => $token,
 			method_name => '_setContext');
 		}
 		$token =~ s/\s/\t/;
-		my $split = [split(/\t/,$token)];
+		$split = [split(/\t/,$token)];
+		print "Logged user:".$split->[0]."\n";
 		return {
 			authentication => $token,
 			user => $split->[0]
@@ -236,6 +240,14 @@ sub _mongodb {
     	$self->{_mongodb} = $conn->get_database($db_name);
     }    
     return $self->{_mongodb};
+}
+
+sub _mssServer {
+	my $self = shift;
+	if (!defined($self->{_mssServer})) {
+		$self->{_mssServer} = Bio::ModelSEED::MSSeedSupportServer::Client->new($self->{'_mssserver-url'});
+	}
+    return $self->{_mssServer};
 }
 
 =head3 _idServer
@@ -1387,47 +1399,75 @@ sub new
     bless $self, $class;
     #BEGIN_CONSTRUCTOR
     my $options = $args[0];
-    if (defined($options->{testuser})) {
-    	$self->{_testuser} = $options->{testuser};
-    }
-    my %params;
-    if ((my $e = $ENV{KB_DEPLOYMENT_CONFIG}) && -e $ENV{KB_DEPLOYMENT_CONFIG}) {	
+	$ENV{KB_NO_FILE_ENVIRONMENT} = 1;
+    my $params;
+    $self->{_accounttype} = "kbase";
+    $self->{'_idserver-url'} = "http://bio-data-1.mcs.anl.gov/services/idserver";
+    $self->{'_mssserver-url'} = "http://biologin-4.mcs.anl.gov:7050";
+    $self->{_host} = "localhost";
+    $self->{_db} = "workspace_service";
+    my $paramlist = [qw(mongodb-database mongodb-host testuser mssserver-url accounttype idserver-url)];
+
+    # so it looks like params is created by looping over the config object
+    # if deployment.cfg exists
+
+    # the keys in the params hash are the same as in the config obuject 
+    # except the block name from the config file is ommitted.
+
+    # the block name is picked up from KB_SERVICE_NAME. this has to be set
+    # in the start_service script as an environment variable.
+
+    # looping over a set of predefined set of parameter keys, see if there
+    # is a value for that key in the config object
+
+    if ((my $e = $ENV{KB_DEPLOYMENT_CONFIG}) && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
 		my $service = $ENV{KB_SERVICE_NAME};
 		if (defined($service)) {
 			my $c = Config::Simple->new();
 			$c->read($e);
-			my @list = qw(accounttype mongodb-host mongodb-database);
-			for my $p (@list) {
-			    my $v = $c->param("$service.$p");
+			for my $p (@{$paramlist}) {
+			  	my $v = $c->param("$service.$p");
 			    if ($v) {
-					$params{$p} = $v;
+					$params->{$p} = $v;
 			    }
 			}
 		}
     }
-    my @list = qw(accounttype mongodb-host mongodb-database);
-	for my $p (@list) {
-	  	if (defined($options->{$p})) {
-			$params{$p} = $options->{$p};
-	    }
-	}
-	$self->{_accounttype} = "kbase";
-    if (defined $params{accounttype}) {
-		#print STDERR "Setting account type to:".$params{accounttype}."\n";
-		$self->{_accounttype} = $params{accounttype};
-    } 
-    if (defined $params{"mongodb-host"}) {
-		$self->{_host} = $params{"mongodb-host"};
-    } else {
-		print STDERR "mongodb-host configuration not found, using 'localhost'\n";
-		$self->{_host} = "localhost";
+
+    # now, we have the options hash. THis is passed into the constructor as a
+    # parameter to new(). If a key from the predefined set of parameter keys
+    # is found in the incoming hash, let the associated value override what
+    # was previously assigned to the params hash from the config object.
+
+    for my $p (@{$paramlist}) {
+  		if (defined($options->{$p})) {
+			$params->{$p} = $options->{$p};
+        }
     }
-    if (defined $params{"mongodb-database"}) {
-		$self->{_db} = $params{"mongodb-database"};
-    } else {
-		print STDERR "mongodb-database configuration not found, using 'workspace_service'\n";
-		$self->{_db} = "workspace_service";
+    
+    # now, if params has one of the predefined set of parameter keys,
+    # use that value to override object instance variable values. The
+    # default object instance variable values were set above.
+
+	if (defined $params->{mongodb-host}) {
+		$self->{_host} = $params->{mongodb-host};
     }
+	if (defined $params->{mongodb-database}) {
+		$self->{_db} = $params->{mongodb-database};
+    }
+    if (defined $params->{accounttype}) {
+		$self->{_accounttype} = $params->{accounttype};
+    }
+    if (defined($params->{testuser})) {
+    	$self->{_testuser} = $params->{testuser};
+    }
+    if (defined $params->{'idserver-url'}) {
+    		$self->{'_idserver-url'} = $params->{'idserver-url'};
+    }
+    if (defined $params->{'mssserver-url'}) {
+    		$self->{'_mssserver-url'} = $params->{'mssserver-url'};
+    }
+    
     #END_CONSTRUCTOR
 
     if ($self->can('_init_instance'))
