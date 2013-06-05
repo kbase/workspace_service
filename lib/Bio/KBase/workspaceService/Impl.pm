@@ -1449,11 +1449,11 @@ sub new
     # use that value to override object instance variable values. The
     # default object instance variable values were set above.
 
-	if (defined $params->{mongodb-host}) {
-		$self->{_host} = $params->{mongodb-host};
+	if (defined $params->{'mongodb-host'}) {
+		$self->{_host} = $params->{'mongodb-host'};
     }
-	if (defined $params->{mongodb-database}) {
-		$self->{_db} = $params->{mongodb-database};
+	if (defined $params->{'mongodb-database'}) {
+		$self->{_db} = $params->{'mongodb-database'};
     }
     if (defined $params->{accounttype}) {
 		$self->{_accounttype} = $params->{accounttype};
