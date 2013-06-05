@@ -261,7 +261,7 @@ Description:
 sub _idServer {
 	my $self = shift;
 	if (!defined($self->{_idserver})) {
-		$self->{_idserver} = Bio::KBase::IDServer::Client->new('http://bio-data-1.mcs.anl.gov/services/idserver');
+		$self->{_idserver} = Bio::KBase::IDServer::Client->new($self->{'_idserver-url'});
 	}
     return $self->{_idserver};
 }
