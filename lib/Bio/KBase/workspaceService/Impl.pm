@@ -249,7 +249,8 @@ Description:
 sub _idServer {
 	my $self = shift;
 	if (!defined($self->{_idserver})) {
-		$self->{_idserver} = Bio::KBase::IDServer::Client->new('http://bio-data-1.mcs.anl.gov/services/idserver');
+		#$self->{_idserver} = Bio::KBase::IDServer::Client->new('http://bio-data-1.mcs.anl.gov/services/idserver');
+		$self->{_idserver} = Bio::KBase::IDServer::Client->new($self->{'_idserver-url'});
 	}
     return $self->{_idserver};
 }
@@ -1396,7 +1397,7 @@ sub new
 		if (defined($service)) {
 			my $c = Config::Simple->new();
 			$c->read($e);
-			my @list = qw(accounttype mongodb-host mongodb-database);
+			my @list = qw(accounttype mongodb-host mongodb-database idserver-url);
 			for my $p (@list) {
 			    my $v = $c->param("$service.$p");
 			    if ($v) {
@@ -1405,17 +1406,22 @@ sub new
 			}
 		}
     }
-    my @list = qw(accounttype mongodb-host mongodb-database);
+    my @list = qw(accounttype mongodb-host mongodb-database idserver-url);
 	for my $p (@list) {
 	  	if (defined($options->{$p})) {
 			$params{$p} = $options->{$p};
 	    }
 	}
 	$self->{_accounttype} = "kbase";
+	$self->{'_idserver-url'} = 'http://bio-data-1.mcs.anl.gov/services/idserver';
     if (defined $params{accounttype}) {
 		#print STDERR "Setting account type to:".$params{accounttype}."\n";
 		$self->{_accounttype} = $params{accounttype};
     } 
+    if (defined $params{'idserver-url'}) {
+               $self->{'_idserver-url'} = $params{'idserver-url'};
+    }
+
     if (defined $params{"mongodb-host"}) {
 		$self->{_host} = $params{"mongodb-host"};
     } else {
