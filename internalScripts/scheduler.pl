@@ -119,7 +119,6 @@ sub monitor {
     my($self) = @_;
     my $count = $self->threads();
     my $continue = 1;
-	my $auth = Bio::KBase::workspaceService::Helpers::auth();
 	while ($continue == 1) {
 		local $Bio::KBase::workspaceService::Server::CallContext = {};
 		my $jobs;
@@ -168,6 +167,14 @@ sub monitor {
 			print "JOBS:".$runningCount."\n";
 			#Queuing new jobs
 			my $openSlots = ($count - $runningCount);
+			$jobs = undef;
+			eval {
+				$jobs = $self->client()->get_jobs({
+					status => "queued",
+					type => $self->jobtype(),
+					auth => $self->auth()
+				});
+			};
 			if (defined($jobs) && $openSlots > 0) {
 				while ($openSlots > 0 && @{$jobs} > 0) {
 					my $job = shift(@{$jobs});
