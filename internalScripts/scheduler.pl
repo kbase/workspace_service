@@ -119,66 +119,56 @@ sub monitor {
     my($self) = @_;
     my $count = $self->threads();
     my $continue = 1;
+	my $auth = Bio::KBase::workspaceService::Helpers::auth();
 	while ($continue == 1) {
-		my $runningJobs = $self->runningJobs();
-		my $runningCount = keys(%{$runningJobs});
-		if ($runningCount < $count) {
-			my $openSlots = ($count - $runningCount);
+		local $Bio::KBase::workspaceService::Server::CallContext = {};
+		my $jobs;
+		eval {
+			$jobs = $self->client()->get_jobs({
+				status => "running",
+				type => $self->jobtype(),
+				auth => $self->auth()
+			});
+		};
+		if (defined($jobs)) {
+			my $runningCount = @{$jobs};
 			#Checking if outstanding queued jobs exist
-			my $auth = Bio::KBase::workspaceService::Helpers::auth();
-			my $jobs;
-			#eval {
-				local $Bio::KBase::workspaceService::Server::CallContext = {};
-				$jobs = $self->client()->get_jobs({
-					status => "running",
-					type => $self->jobtype(),
-					auth => $self->auth()
-				});
-				print "JOBS:".@{$jobs}."\n";
-			#};
-			if (defined($jobs)) {
-				for (my $i=0; $i < @{$jobs}; $i++) {
-					my $job = $jobs->[$i];
-					if (defined($job->{jobdata}->{qsubid}) && $job->{jobdata}->{schedulerstatus} eq $self->jobstatus()) {
-						my $id = $job->{jobdata}->{qsubid};
-						print "Running ID ".$id."\n";
-						if (!defined($runningJobs->{$id})) {
-							my $input = {
-								jobid => $job->{id},
-								status => "error",
-								auth => $self->auth(),
-								currentStatus => "running"
-							};
-							my $filename = $self->jobdirectory()."/errors/".$self->script().".e".$id;
-							if (-e $filename) {
-								my $error = "";
-								open (INPUT, "<", $filename);
-							    while (my $Line = <INPUT>) {
-							        chomp($Line);
-							        $Line =~ s/\r//;
-									$error .= $Line."\n";
-							    }
-							    close(INPUT);
-								$input->{jobdata}->{error} = $error;
-							}
-							eval {
-								local $Bio::KBase::workspaceService::Server::CallContext = {};
-								my $status = $self->client()->set_job_status($input);
-							};
+			my $runningJobs = $self->runningJobs();
+			for (my $i=0; $i < @{$jobs}; $i++) {
+				my $job = $jobs->[$i];
+				if (defined($job->{jobdata}->{qsubid}) && $job->{jobdata}->{schedulerstatus} eq $self->jobstatus()) {
+					my $id = $job->{jobdata}->{qsubid};
+					if (!defined($runningJobs->{$id})) {
+						my $input = {
+							jobid => $job->{id},
+							status => "error",
+							auth => $self->auth(),
+							currentStatus => "running"
+						};
+						my $filename = $self->jobdirectory()."/errors/".$self->script().".e".$id;
+						if (-e $filename) {
+							my $error = "";
+							open (INPUT, "<", $filename);
+						    while (my $Line = <INPUT>) {
+						        chomp($Line);
+						        $Line =~ s/\r//;
+								$error .= $Line."\n";
+						    }
+						    close(INPUT);
+							$input->{jobdata}->{error} = $error;
 						}
+						eval {
+							local $Bio::KBase::workspaceService::Server::CallContext = {};
+							my $status = $self->client()->set_job_status($input);
+						};
+						$runningCount--;
 					}
 				}
 			}
-			#eval {
-				local $Bio::KBase::workspaceService::Server::CallContext = {};
-				$jobs = $self->client()->get_jobs({
-					status => $self->jobstatus(),
-					type => $self->jobtype(),
-					auth => $self->auth()
-				});
-			#};
-			if (defined($jobs)) {
-				#Queuing jobs
+			print "JOBS:".$runningCount."\n";
+			#Queuing new jobs
+			my $openSlots = ($count - $runningCount);
+			if (defined($jobs) && $openSlots > 0) {
 				while ($openSlots > 0 && @{$jobs} > 0) {
 					my $job = shift(@{$jobs});
 					print "Queuing job:".$job->{id}."\n";
