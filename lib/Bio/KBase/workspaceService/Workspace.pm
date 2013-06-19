@@ -55,7 +55,7 @@ sub new {
 	bless $self;
 	$self->_validateID($args->{id});
 	$self->_validatePermission($args->{defaultPermissions});
-    return $self;
+	return $self;
 }
 
 =head3 id
@@ -250,7 +250,7 @@ sub getObject {
 	if (!defined($objects->{$type}->{$id})) {
 		if (defined($options->{throwErrorIfMissing}) && $options->{throwErrorIfMissing} == 1) {
 			Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Specified object not found in the workspace!",
-							       method_name => 'getObject');
+									method_name => 'getObject');
 		}
 		return undef;
 	}
@@ -263,7 +263,7 @@ sub getObject {
 	}
 	if (!defined($obj) && defined($options->{throwErrorIfMissing}) && $options->{throwErrorIfMissing} == 1) {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object ".$self->id()."/".$type."/".$id." not found in database!",
-							       method_name => 'getObject');
+									method_name => 'getObject');
 	}
 	return $obj;
 }
@@ -514,17 +514,17 @@ sub deleteObjectPermanently {
 	if (defined($obj)) {
 		if ($obj->command() ne "delete") {
 			Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object must be in a deleted state before it can be permanently deleted!",
-								       method_name => 'deleteObjectPermanently');
+										method_name => 'deleteObjectPermanently');
 		}
 		if ($self->_updateObjects($type,$id,undef,$obj->uuid()) == 0) {
 			Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "State of object was altered during delete process. Delete aborted!",
-								       method_name => 'deleteObjectPermanently');	
+										method_name => 'deleteObjectPermanently');	
 		}
 		$obj->permanentDelete();
 	} elsif (defined($self->objects()->{$type}->{$id})) {
 		if ($self->_updateObjects($type,$id,undef,$self->objects()->{$type}->{$id}) == 0) {
 			Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "State of object was altered during delete process. Delete aborted!",
-								       method_name => 'deleteObjectPermanently');	
+										method_name => 'deleteObjectPermanently');	
 		}
 	}
 	return $obj;
@@ -585,7 +585,7 @@ sub permanentDelete {
 	my ($self) = @_;
 	if ($self->currentUser() ne $self->owner() && $self->currentUser() ne "workspaceroot") {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Only workspace owner can delete workspace!",
-							       method_name => 'permanentDelete');
+									method_name => 'permanentDelete');
 	}
 	my $objs = $self->getAllObjects();
 	for (my $i=0; $i < @{$objs}; $i++) {

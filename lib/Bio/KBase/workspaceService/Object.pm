@@ -63,7 +63,7 @@ sub new {
 	if (defined($args->{rawdata})) {
 		$self->processRawData($args->{rawdata});
 	}
-    return $self;
+	return $self;
 }
 
 =head3 parent

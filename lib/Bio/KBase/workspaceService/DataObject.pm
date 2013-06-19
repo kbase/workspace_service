@@ -51,7 +51,7 @@ sub new {
 		$self->processRawData($args->{rawdata});
 	}
 	$self->_validateObject();
-    return $self;
+	return $self;
 }
 
 =head3 parent
@@ -153,8 +153,8 @@ sub processRawData {
 	my $json = 0;
 	if (ref($data)) {
 		my $JSON = JSON::XS->new->utf8(1);
-    	$data = $JSON->encode($data);
-    	$json = 1;
+		$data = $JSON->encode($data);
+		$json = 1;
 	}
 	
 	#if (length($data) > 5000000) {
@@ -189,7 +189,7 @@ sub retrieveRawData {
 		my $temp = $outdata;
 		#my $JSON = JSON::XS->new->utf8(1);
 		my $JSON = JSON::XS->new();
-    	$outdata = $JSON->decode($temp);
+		$outdata = $JSON->decode($temp);
 	}
 	return $outdata;
 }

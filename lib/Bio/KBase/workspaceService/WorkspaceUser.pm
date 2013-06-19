@@ -46,7 +46,7 @@ sub new {
 	};
 	bless $self;
 	$self->_validateID($args->{id});
-    return $self;
+	return $self;
 }
 
 =head3 id
@@ -175,10 +175,10 @@ sub getUserWorkspaces {
 	my $workspaceHash = {};
 	my $workspaces = $self->workspaces();
 	foreach my $key (keys(%{$workspaces})) {
-    	if ($workspaces->{$key} ne "n") {
-    		$workspaceHash->{$key} = $self->workspaces()->{$key};
-    	}
-    }
+		if ($workspaces->{$key} ne "n") {
+			$workspaceHash->{$key} = $self->workspaces()->{$key};
+		}
+	}
 	return $self->parent()->_getWorkspaces([keys(%{$workspaceHash})],{orQuery => [{defaultPermissions => {'$in' => ["a","w","r"]}}]});
 }
 
