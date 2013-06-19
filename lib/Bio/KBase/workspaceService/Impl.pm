@@ -134,24 +134,17 @@ sub _accountType {
 sub _authenticate {
 	my ($self,$auth) = @_;
 	if ($self->{_accounttype} eq "kbase") {
-		if ($auth =~ m/^IRIS-/) {
+		my $token = Bio::KBase::AuthToken->new(
+			token => $auth,
+		);
+		if ($token->validate()) {
 			return {
 				authentication => $auth,
-				user => $auth
+				user => $token->user_id
 			};
 		} else {
-			my $token = Bio::KBase::AuthToken->new(
-				token => $auth,
-			);
-			if ($token->validate()) {
-				return {
-					authentication => $auth,
-					user => $token->user_id
-				};
-			} else {
-				Bio::KBase::Exceptions::KBaseException->throw(error => "Invalid authorization token:".$auth,
-				method_name => '_setContext');
-			}
+			Bio::KBase::Exceptions::KBaseException->throw(error => "Invalid authorization token:".$auth,
+			method_name => '_setContext');
 		}
 	} elsif ($self->{_accounttype} eq "seed") {
 		require "Bio/ModelSEED/MSSeedSupportServer/Client.pm";
