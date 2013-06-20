@@ -1159,7 +1159,7 @@ sub _validateUserID {
 sub _validateObjectID {
 	my ($self,$id) = @_;
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object ID failed validation!",
-		method_name => '_validateUserID') if ($id !~ m/^.+$/);
+		method_name => '_validateUserID') if ($id !~ m/^[a-zA-Z0-9\|._-]+$/);
 }
 
 sub _validatePermission {
