@@ -1386,11 +1386,11 @@ sub _patch {
 
 sub new
 {
-	my($class, @args) = @_;
-	my $self = {
-	};
-	bless $self, $class;
-	#BEGIN_CONSTRUCTOR
+    my($class, @args) = @_;
+    my $self = {
+    };
+    bless $self, $class;
+    #BEGIN_CONSTRUCTOR
 	my $options = $args[0];
 	$ENV{KB_NO_FILE_ENVIRONMENT} = 1;
 	my $params;
@@ -1461,13 +1461,13 @@ sub new
 			$self->{'_mssserver-url'} = $params->{'mssserver-url'};
 	}
 	
-	#END_CONSTRUCTOR
+    #END_CONSTRUCTOR
 
-	if ($self->can('_init_instance'))
-	{
+    if ($self->can('_init_instance'))
+    {
 	$self->_init_instance();
-	}
-	return $self;
+    }
+    return $self;
 }
 
 =head1 METHODS
@@ -1566,20 +1566,20 @@ Creates "Media" objects in the workspace for all media contained in the specifie
 
 sub load_media_from_bio
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to load_media_from_bio:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'load_media_from_bio');
-	}
+							       method_name => 'load_media_from_bio');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($mediaMetas);
-	#BEGIN load_media_from_bio
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($mediaMetas);
+    #BEGIN load_media_from_bio
 	$self->_setContext($ctx,$params);
 	$params = $self->_validateargs($params,[],{
 		mediaWS => "KBaseMedia",
@@ -1612,15 +1612,15 @@ sub load_media_from_bio
 		}
 	}
 	$self->_clearContext();
-	#END load_media_from_bio
-	my @_bad_returns;
-	(ref($mediaMetas) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"mediaMetas\" (value was \"$mediaMetas\")");
-	if (@_bad_returns) {
+    #END load_media_from_bio
+    my @_bad_returns;
+    (ref($mediaMetas) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"mediaMetas\" (value was \"$mediaMetas\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to load_media_from_bio:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'load_media_from_bio');
-	}
-	return($mediaMetas);
+							       method_name => 'load_media_from_bio');
+    }
+    return($mediaMetas);
 }
 
 
@@ -1720,20 +1720,20 @@ Imports a biochemistry from a URL
 
 sub import_bio
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to import_bio:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'import_bio');
-	}
+							       method_name => 'import_bio');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadata);
-	#BEGIN import_bio
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN import_bio
 	$self->_setContext($ctx,$params);
 	$params = $self->_validateargs($params,[],{
 		bioid => "default",
@@ -1780,15 +1780,15 @@ sub import_bio
 	$obj = $ws->saveObject("Biochemistry",$params->{bioid},$data,"import_bio",{});
 	$metadata = $obj->metadata($params->{asHash});
 	$self->_clearContext();
-	#END import_bio
-	my @_bad_returns;
-	(ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-	if (@_bad_returns) {
+    #END import_bio
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to import_bio:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'import_bio');
-	}
-	return($metadata);
+							       method_name => 'import_bio');
+    }
+    return($metadata);
 }
 
 
@@ -1890,20 +1890,20 @@ Imports a mapping from a URL
 
 sub import_map
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to import_map:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'import_map');
-	}
+							       method_name => 'import_map');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadata);
-	#BEGIN import_map
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN import_map
 	$self->_setContext($ctx,$params);
 	$params = $self->_validateargs($params,[],{
 		bioid => "default",
@@ -1953,15 +1953,15 @@ sub import_map
 	$obj = $ws->saveObject("Mapping",$params->{mapid},$data,"import_map",{});
 	$metadata = $obj->metadata($params->{asHash});
 	$self->_clearContext();
-	#END import_map
-	my @_bad_returns;
-	(ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-	if (@_bad_returns) {
+    #END import_map
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to import_map:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'import_map');
-	}
-	return($metadata);
+							       method_name => 'import_map');
+    }
+    return($metadata);
 }
 
 
@@ -2071,20 +2071,20 @@ Saves the input object data and metadata into the selected workspace, returning 
 
 sub save_object
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to save_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'save_object');
-	}
+							       method_name => 'save_object');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadata);
-	#BEGIN save_object
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN save_object
 	$self->_setContext($ctx,$params);
 	$params = $self->_validateargs($params,["id","type","data","workspace"],{
 		command => undef,
@@ -2113,15 +2113,15 @@ sub save_object
 	}
 	$metadata = $obj->metadata($params->{asHash});
 	$self->_clearContext();
-	#END save_object
-	my @_bad_returns;
-	(ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-	if (@_bad_returns) {
+    #END save_object
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to save_object:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'save_object');
-	}
-	return($metadata);
+							       method_name => 'save_object');
+    }
+    return($metadata);
 }
 
 
@@ -2216,20 +2216,20 @@ Object is only temporarily deleted and can be recovered by using the revert comm
 
 sub delete_object
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to delete_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'delete_object');
-	}
+							       method_name => 'delete_object');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadata);
-	#BEGIN delete_object
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN delete_object
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["id","type","workspace"],{
 		asHash => 0
@@ -2238,15 +2238,15 @@ sub delete_object
 	my $obj = $ws->deleteObject($params->{type},$params->{id});
 	$metadata = $obj->metadata($params->{asHash});
 	$self->_clearContext();
-	#END delete_object
-	my @_bad_returns;
-	(ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-	if (@_bad_returns) {
+    #END delete_object
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to delete_object:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'delete_object');
-	}
-	return($metadata);
+							       method_name => 'delete_object');
+    }
+    return($metadata);
 }
 
 
@@ -2342,20 +2342,20 @@ Objects cannot be permanently deleted unless they've been deleted first.
 
 sub delete_object_permanently
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to delete_object_permanently:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'delete_object_permanently');
-	}
+							       method_name => 'delete_object_permanently');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadata);
-	#BEGIN delete_object_permanently
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN delete_object_permanently
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["id","type","workspace"],{
 		asHash => 0
@@ -2372,15 +2372,15 @@ sub delete_object_permanently
 		$metadata = $obj->metadata($params->{asHash});
 	}
 	$self->_clearContext();
-	#END delete_object_permanently
-	my @_bad_returns;
-	(ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-	if (@_bad_returns) {
+    #END delete_object_permanently
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to delete_object_permanently:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'delete_object_permanently');
-	}
-	return($metadata);
+							       method_name => 'delete_object_permanently');
+    }
+    return($metadata);
 }
 
 
@@ -2486,20 +2486,20 @@ This commands provides access to all versions of the object via the instance par
 
 sub get_object
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'get_object');
-	}
+							       method_name => 'get_object');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($output);
-	#BEGIN get_object
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($output);
+    #BEGIN get_object
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["id","type","workspace"],{
 		instance => undef,
@@ -2528,15 +2528,15 @@ sub get_object
 		metadata => $obj->metadata($params->{asHash})
 	};
 	$self->_clearContext();
-	#END get_object
-	my @_bad_returns;
-	(ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
-	if (@_bad_returns) {
+    #END get_object
+    my @_bad_returns;
+    (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_object:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'get_object');
-	}
-	return($output);
+							       method_name => 'get_object');
+    }
+    return($output);
 }
 
 
@@ -2636,20 +2636,20 @@ This commands provides access to all versions of the object via the instance par
 
 sub get_object_by_ref
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_object_by_ref:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'get_object_by_ref');
-	}
+							       method_name => 'get_object_by_ref');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($output);
-	#BEGIN get_object_by_ref
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($output);
+    #BEGIN get_object_by_ref
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["reference"],{
 		asHash => 0,
@@ -2668,15 +2668,15 @@ sub get_object_by_ref
 		metadata => $obj->metadata($params->{asHash})
 	};
 	$self->_clearContext();
-	#END get_object_by_ref
-	my @_bad_returns;
-	(ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
-	if (@_bad_returns) {
+    #END get_object_by_ref
+    my @_bad_returns;
+    (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_object_by_ref:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'get_object_by_ref');
-	}
-	return($output);
+							       method_name => 'get_object_by_ref');
+    }
+    return($output);
 }
 
 
@@ -2790,20 +2790,20 @@ This commands provides access to all versions of the object via the instance par
 
 sub save_object_by_ref
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to save_object_by_ref:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'save_object_by_ref');
-	}
+							       method_name => 'save_object_by_ref');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadata);
-	#BEGIN save_object_by_ref
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN save_object_by_ref
 	$self->_setContext($ctx,$params);
 	$params = $self->_validateargs($params,["data","id","type"],{
 		reference => undef,
@@ -2828,15 +2828,15 @@ sub save_object_by_ref
 	my $obj = $self->_saveObjectByRef($params->{type},$params->{id},$params->{data},$params->{command},$params->{metadata},$params->{reference},$params->{replace});
 	$metadata = $obj->metadata($params->{asHash});
 	$self->_clearContext();
-	#END save_object_by_ref
-	my @_bad_returns;
-	(ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-	if (@_bad_returns) {
+    #END save_object_by_ref
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to save_object_by_ref:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'save_object_by_ref');
-	}
-	return($metadata);
+							       method_name => 'save_object_by_ref');
+    }
+    return($metadata);
 }
 
 
@@ -2933,20 +2933,20 @@ This commands provides access to metadata for all versions of the object via the
 
 sub get_objectmeta
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_objectmeta:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'get_objectmeta');
-	}
+							       method_name => 'get_objectmeta');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadata);
-	#BEGIN get_objectmeta
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN get_objectmeta
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["id","type","workspace"],{
 		instance => undef,
@@ -2959,15 +2959,15 @@ sub get_objectmeta
 	});
 	$metadata = $obj->metadata($params->{asHash});
 	$self->_clearContext();
-	#END get_objectmeta
-	my @_bad_returns;
-	(ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-	if (@_bad_returns) {
+    #END get_objectmeta
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_objectmeta:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'get_objectmeta');
-	}
-	return($metadata);
+							       method_name => 'get_objectmeta');
+    }
+    return($metadata);
 }
 
 
@@ -3059,20 +3059,20 @@ This commands provides access to all versions of the object via the instance par
 
 sub get_objectmeta_by_ref
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_objectmeta_by_ref:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'get_objectmeta_by_ref');
-	}
+							       method_name => 'get_objectmeta_by_ref');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadata);
-	#BEGIN get_objectmeta_by_ref
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN get_objectmeta_by_ref
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["reference"],{
 		asHash => 0
@@ -3080,15 +3080,15 @@ sub get_objectmeta_by_ref
 	my $obj = $self->_getObject($params->{reference},{throwErrorIfMissing => 1});
 	$metadata = $obj->metadata($params->{asHash});
 	$self->_clearContext();
-	#END get_objectmeta_by_ref
-	my @_bad_returns;
-	(ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-	if (@_bad_returns) {
+    #END get_objectmeta_by_ref
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_objectmeta_by_ref:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'get_objectmeta_by_ref');
-	}
-	return($metadata);
+							       method_name => 'get_objectmeta_by_ref');
+    }
+    return($metadata);
 }
 
 
@@ -3187,20 +3187,20 @@ This ensures that the object instance always increases and no portion of the obj
 
 sub revert_object
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to revert_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'revert_object');
-	}
+							       method_name => 'revert_object');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadata);
-	#BEGIN revert_object
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN revert_object
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["id","type","workspace"],{
 		instance => undef,
@@ -3210,15 +3210,15 @@ sub revert_object
 	my $obj = $ws->revertObject($params->{type},$params->{id},$params->{instance});
 	$metadata = $obj->metadata($params->{asHash});
 	$self->_clearContext();
-	#END revert_object
-	my @_bad_returns;
-	(ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-	if (@_bad_returns) {
+    #END revert_object
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to revert_object:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'revert_object');
-	}
-	return($metadata);
+							       method_name => 'revert_object');
+    }
+    return($metadata);
 }
 
 
@@ -3322,20 +3322,20 @@ It is possible to use the version parameter to copy any version of a workspace o
 
 sub copy_object
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to copy_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'copy_object');
-	}
+							       method_name => 'copy_object');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadata);
-	#BEGIN copy_object
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN copy_object
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["new_id","new_workspace","source_id","type","source_workspace"],{
 		instance => undef,
@@ -3534,15 +3534,15 @@ sub copy_object
 		$metadata = $newobj->metadata($params->{asHash});
 	}
 	$self->_clearContext();
-	#END copy_object
-	my @_bad_returns;
-	(ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-	if (@_bad_returns) {
+    #END copy_object
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to copy_object:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'copy_object');
-	}
-	return($metadata);
+							       method_name => 'copy_object');
+    }
+    return($metadata);
 }
 
 
@@ -3643,20 +3643,20 @@ Returns the metadata of the newly moved object.
 
 sub move_object
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to move_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'move_object');
-	}
+							       method_name => 'move_object');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadata);
-	#BEGIN move_object
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN move_object
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["new_id","new_workspace","source_id","type","source_workspace"],{
 		asHash => 0
@@ -3678,15 +3678,15 @@ sub move_object
 		$metadata = $obj->metadata($params->{asHash});
 	}
 	$self->_clearContext();
-	#END move_object
-	my @_bad_returns;
-	(ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-	if (@_bad_returns) {
+    #END move_object
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to move_object:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'move_object');
-	}
-	return($metadata);
+							       method_name => 'move_object');
+    }
+    return($metadata);
 }
 
 
@@ -3751,20 +3751,20 @@ Returns "1" if the object exists, "0" if not
 
 sub has_object
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to has_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-									method_name => 'has_object');
-	}
+							       method_name => 'has_object');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($object_present);
-	#BEGIN has_object
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($object_present);
+    #BEGIN has_object
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["id","type","workspace"],{
 		instance => undef
@@ -3779,15 +3779,15 @@ sub has_object
 		$object_present = 0;
 	}
 	$self->_clearContext();
-	#END has_object
-	my @_bad_returns;
-	(!ref($object_present)) or push(@_bad_returns, "Invalid type for return variable \"object_present\" (value was \"$object_present\")");
-	if (@_bad_returns) {
+    #END has_object
+    my @_bad_returns;
+    (!ref($object_present)) or push(@_bad_returns, "Invalid type for return variable \"object_present\" (value was \"$object_present\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to has_object:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'has_object');
-	}
-	return($object_present);
+							       method_name => 'has_object');
+    }
+    return($object_present);
 }
 
 
@@ -3881,20 +3881,20 @@ Returns the metadata associated with every version of a specified object in a sp
 
 sub object_history
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to object_history:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'object_history');
-	}
+							       method_name => 'object_history');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadatas);
-	#BEGIN object_history
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadatas);
+    #BEGIN object_history
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["id","type","workspace"],{
 		asHash => 0
@@ -3905,15 +3905,15 @@ sub object_history
 		$metadatas->[$history->[$i]->instance()] = $history->[$i]->metadata($params->{asHash});
 	}
 	$self->_clearContext();
-	#END object_history
-	my @_bad_returns;
-	(ref($metadatas) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadatas\" (value was \"$metadatas\")");
-	if (@_bad_returns) {
+    #END object_history
+    my @_bad_returns;
+    (ref($metadatas) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadatas\" (value was \"$metadatas\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to object_history:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'object_history');
-	}
-	return($metadatas);
+							       method_name => 'object_history');
+    }
+    return($metadatas);
 }
 
 
@@ -3991,20 +3991,20 @@ Creates a new workspace with the specified name and default permissions.
 
 sub create_workspace
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to create_workspace:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'create_workspace');
-	}
+							       method_name => 'create_workspace');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadata);
-	#BEGIN create_workspace
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN create_workspace
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["workspace"],{
 		default_permission => "n",
@@ -4018,15 +4018,15 @@ sub create_workspace
 	$ws = $self->_createWorkspace($params->{workspace},$params->{default_permission});
 	$metadata = $ws->metadata($params->{asHash});
 	$self->_clearContext();
-	#END create_workspace
-	my @_bad_returns;
-	(ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-	if (@_bad_returns) {
+    #END create_workspace
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to create_workspace:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'create_workspace');
-	}
-	return($metadata);
+							       method_name => 'create_workspace');
+    }
+    return($metadata);
 }
 
 
@@ -4102,20 +4102,20 @@ Retreives the metadata associated with the specified workspace.
 
 sub get_workspacemeta
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_workspacemeta:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_workspacemeta');
-	}
+							       method_name => 'get_workspacemeta');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadata);
-	#BEGIN get_workspacemeta
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN get_workspacemeta
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["workspace"],{
 		asHash => 0
@@ -4123,15 +4123,15 @@ sub get_workspacemeta
 	my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
 	$metadata = $ws->metadata($params->{asHash});
 	$self->_clearContext();
-	#END get_workspacemeta
-	my @_bad_returns;
-	(ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-	if (@_bad_returns) {
+    #END get_workspacemeta
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_workspacemeta:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_workspacemeta');
-	}
-	return($metadata);
+							       method_name => 'get_workspacemeta');
+    }
+    return($metadata);
 }
 
 
@@ -4187,34 +4187,34 @@ Retreives a list of all users with custom permissions to the workspace.
 
 sub get_workspacepermissions
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_workspacepermissions:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_workspacepermissions');
-	}
+							       method_name => 'get_workspacepermissions');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($user_permissions);
-	#BEGIN get_workspacepermissions
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($user_permissions);
+    #BEGIN get_workspacepermissions
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["workspace"],{});
 	my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
 	$user_permissions = $ws->getWorkspaceUserPermissions();
 	$self->_clearContext();
-	#END get_workspacepermissions
-	my @_bad_returns;
-	(ref($user_permissions) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"user_permissions\" (value was \"$user_permissions\")");
-	if (@_bad_returns) {
+    #END get_workspacepermissions
+    my @_bad_returns;
+    (ref($user_permissions) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"user_permissions\" (value was \"$user_permissions\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_workspacepermissions:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_workspacepermissions');
-	}
-	return($user_permissions);
+							       method_name => 'get_workspacepermissions');
+    }
+    return($user_permissions);
 }
 
 
@@ -4290,20 +4290,20 @@ Deletes a specified workspace with all objects.
 
 sub delete_workspace
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to delete_workspace:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'delete_workspace');
-	}
+							       method_name => 'delete_workspace');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadata);
-	#BEGIN delete_workspace
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN delete_workspace
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["workspace"],{
 		asHash => 0
@@ -4312,15 +4312,15 @@ sub delete_workspace
 	$ws->permanentDelete();
 	$metadata = $ws->metadata($params->{asHash});
 	$self->_clearContext();
-	#END delete_workspace
-	my @_bad_returns;
-	(ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-	if (@_bad_returns) {
+    #END delete_workspace
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to delete_workspace:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'delete_workspace');
-	}
-	return($metadata);
+							       method_name => 'delete_workspace');
+    }
+    return($metadata);
 }
 
 
@@ -4402,20 +4402,20 @@ Copies a specified workspace with all objects.
 
 sub clone_workspace
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to clone_workspace:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'clone_workspace');
-	}
+							       method_name => 'clone_workspace');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadata);
-	#BEGIN clone_workspace
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN clone_workspace
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["new_workspace","current_workspace"],{
 		default_permissions => "n",
@@ -4632,15 +4632,15 @@ sub clone_workspace
 		$metadata = $ws->metadata($params->{asHash});
 	}
 	$self->_clearContext();
-	#END clone_workspace
-	my @_bad_returns;
-	(ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-	if (@_bad_returns) {
+    #END clone_workspace
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to clone_workspace:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'clone_workspace');
-	}
-	return($metadata);
+							       method_name => 'clone_workspace');
+    }
+    return($metadata);
 }
 
 
@@ -4714,20 +4714,20 @@ Lists the metadata of all workspaces a user has access to.
 
 sub list_workspaces
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to list_workspaces:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'list_workspaces');
-	}
+							       method_name => 'list_workspaces');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($workspaces);
-	#BEGIN list_workspaces
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($workspaces);
+    #BEGIN list_workspaces
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,[],{
 		asHash => 0
@@ -4743,15 +4743,15 @@ sub list_workspaces
 		push(@{$workspaces},$wss->[$i]->metadata($params->{asHash}));
 	}
 	$self->_clearContext();
-	#END list_workspaces
-	my @_bad_returns;
-	(ref($workspaces) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"workspaces\" (value was \"$workspaces\")");
-	if (@_bad_returns) {
+    #END list_workspaces
+    my @_bad_returns;
+    (ref($workspaces) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"workspaces\" (value was \"$workspaces\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to list_workspaces:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'list_workspaces');
-	}
-	return($workspaces);
+							       method_name => 'list_workspaces');
+    }
+    return($workspaces);
 }
 
 
@@ -4845,20 +4845,20 @@ Lists the metadata of all objects in the specified workspace with the specified 
 
 sub list_workspace_objects
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to list_workspace_objects:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'list_workspace_objects');
-	}
+							       method_name => 'list_workspace_objects');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($objects);
-	#BEGIN list_workspace_objects
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($objects);
+    #BEGIN list_workspace_objects
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["workspace"],{
 		type => undef,
@@ -4874,15 +4874,15 @@ sub list_workspace_objects
 		}
 	}
 	$self->_clearContext();
-	#END list_workspace_objects
-	my @_bad_returns;
-	(ref($objects) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"objects\" (value was \"$objects\")");
-	if (@_bad_returns) {
+    #END list_workspace_objects
+    my @_bad_returns;
+    (ref($objects) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"objects\" (value was \"$objects\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to list_workspace_objects:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'list_workspace_objects');
-	}
-	return($objects);
+							       method_name => 'list_workspace_objects');
+    }
+    return($objects);
 }
 
 
@@ -4961,20 +4961,20 @@ Must have admin privelages to change workspace global permissions.
 
 sub set_global_workspace_permissions
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to set_global_workspace_permissions:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'set_global_workspace_permissions');
-	}
+							       method_name => 'set_global_workspace_permissions');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($metadata);
-	#BEGIN set_global_workspace_permissions
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($metadata);
+    #BEGIN set_global_workspace_permissions
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["new_permission","workspace"],{
 		asHash => 0
@@ -4983,15 +4983,15 @@ sub set_global_workspace_permissions
 	$ws->setDefaultPermissions($params->{new_permission});
 	$metadata = $ws->metadata($params->{asHash});
 	$self->_clearContext();
-	#END set_global_workspace_permissions
-	my @_bad_returns;
-	(ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
-	if (@_bad_returns) {
+    #END set_global_workspace_permissions
+    my @_bad_returns;
+    (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to set_global_workspace_permissions:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'set_global_workspace_permissions');
-	}
-	return($metadata);
+							       method_name => 'set_global_workspace_permissions');
+    }
+    return($metadata);
 }
 
 
@@ -5054,35 +5054,35 @@ Must have admin privelages to change workspace permissions.
 
 sub set_workspace_permissions
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to set_workspace_permissions:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'set_workspace_permissions');
-	}
+							       method_name => 'set_workspace_permissions');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($success);
-	#BEGIN set_workspace_permissions
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($success);
+    #BEGIN set_workspace_permissions
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["users","new_permission","workspace"],{});
 	my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
 	$ws->setUserPermissions($params->{users},$params->{new_permission});
 	$success = 1;
 	$self->_clearContext();  
-	#END set_workspace_permissions
-	my @_bad_returns;
-	(!ref($success)) or push(@_bad_returns, "Invalid type for return variable \"success\" (value was \"$success\")");
-	if (@_bad_returns) {
+    #END set_workspace_permissions
+    my @_bad_returns;
+    (!ref($success)) or push(@_bad_returns, "Invalid type for return variable \"success\" (value was \"$success\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to set_workspace_permissions:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'set_workspace_permissions');
-	}
-	return($success);
+							       method_name => 'set_workspace_permissions');
+    }
+    return($success);
 }
 
 
@@ -5136,34 +5136,34 @@ Retrieves settings for user account, including currently selected workspace
 
 sub get_user_settings
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_user_settings:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_user_settings');
-	}
+							       method_name => 'get_user_settings');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($output);
-	#BEGIN get_user_settings
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($output);
+    #BEGIN get_user_settings
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,[],{});
 	my $wsu = $self->_getWorkspaceUser($self->_getUsername(),{createIfMissing => 1});
 	$output = $wsu->settings();
 	$self->_clearContext();
-	#END get_user_settings
-	my @_bad_returns;
-	(ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
-	if (@_bad_returns) {
+    #END get_user_settings
+    my @_bad_returns;
+    (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_user_settings:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_user_settings');
-	}
-	return($output);
+							       method_name => 'get_user_settings');
+    }
+    return($output);
 }
 
 
@@ -5221,35 +5221,35 @@ Retrieves settings for user account, including currently selected workspace
 
 sub set_user_settings
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to set_user_settings:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'set_user_settings');
-	}
+							       method_name => 'set_user_settings');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($output);
-	#BEGIN set_user_settings
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($output);
+    #BEGIN set_user_settings
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["setting","value"],{});
 	my $wsu = $self->_getWorkspaceUser($self->_getUsername(),{createIfMissing => 1});
 	$wsu->updateSettings($params->{setting},$params->{value});
 	$output = $wsu->settings();
 	$self->_clearContext();
-	#END set_user_settings
-	my @_bad_returns;
-	(ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
-	if (@_bad_returns) {
+    #END set_user_settings
+    my @_bad_returns;
+    (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to set_user_settings:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'set_user_settings');
-	}
-	return($output);
+							       method_name => 'set_user_settings');
+    }
+    return($output);
 }
 
 
@@ -5329,20 +5329,20 @@ Queues a new job in the workspace.
 
 sub queue_job
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to queue_job:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'queue_job');
-	}
+							       method_name => 'queue_job');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($job);
-	#BEGIN queue_job
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($job);
+    #BEGIN queue_job
 	$self->_setContext($ctx,$params);
 	$params = $self->_validateargs($params,["type"],{
 		"state" => "queued",
@@ -5375,15 +5375,15 @@ sub queue_job
 	};
 	$self->_mongodb()->get_collection('jobObjects')->insert($job);
 	$self->_clearContext();  
-	#END queue_job
-	my @_bad_returns;
-	(ref($job) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"job\" (value was \"$job\")");
-	if (@_bad_returns) {
+    #END queue_job
+    my @_bad_returns;
+    (ref($job) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"job\" (value was \"$job\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to queue_job:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'queue_job');
-	}
-	return($job);
+							       method_name => 'queue_job');
+    }
+    return($job);
 }
 
 
@@ -5464,20 +5464,20 @@ Used to manage jobs by ensuring multiple server don't claim the same job.
 
 sub set_job_status
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to set_job_status:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'set_job_status');
-	}
+							       method_name => 'set_job_status');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($job);
-	#BEGIN set_job_status
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($job);
+    #BEGIN set_job_status
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["jobid","status"],{
 		currentStatus => undef,
@@ -5540,15 +5540,15 @@ sub set_job_status
 	my $JSON = JSON::XS->new->utf8(1);
 	$job = $JSON->decode($JSON->encode($job));
 	$self->_clearContext();
-	#END set_job_status
-	my @_bad_returns;
-	(ref($job) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"job\" (value was \"$job\")");
-	if (@_bad_returns) {
+    #END set_job_status
+    my @_bad_returns;
+    (ref($job) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"job\" (value was \"$job\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to set_job_status:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'set_job_status');
-	}
-	return($job);
+							       method_name => 'set_job_status');
+    }
+    return($job);
 }
 
 
@@ -5626,20 +5626,20 @@ job_id is a string
 
 sub get_jobs
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_jobs:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_jobs');
-	}
+							       method_name => 'get_jobs');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($jobs);
-	#BEGIN get_jobs
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($jobs);
+    #BEGIN get_jobs
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,[],{
 		status => undef,
@@ -5674,15 +5674,15 @@ sub get_jobs
 		push(@{$jobs},$newobj);
 	}
 	$self->_clearContext();
-	#END get_jobs
-	my @_bad_returns;
-	(ref($jobs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"jobs\" (value was \"$jobs\")");
-	if (@_bad_returns) {
+    #END get_jobs
+    my @_bad_returns;
+    (ref($jobs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"jobs\" (value was \"$jobs\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_jobs:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_jobs');
-	}
-	return($jobs);
+							       method_name => 'get_jobs');
+    }
+    return($jobs);
 }
 
 
@@ -5725,25 +5725,25 @@ An object cannot be saved in any workspace if it's type is not on this list.
 
 sub get_types
 {
-	my $self = shift;
+    my $self = shift;
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($types);
-	#BEGIN get_types
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($types);
+    #BEGIN get_types
 	$types = [keys(%{$self->_permanentTypes()})];
 	my $cursor = $self->_mongodb()->get_collection('typeObjects')->find({});
 	while (my $object = $cursor->next) {
 		push(@{$types},$object->{id});
 	}
-	#END get_types
-	my @_bad_returns;
-	(ref($types) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"types\" (value was \"$types\")");
-	if (@_bad_returns) {
+    #END get_types
+    my @_bad_returns;
+    (ref($types) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"types\" (value was \"$types\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to get_types:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_types');
-	}
-	return($types);
+							       method_name => 'get_types');
+    }
+    return($types);
 }
 
 
@@ -5796,20 +5796,20 @@ Cannot add a type that already exists.
 
 sub add_type
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to add_type:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'add_type');
-	}
+							       method_name => 'add_type');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($success);
-	#BEGIN add_type
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($success);
+    #BEGIN add_type
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["type"],{});
 	if ($self->_getUsername() eq "public") {
@@ -5833,15 +5833,15 @@ sub add_type
 	});
 	$success = 1;
 	$self->_clearContext();
-	#END add_type
-	my @_bad_returns;
-	(!ref($success)) or push(@_bad_returns, "Invalid type for return variable \"success\" (value was \"$success\")");
-	if (@_bad_returns) {
+    #END add_type
+    my @_bad_returns;
+    (!ref($success)) or push(@_bad_returns, "Invalid type for return variable \"success\" (value was \"$success\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to add_type:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'add_type');
-	}
-	return($success);
+							       method_name => 'add_type');
+    }
+    return($success);
 }
 
 
@@ -5894,20 +5894,20 @@ Permanent types cannot be removed.
 
 sub remove_type
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to remove_type:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'remove_type');
-	}
+							       method_name => 'remove_type');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($success);
-	#BEGIN remove_type
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($success);
+    #BEGIN remove_type
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["type"],{});
 	if ($self->_getUsername() eq "public") {
@@ -5923,15 +5923,15 @@ sub remove_type
 	}
 	$self->_clearContext();
 	$success = 1;
-	#END remove_type
-	my @_bad_returns;
-	(!ref($success)) or push(@_bad_returns, "Invalid type for return variable \"success\" (value was \"$success\")");
-	if (@_bad_returns) {
+    #END remove_type
+    my @_bad_returns;
+    (!ref($success)) or push(@_bad_returns, "Invalid type for return variable \"success\" (value was \"$success\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to remove_type:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'remove_type');
-	}
-	return($success);
+							       method_name => 'remove_type');
+    }
+    return($success);
 }
 
 
@@ -5983,20 +5983,20 @@ This function patches the database after an update. Called remotely, but only ca
 
 sub patch
 {
-	my $self = shift;
-	my($params) = @_;
+    my $self = shift;
+    my($params) = @_;
 
-	my @_bad_arguments;
-	(ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-	if (@_bad_arguments) {
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to patch:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'patch');
-	}
+							       method_name => 'patch');
+    }
 
-	my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
-	my($success);
-	#BEGIN patch
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my($success);
+    #BEGIN patch
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["patch_id"],{});
 	if ($self->_getUsername() ne "workspaceroot") {
@@ -6006,15 +6006,15 @@ sub patch
 	$self->_patch($params);
 	$self->_clearContext();
 	$success = 1;
-	#END patch
-	my @_bad_returns;
-	(!ref($success)) or push(@_bad_returns, "Invalid type for return variable \"success\" (value was \"$success\")");
-	if (@_bad_returns) {
+    #END patch
+    my @_bad_returns;
+    (!ref($success)) or push(@_bad_returns, "Invalid type for return variable \"success\" (value was \"$success\")");
+    if (@_bad_returns) {
 	my $msg = "Invalid returns passed to patch:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'patch');
-	}
-	return($success);
+							       method_name => 'patch');
+    }
+    return($success);
 }
 
 
@@ -6051,7 +6051,7 @@ Return the module version. This is a Semantic Versioning number.
 =cut
 
 sub version {
-	return $VERSION;
+    return $VERSION;
 }
 
 =head1 TYPES
