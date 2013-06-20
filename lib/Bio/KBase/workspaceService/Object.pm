@@ -310,12 +310,12 @@ Description:
 sub data {
 	my ($self) = @_;
 	my $obj = $self->dataObject()->retrieveRawData();
-	if (ref($obj)) {
-		$obj->{_wsUUID} = $self->uuid();
-		$obj->{_wsID} = $self->id();
-		$obj->{_wsType} = $self->type();
-		$obj->{_wsWS} = $self->workspace();
-	}
+#	if (ref($obj)) {
+#		$obj->{_wsUUID} = $self->uuid();
+#		$obj->{_wsID} = $self->id();
+#		$obj->{_wsType} = $self->type();
+#		$obj->{_wsWS} = $self->workspace();
+#	}
 	return $obj;
 }
 
@@ -371,14 +371,14 @@ Description:
 
 sub processRawData {
 	my ($self,$data) = @_;
-	if (ref($data)) {
-		my $list = [ qw(_wsUUID _wsUUID _wsType _wsWS) ];
-		foreach my $item (@{$list}) {
-			if (defined($data->{_wsUUID})) {
-				delete $data->{_wsUUID};
-			}
-		}
-	}
+#	if (ref($data)) {
+#		my $list = [ qw(_wsUUID _wsUUID _wsType _wsWS) ];
+#		foreach my $item (@{$list}) {
+#			if (defined($data->{_wsUUID})) {
+#				delete $data->{_wsUUID};
+#			}
+#		}
+#	}
 	$self->{_dataObject} = $self->parent()->_createDataObject($data);
 	$self->{_chsum} = $self->dataObject()->chsum();
 	return $self->dataObject();

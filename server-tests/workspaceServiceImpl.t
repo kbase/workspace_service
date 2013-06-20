@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Data::Dumper;
-my $test_count = 71;
+my $test_count = 75;
 
 ################################################################################
 #Test intiailization: setting test config, instantiating Impl, getting auth token
@@ -264,7 +264,7 @@ eval{
 };
 isnt($@,'',"Attempt to create workspace without a hash reference  fails");
 ################################################################################
-#Test 33-44: Adding objects to workspace
+#Test 33-48: Adding objects to workspace
 ################################################################################ 
 note("Test Adding Objects to the workspace testworkspace");
 my $wsmeta;
@@ -331,6 +331,15 @@ eval {
 	});
 };
 ok $output->{metadata}->[0] eq "testbiochem","save_object ran and returned testbiochem object with correct ID!";
+
+# regression tests for previous behavior of inserting fields into data hash
+{
+	my $data = $output->{data};
+	foreach my $field (qw(_wsUUID _wsID _wsType _wsWS)) {
+		ok(!defined $data->{$field}, "Ensure $field not in returned data");
+	}
+}
+
 #Test should fail gracefully when sending bad parameters
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
@@ -371,7 +380,7 @@ is($bool,0, "Confirm that Test2 does not exist");
 
 note("Retrieving test object data from database");
 ################################################################################
-#Test 45-57: Retreiving, moving, copying, deleting, and reverting objects 
+#Test 49-61: Retreiving, moving, copying, deleting, and reverting objects 
 ################################################################################ 
 #Retrieving test object data from database
 $objmeta = [];
@@ -479,7 +488,7 @@ ok defined($objidhash->{TestCopy}),
 ok defined($objidhash->{TestMove}),
 	"list_workspace_objects returned object list with moved result object TestMove!";
 ################################################################################
-#Test 58-67: Cloning workspaces with objects
+#Test 62-73: Cloning workspaces with objects
 ################################################################################ 
 $conf2 = {
         new_workspace => "clonetestworkspace",
@@ -552,7 +561,7 @@ ok $idhash->{testworkspace} eq "r",
 ok $idhash->{clonetestworkspace} eq "w",
 	"list_workspaces says public has write privelages to clonetestworkspace!";
 ################################################################################
-#Test 68-71: Testing types
+#Test 74-75: Testing types
 ################################################################################ 
 #Testing the very basic type services
 eval {
