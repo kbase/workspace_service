@@ -58,9 +58,9 @@ ok(defined($idhash1->{testworkspace1}),
 
 # Create a few more workspaces
 lives_ok { $impl->create_workspace({workspace=>"testworkspace2",default_permission=>"r",auth=>$oauth_token}); } "create read-only ws";
-lives_ok { $impl->create_workspace({workspace=>"testworkspace3",default_permission=>"a",auth=>$oauth_token}); } "create admin ws";
-lives_ok { $impl->create_workspace({workspace=>"testworkspace4",default_permission=>"w",auth=>$oauth_token}); } "create rw ws";
-lives_ok { $impl->create_workspace({workspace=>"testworkspace5",default_permission=>"n",auth=>$oauth_token}); } "create no perm ws";
+lives_ok { $impl->create_workspace({workspace=>"testworkspace3",default_permission=>"r",auth=>$oauth_token}); } "create read-only ws #2";
+lives_ok { $impl->create_workspace({workspace=>"testworkspace4",default_permission=>"n",auth=>$oauth_token}); } "create no perm ws";
+lives_ok { $impl->create_workspace({workspace=>"testworkspace5",default_permission=>"n",auth=>$oauth_token}); } "create no perm ws #2";
 
 $workspace_list = $impl->list_workspaces({auth=>$oauth_token});
 
