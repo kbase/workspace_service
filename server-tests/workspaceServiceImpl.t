@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Data::Dumper;
-my $test_count = 81;
+my $test_count = 78;
 
 ################################################################################
 #Test intiailization: setting test config, instantiating Impl, getting auth token
@@ -71,7 +71,7 @@ my @impl_methods = qw(
 	get_types
 	remove_type
 );
-can_ok($impl, @impl_methods);    
+can_ok($impl, @impl_methods);
 ################################################################################
 #Test 4-9: Can kbasetest create a workspace, and is the returned metadata correct?
 ################################################################################
@@ -91,27 +91,21 @@ is $meta->[3],0;
 is $meta->[4],"a";
 is $meta->[5],"n";
 ################################################################################
-#Test 10-11: Creating a public workspace, and is the returned metadata correct?
+#Test 10: Creating a public workspace w/o auth should fail
 ################################################################################
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
-	$meta = $impl->create_workspace({
-	        workspace => "test_two",
-	        default_permission => "n",
-	});
+	throws_ok {$impl->create_workspace({
+										workspace => "test_two",
+										default_permission => "n",
+										})
+				} qr/Must be authenticated to create a workspace!/,
+				"Creating a workspace w/o auth fails";
 };
-is $meta->[0], "test_two";
-is $meta->[1], "public";
 ################################################################################
-#Test 12-15: List workspaces returns the right workspaces
+#Test 11-12: List workspaces returns the right workspaces
 ################################################################################
 my $metas;
-eval {
-	local $Bio::KBase::workspaceService::Server::CallContext = {};
-	$metas = $impl->list_workspaces({});
-};
-is scalar @$metas, 1;
-ok($metas->[0]->[0] eq "test_two", "name matches");
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
 	$metas = $impl->list_workspaces({auth => $oauth});
@@ -119,7 +113,7 @@ eval {
 is scalar @$metas, 1;
 ok($metas->[0]->[0] eq "testworkspace", "name matches");
 ################################################################################
-#Test 16: Workspace dies when accessed with bad token
+#Test 13: Workspace dies when accessed with bad token
 ################################################################################
 my $output;
 eval {
@@ -128,7 +122,7 @@ eval {
 };
 is $output, undef, "list_workspaces dies with bad authentication";
 ################################################################################
-#Test 17-22: Can create lots of workspaces and list the right number
+#Test 14-19: Can create lots of workspaces and list the right number
 ################################################################################
 # Create a few more workspaces
 $output = undef;
@@ -166,7 +160,7 @@ foreach $ws (@{$workspace_list}) {
 ok(defined($idhash->{testworkspace3}),
    "list_workspaces returns newly created workspace testworkspace!");
 ################################################################################
-#Test 23: Dies when attempting to create duplicate workspace
+#Test 20: Dies when attempting to create duplicate workspace
 ################################################################################   
 $output = undef;
 eval {
@@ -175,7 +169,7 @@ eval {
 };
 ok(!defined($output), "Dies when attempting to create duplicate workspace");
 ################################################################################
-#Test 24-26: Can delete workspace, but cannot delete twice, and cannot delete nonexistant workspace
+#Test 21-23: Can delete workspace, but cannot delete twice, and cannot delete nonexistant workspace
 ################################################################################ 
 $output = undef;
 eval {
@@ -198,7 +192,7 @@ eval {
 };
 ok(!defined($output),"duplicate delete fails");
 ################################################################################
-#Test 27-29: Can clone workspace, but cannot clone a deleted or nonexistant workspace
+#Test 24-26: Can clone workspace, but cannot clone a deleted or nonexistant workspace
 ################################################################################ 
 $output = undef;
 eval {
@@ -243,7 +237,7 @@ is $output, undef, "clone a non-existent workspace should fail";
 # Does the cloned workspace match the original
 # Does the cloned workspace preserve permissions
 ################################################################################
-#Test 30-32: Cannot make workspace with bad or no permissions, and must use hash ref
+#Test 27-29: Cannot make workspace with bad or no permissions, and must use hash ref
 ################################################################################ 
 eval{
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
@@ -264,7 +258,7 @@ eval{
 };
 isnt($@,'',"Attempt to create workspace without a hash reference  fails");
 ################################################################################
-#Test 33-53: Adding objects to workspace
+#Test 30-50: Adding objects to workspace
 ################################################################################ 
 note("Test Adding Objects to the workspace testworkspace");
 my $wsmeta;
@@ -396,7 +390,7 @@ is($bool,0, "Confirm that Test2 does not exist");
 
 note("Retrieving test object data from database");
 ################################################################################
-#Test 54-66: Retreiving, moving, copying, deleting, and reverting objects 
+#Test 51-63: Retreiving, moving, copying, deleting, and reverting objects 
 ################################################################################ 
 #Retrieving test object data from database
 $objmeta = [];
@@ -504,7 +498,7 @@ ok defined($objidhash->{TestCopy}),
 ok defined($objidhash->{TestMove}),
 	"list_workspace_objects returned object list with moved result object TestMove!";
 ################################################################################
-#Test 67-76: Cloning workspaces with objects
+#Test 64-73: Cloning workspaces with objects
 ################################################################################ 
 $conf2 = {
         new_workspace => "clonetestworkspace",
@@ -577,7 +571,7 @@ ok $idhash->{testworkspace} eq "r",
 ok $idhash->{clonetestworkspace} eq "w",
 	"list_workspaces says public has write privelages to clonetestworkspace!";
 ################################################################################
-#Test 77-81: Testing types
+#Test 74-78: Testing types
 ################################################################################ 
 #Testing the very basic type services
 eval {

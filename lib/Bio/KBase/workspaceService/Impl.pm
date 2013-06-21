@@ -4036,6 +4036,10 @@ sub create_workspace
 		default_permission => "n",
 		asHash => 0
 	});
+	if ($self->_getUsername() eq "public") {
+		my $msg = "Must be authenticated to create a workspace!";
+		$ARG_VAL_ERR->throw(error => $msg, method_name => 'create_workspace');
+	}
 	my $ws = $self->_getWorkspace($params->{workspace});
 	if (defined($ws)) {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Cannot create workspace because workspace already exists!",
