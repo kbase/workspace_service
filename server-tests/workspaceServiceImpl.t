@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Data::Dumper;
-my $test_count = 75;
+my $test_count = 80;
 
 ################################################################################
 #Test intiailization: setting test config, instantiating Impl, getting auth token
@@ -264,7 +264,7 @@ eval{
 };
 isnt($@,'',"Attempt to create workspace without a hash reference  fails");
 ################################################################################
-#Test 33-48: Adding objects to workspace
+#Test 33-53: Adding objects to workspace
 ################################################################################ 
 note("Test Adding Objects to the workspace testworkspace");
 my $wsmeta;
@@ -370,17 +370,33 @@ is($bool,0, "Confirm that Test2 does not exist");
 		auth => $oauth,
 		data => {"ItsNotFunny" => "MyPantsAreOnFire"}
 	};
-	foreach my $id ('a b', 'a/b', 'a+b', 'a(b', 'a)b', 'a%b') {
-		$params->{id} = $id;
+	foreach my $c (' ', '/', '+', '(', ')', '%') {
+		$params->{id} = 'a'.$c.'b';
 		throws_ok {$impl->save_object($params)} qr/$err/ , 
-			"shouldn't save $id - bad chars";
+			"shouldn't save $params->{id} - bad chars";
+	}
+}
+
+# Test a few good characters when saving IDs
+
+{
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	my $params = {
+		workspace => "testworkspace",
+		type => "Unspecified",
+		auth => $oauth,
+		data => {"ItsNotFunny" => "MyPantsAreOnFire"}
+	};
+	foreach my $c ('|', '.', '0', '_', '-') {
+		$params->{id} = 'a'.$c.'b';
+		ok($impl->save_object($params), "should save $params->{id} ok");
 	}
 }
 
 
 note("Retrieving test object data from database");
 ################################################################################
-#Test 49-61: Retreiving, moving, copying, deleting, and reverting objects 
+#Test 54-66: Retreiving, moving, copying, deleting, and reverting objects 
 ################################################################################ 
 #Retrieving test object data from database
 $objmeta = [];
@@ -488,7 +504,7 @@ ok defined($objidhash->{TestCopy}),
 ok defined($objidhash->{TestMove}),
 	"list_workspace_objects returned object list with moved result object TestMove!";
 ################################################################################
-#Test 62-73: Cloning workspaces with objects
+#Test 67-76: Cloning workspaces with objects
 ################################################################################ 
 $conf2 = {
         new_workspace => "clonetestworkspace",
@@ -561,7 +577,7 @@ ok $idhash->{testworkspace} eq "r",
 ok $idhash->{clonetestworkspace} eq "w",
 	"list_workspaces says public has write privelages to clonetestworkspace!";
 ################################################################################
-#Test 74-75: Testing types
+#Test 77-80: Testing types
 ################################################################################ 
 #Testing the very basic type services
 eval {

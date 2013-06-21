@@ -83,6 +83,8 @@ use IO::Uncompress::Gunzip qw(gunzip);
 use File::Temp qw(tempfile);
 use LWP::Simple qw(getstore);
 
+my $ARG_VAL_ERR = 'Bio::KBase::Exceptions::ArgumentValidationError';
+
 sub _args {
 	my $mandatory = shift;
 	my $optional  = shift;
@@ -1175,13 +1177,21 @@ sub _validateUserID {
 sub _validateObjectID {
 	my ($self,$id) = @_;
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object ID failed validation!",
-		method_name => '_validateUserID') if ($id !~ m/^[a-zA-Z0-9\|._-]+$/);
+		method_name => '_validateUserID') if ($id !~ m/^[\w\|.-]+$/);
 }
 
 sub _validatePermission {
 	my ($self,$permission) = @_;
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Specified permission not valid!",
 		method_name => '_validateWorkspaceID') if ($permission !~ m/^[awrn]$/);
+}
+
+sub _validateTypeName {
+	my ($self, $type) = @_;
+	if ($type !~ m/^\w+$/) {
+		$ARG_VAL_ERR->throw(error => 'Type name has illegal characters!',
+			method_name => '_validateTypeName');
+	}
 }
 
 sub _validateObjectType {
@@ -5828,6 +5838,7 @@ sub add_type
     #BEGIN add_type
 	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["type"],{});
+	$self->_validateTypeName($params->{type});
 	if ($self->_getUsername() eq "public") {
 		my $msg = "Must be authenticated to add new types!";
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'add_type');
