@@ -45,12 +45,10 @@ sub new {
 		_defaultPermissions => $args->{defaultPermissions},
 		_objects => {}
 	};
-	foreach my $key (keys(%{$args->{objects}})) {
-		foreach my $keytwo (keys(%{$args->{objects}->{$key}})) {
-			my $newkey = $keytwo;
-			$newkey =~ s/_DOT_/./g;
-			$self->{_objects}->{$key}->{$newkey} = $args->{objects}->{$key}->{$keytwo};
-		}
+	foreach my $safeid (keys(%{$args->{objects}})) {
+		my $realid = $safeid;
+		$realid =~ s/_DOT_/./g;
+		$self->{_objects}->{$realid} = $args->{objects}->{$safeid};
 	}
 	bless $self;
 	$self->_validateID($args->{id});
@@ -153,10 +151,10 @@ Description:
 
 sub metadata {
 	my ($self,$ashash) = @_;
-	my $objects = 0;
-	foreach my $key (keys(%{$self->objects()})) {
-		$objects += keys(%{$self->objects()->{$key}});
-	}
+	my $objects += keys(%{$self->objects()});
+#	foreach my $key (keys(%{$self->objects()})) {
+#		$objects += keys(%{$self->objects()->{$key}});
+#	}
 	if (defined($ashash) && $ashash == 1) {
 		return {
 			id => $self->id(),
@@ -247,7 +245,7 @@ sub getObject {
 	my ($self,$type,$id,$options) = @_;
 	$self->checkPermissions(["r","w","a"]);
 	my $objects = $self->objects();
-	if (!defined($objects->{$type}->{$id})) {
+	if (!defined($objects->{$id})) {
 		if (defined($options->{throwErrorIfMissing}) && $options->{throwErrorIfMissing} == 1) {
 			Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Specified object not found in the workspace!",
 									method_name => 'getObject');
@@ -258,7 +256,7 @@ sub getObject {
 	if (defined($options->{instance})) {
 		$obj = $self->parent()->_getObjectByID($id,$type,$self->id(),$options->{instance});
 	} else {
-		my $uuid = $objects->{$type}->{$id};
+		my $uuid = $objects->{$id};
 		$obj = $self->parent()->_getObject($uuid);
 	}
 	if (!defined($obj) && defined($options->{throwErrorIfMissing}) && $options->{throwErrorIfMissing} == 1) {
@@ -281,7 +279,7 @@ sub getObjectHistory {
 	my ($self,$type,$id) = @_;
 	$self->checkPermissions(["r","w","a"]);
 	my $objects = $self->objects();
-	if (!defined($objects->{$type}->{$id})) {
+	if (!defined($objects->{$id})) {
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Specified object not found in the workspace!",
 		method_name => 'getObject');
 	}
@@ -299,20 +297,23 @@ Description:
 
 sub getAllObjects {
 	my ($self,$type,$options) = @_;
+	if($type) {
+		$options->{type} = $type;
+	}
 	$self->checkPermissions(["r","w","a"]);
 	my $uuids = [];
 	my $objects = $self->objects();
-	if (!defined($type)) {
-		foreach my $type (keys(%{$objects})) {
-			foreach my $alias (keys(%{$objects->{$type}})) {
-				push(@{$uuids},$objects->{$type}->{$alias});
+#	if (!defined($type)) {
+#		foreach my $type (keys(%{$objects})) {
+			foreach my $alias (keys(%{$objects})) {
+				push(@{$uuids},$objects->{$alias});
 			}
-		}
-	} else {
-		foreach my $alias (keys(%{$objects->{$type}})) {
-			push(@{$uuids},$objects->{$type}->{$alias});	
-		}
-	}
+#		}
+#	} else {
+#		foreach my $alias (keys(%{$objects->{$type}})) {
+#			push(@{$uuids},$objects->{$type}->{$alias});	
+#		}
+#	}
 	return $self->parent()->_getObjects($uuids,$options); 
 }
 
@@ -634,15 +635,15 @@ sub _updateObjects {
 	my $saveid = $id;
 	$saveid =~ s/\./_DOT_/g;
 	if (!defined($uuid)) {
-		if ($self->parent()->_updateDB("workspaces",{id => $self->id(),'objects.'.$type.'.'.$saveid => $olduuid},{'$unset' => {'objects.'.$type.'.'.$saveid => $olduuid}}) == 0) {
+		if ($self->parent()->_updateDB("workspaces",{id => $self->id(),'objects.'.$saveid => $olduuid},{'$unset' => {'objects.'.$saveid => $olduuid}}) == 0) {
 			return 0;
 		}
-		delete $self->objects()->{$type}->{$id};
+		delete $self->objects()->{$id};
 	} else {
-		if ($self->parent()->_updateDB("workspaces",{id => $self->id(),'objects.'.$type.'.'.$saveid => $olduuid},{'$set' => {'objects.'.$type.'.'.$saveid => $uuid}}) == 0) {
+		if ($self->parent()->_updateDB("workspaces",{id => $self->id(),'objects.'.$saveid => $olduuid},{'$set' => {'objects.'.$saveid => $uuid}}) == 0) {
 			return 0;
 		}
-		$self->objects()->{$type}->{$id} = $uuid;
+		$self->objects()->{$id} = $uuid;
 	}
 	return 1;
 }

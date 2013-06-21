@@ -379,7 +379,7 @@ sub _saveObjectByRef {
 			}
 		}
 	}
-	return $self->_createObject({
+	return $self->_createObject({ # TODO this appears to never be run
 		uuid => $ref,
 		type => $type,
 		workspace => "NO_WORKSPACE",
@@ -920,36 +920,52 @@ Description:
 
 sub _getObjects {
 	my ($self,$ids,$options) = @_;
-	my $cursor = $self->_mongodb()->get_collection('workspaceObjects')->find({uuid => {'$in' => $ids} });
+	my $query = {uuid => {'$in' => $ids}};
+	my $type = undef;
+	if(defined $options->{type} && $options->{type}) {
+		$type = $options->{type};
+		$query = {'$and' => [{'type' => $type}, $query]};
+		
+	}
+	my $cursor = $self->_mongodb()->get_collection('workspaceObjects')->find($query);
 	my $objHash = {};
 	while (my $object = $cursor->next) {
-		my $newObject = Bio::KBase::workspaceService::Object->new({
-			parent => $self,
-			uuid => $object->{uuid},
-			id => $object->{id},
-			workspace => $object->{workspace},
-			type => $object->{type},
-			ancestor => $object->{ancestor},
-			revertAncestors => $object->{revertAncestors},
-			owner => $object->{owner},
-			lastModifiedBy => $object->{lastModifiedBy},
-			command => $object->{command},
-			instance => $object->{instance},
-			chsum => $object->{chsum},
-			meta => $object->{meta},
-			moddate => $object->{moddate}
-		});
+		$object->{parent} = $self;
+		my $newObject = Bio::KBase::workspaceService::Object->new($object); #{
+#			parent => $self,
+#			uuid => $object->{uuid},
+#			id => $object->{id},
+#			workspace => $object->{workspace},
+#			type => $object->{type},
+#			ancestor => $object->{ancestor},
+#			revertAncestors => $object->{revertAncestors},
+#			owner => $object->{owner},
+#			lastModifiedBy => $object->{lastModifiedBy},
+#			command => $object->{command},
+#			instance => $object->{instance},
+#			chsum => $object->{chsum},
+#			meta => $object->{meta},
+#			moddate => $object->{moddate}
+#		});
 		$objHash->{$newObject->uuid()} = $newObject;
 	}
 	my $objects = [];
-	for (my $i=0; $i < @{$ids}; $i++) {
-		if (defined($objHash->{$ids->[$i]})) {
-			push(@{$objects},$objHash->{$ids->[$i]});
-		} elsif ($options->{throwErrorIfMissing} == 1) {
-			Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object ".$ids->[$i]." not found!",
+	foreach my $id (@{$ids}) {
+		if (defined($objHash->{$id})) {
+			push(@{$objects},$objHash->{$id});
+		} elsif ($options->{throwErrorIfMissing} == 1 && !$type) {
+			Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object ".$id." not found!",
 									method_name => '_getObjects');
 		}
 	}
+#	for (my $i=0; $i < @{$ids}; $i++) {
+#		if (defined($objHash->{$ids->[$i]})) {
+#			push(@{$objects},$objHash->{$ids->[$i]});
+#		} elsif ($options->{throwErrorIfMissing} == 1) {
+#			Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object ".$ids->[$i]." not found!",
+#									method_name => '_getObjects');
+#		}
+#	}
 	return $objects;
 }
 
@@ -962,7 +978,7 @@ Description:
 
 =cut
 
-sub _getObjectByID {
+sub _getObjectByID { # TODO below method almost identical, merge
 	my ($self,$id,$type,$workspace,$instance,$options) = @_;
 	my $cursor = $self->_mongodb()->get_collection( 'workspaceObjects' )->find({
 		id => $id,
@@ -2524,7 +2540,7 @@ sub get_object
 		$data = $obj->data();
 	}
 	$output = {
-		data => $obj->data(),
+		data => $obj->data(), # TODO fix this, ignores asJSON
 		metadata => $obj->metadata($params->{asHash})
 	};
 	$self->_clearContext();
