@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Data::Dumper;
-my $test_count = 80;
+my $test_count = 81;
 
 ################################################################################
 #Test intiailization: setting test config, instantiating Impl, getting auth token
@@ -573,11 +573,11 @@ ok defined($idhash->{testworkspace}),
 ok defined($idhash->{clonetestworkspace}),
 	"list_workspaces reveals nonreadable workspace clonetestworkspace with write privelages granted to testuser1!";
 ok $idhash->{testworkspace} eq "r",
-	"list_workspaces says public has read only privelages to testworkspace!";
+	"list_workspaces says public has read only privileges to testworkspace!";
 ok $idhash->{clonetestworkspace} eq "w",
 	"list_workspaces says public has write privelages to clonetestworkspace!";
 ################################################################################
-#Test 77-80: Testing types
+#Test 77-81: Testing types
 ################################################################################ 
 #Testing the very basic type services
 eval {
@@ -626,6 +626,14 @@ ok !defined($typehash->{TempTestType}),
 	"TempTestType no longer exists!";
 ok defined($typehash->{Genome}),
 	"Genome exists!";
+
+# Test types with illegal characters throw an error
+{
+	local local $Bio::KBase::workspaceService::Server::CallContext = {};
+	throws_ok {$impl->add_type({type => 'Foo-bar', auth => $oauth})}
+			qr/Type name has illegal characters!/ ,
+			"shouldn't add type Foo-bar - bad chars";
+}
 ################################################################################
 #Cleanup: clearing out all objects from the workspace database
 ################################################################################ 
