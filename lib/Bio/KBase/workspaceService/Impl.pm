@@ -381,7 +381,7 @@ sub _saveObjectByRef {
 			}
 		}
 	}
-	return $self->_createObject({ # TODO this appears to never be run
+	return $self->_createObject({
 		uuid => $ref,
 		type => $type,
 		workspace => "NO_WORKSPACE",
