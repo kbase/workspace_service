@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Data::Dumper;
-my $test_count = 78;
+my $test_count = 80;
 
 ################################################################################
 #Test intiailization: setting test config, instantiating Impl, getting auth token
@@ -134,13 +134,13 @@ ok (defined($output),"Created workspace");
 $output = undef;
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
-	$output = $impl->create_workspace({workspace=>"testworkspace3",default_permission=>"a",auth=>$oauth}); 
+	$output = $impl->create_workspace({workspace=>"testworkspace3",default_permission=>"r",auth=>$oauth}); 
 };
 ok (defined($output),"Created workspace");
 $output = undef;
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
-	$output = $impl->create_workspace({workspace=>"testworkspace4",default_permission=>"w",auth=>$oauth}); 
+	$output = $impl->create_workspace({workspace=>"testworkspace4",default_permission=>"n",auth=>$oauth}); 
 };
 ok (defined($output),"Created workspace");
 $output = undef;
@@ -160,7 +160,28 @@ foreach $ws (@{$workspace_list}) {
 ok(defined($idhash->{testworkspace3}),
    "list_workspaces returns newly created workspace testworkspace!");
 ################################################################################
-#Test 20: Dies when attempting to create duplicate workspace
+#Test 20-21: Cannot create world writeable workspaces
+################################################################################
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	throws_ok {$impl->create_workspace({workspace=>"testworkspace_fake",
+										default_permission=>"a",
+										auth=>$oauth
+										})
+				} qr/Specified permission not valid!/,
+				"Can't create global admin workspace"; 
+};
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	throws_ok {$impl->create_workspace({workspace=>"testworkspace_fake",
+										default_permission=>"w",
+										auth=>$oauth
+										})
+				} qr/Specified permission not valid!/,
+				"Can't create global writeable workspace"; 
+};
+################################################################################
+#Test 22: Dies when attempting to create duplicate workspace
 ################################################################################   
 $output = undef;
 eval {
@@ -169,7 +190,7 @@ eval {
 };
 ok(!defined($output), "Dies when attempting to create duplicate workspace");
 ################################################################################
-#Test 21-23: Can delete workspace, but cannot delete twice, and cannot delete nonexistant workspace
+#Test 23-25: Can delete workspace, but cannot delete twice, and cannot delete nonexistant workspace
 ################################################################################ 
 $output = undef;
 eval {
@@ -192,7 +213,7 @@ eval {
 };
 ok(!defined($output),"duplicate delete fails");
 ################################################################################
-#Test 24-26: Can clone workspace, but cannot clone a deleted or nonexistant workspace
+#Test 26-28: Can clone workspace, but cannot clone a deleted or nonexistant workspace
 ################################################################################ 
 $output = undef;
 eval {
@@ -237,7 +258,7 @@ is $output, undef, "clone a non-existent workspace should fail";
 # Does the cloned workspace match the original
 # Does the cloned workspace preserve permissions
 ################################################################################
-#Test 27-29: Cannot make workspace with bad or no permissions, and must use hash ref
+#Test 29-31: Cannot make workspace with bad or no permissions, and must use hash ref
 ################################################################################ 
 eval{
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
@@ -258,7 +279,7 @@ eval{
 };
 isnt($@,'',"Attempt to create workspace without a hash reference  fails");
 ################################################################################
-#Test 30-50: Adding objects to workspace
+#Test 32-52: Adding objects to workspace
 ################################################################################ 
 note("Test Adding Objects to the workspace testworkspace");
 my $wsmeta;
@@ -390,7 +411,7 @@ is($bool,0, "Confirm that Test2 does not exist");
 
 note("Retrieving test object data from database");
 ################################################################################
-#Test 51-63: Retreiving, moving, copying, deleting, and reverting objects 
+#Test 53-65: Retreiving, moving, copying, deleting, and reverting objects 
 ################################################################################ 
 #Retrieving test object data from database
 $objmeta = [];
@@ -498,7 +519,7 @@ ok defined($objidhash->{TestCopy}),
 ok defined($objidhash->{TestMove}),
 	"list_workspace_objects returned object list with moved result object TestMove!";
 ################################################################################
-#Test 64-73: Cloning workspaces with objects
+#Test 66-75: Cloning workspaces with objects
 ################################################################################ 
 $conf2 = {
         new_workspace => "clonetestworkspace",
@@ -571,7 +592,7 @@ ok $idhash->{testworkspace} eq "r",
 ok $idhash->{clonetestworkspace} eq "w",
 	"list_workspaces says public has write privelages to clonetestworkspace!";
 ################################################################################
-#Test 74-78: Testing types
+#Test 76-80: Testing types
 ################################################################################ 
 #Testing the very basic type services
 eval {

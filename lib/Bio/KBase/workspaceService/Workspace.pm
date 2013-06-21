@@ -52,7 +52,7 @@ sub new {
 	}
 	bless $self;
 	$self->_validateID($args->{id});
-	$self->_validatePermission($args->{defaultPermissions});
+	$self->_validatePermission($args->{defaultPermissions}, 1);
 	return $self;
 }
 
@@ -226,7 +226,7 @@ Description:
 
 sub setDefaultPermissions {
 	my ($self,$perm) = @_;
-	$self->_validatePermission($perm);
+	$self->_validatePermission($perm, 1);
 	$self->checkPermissions(["a"]);
 	$self->{_defaultPermissions} = $perm;
 	$self->parent()->_updateDB("workspaces",{id => $self->id()},{'$set' => {'defaultPermissions' => $perm}});
@@ -654,8 +654,8 @@ sub _validateID {
 }
 
 sub _validatePermission {
-	my ($self,$permission) = @_;
-	$self->parent()->_validatePermission($permission);
+	my ($self,$permission, $default) = @_;
+	$self->parent()->_validatePermission($permission, $default);
 }
 
 sub _validateType {

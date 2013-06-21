@@ -32,7 +32,7 @@ workspace tutorials:
 facilitating collaboration
 
 2.) When an object is overwritten in a workspace, the previous version is preserved and
-easily accessible at any time, enabling the use of workspaces to track object provenance
+easily accessible at any time, enabling the use of workspaces to track object versions
 
 3.) Workspaces have default permissions and user-specific permissions, providing total 
 control over the sharing and access of workspace contents
@@ -64,7 +64,7 @@ the request. If this is not provided a default user "public" is assumed.
 =head2 WORKSPACE
 
 A workspace is a named collection of objects owned by a specific
-user, that may be viewable or editable by other users.Functions that operate
+user, that may be viewable or editable by other users. Functions that operate
 on workspaces take a C<workspace_id>, which is an alphanumeric string that
 uniquely identifies a workspace among all workspaces.
 
@@ -4236,7 +4236,7 @@ a string
 
 =item Description
 
-A string used as an ID for a workspace. Any string consisting of alphanumeric characters and "-" is acceptable
+A string used as an ID for a workspace. Any string consisting of alphanumeric characters and "_" is acceptable
 
 
 =item Definition
@@ -4329,7 +4329,7 @@ a string
 
 =item Description
 
-Single letter indicating permissions on access to workspace. Options are: 'a' for administative access, 'w' for read/write access, 'r' for read access, and 'n' for no access.
+Single letter indicating permissions on access to workspace. Options are: 'a' for administative access, 'w' for read/write access, 'r' for read access, and 'n' for no access. For default permissions (e.g. permissions for any user) only 'n' and 'r' are allowed.
 
 
 =item Definition
