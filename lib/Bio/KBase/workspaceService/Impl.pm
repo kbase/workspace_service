@@ -107,12 +107,7 @@ sub _args {
 sub _getUsername {
 	my ($self) = @_;
 	if (!defined($self->_getContext->{_override}->{_currentUser})) {
-		if (defined($self->{_testuser})) {
-			$self->_getContext->{_override}->{_currentUser} = $self->{_testuser};
-		} else {
-			$self->_getContext->{_override}->{_currentUser} = "public";
-		}
-		
+		$self->_getContext->{_override}->{_currentUser} = "public";
 	}
 	return $self->_getContext->{_override}->{_currentUser};
 }
@@ -1431,7 +1426,7 @@ sub new
 	$self->{'_mssserver-url'} = "http://biologin-4.mcs.anl.gov:7050";
 	$self->{_host} = "localhost";
 	$self->{_db} = "workspace_service";
-	my $paramlist = [qw(mongodb-database mongodb-host testuser mssserver-url accounttype idserver-url)];
+	my $paramlist = [qw(mongodb-database mongodb-host mssserver-url accounttype idserver-url)];
 
 	# so it looks like params is created by looping over the config object
 	# if deployment.cfg exists
@@ -1482,9 +1477,6 @@ sub new
 	}
 	if (defined $params->{accounttype}) {
 		$self->{_accounttype} = $params->{accounttype};
-	}
-	if (defined($params->{testuser})) {
-		$self->{_testuser} = $params->{testuser};
 	}
 	if (defined $params->{'idserver-url'}) {
 			$self->{'_idserver-url'} = $params->{'idserver-url'};
@@ -4152,7 +4144,7 @@ sub get_workspacemeta
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN get_workspacemeta
-	$self->_setContext($ctx,$params);
+	$self->_setContext($ctx,$params);    #  TODO can get meta without creds
 	$self->_validateargs($params,["workspace"],{
 		asHash => 0
 	});
