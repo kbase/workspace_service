@@ -548,8 +548,11 @@ sub setUserPermissions {
 		throwErrorIfMissing => 0,
 		createIfMissing => 1
 	});
-	for (my $i=0; $i < @{$userObjects}; $i++) {
-		$userObjects->[$i]->setWorkspacePermission($self->id(),$perm);
+	foreach my $u (@{$userObjects}) {
+		if($self->currentUser() eq $self->owner() ||
+			$u->id() ne $self->owner()) {
+			$u->setWorkspacePermission($self->id(), $perm);
+		}
 	}
 }
 

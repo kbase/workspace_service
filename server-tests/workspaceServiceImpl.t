@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Data::Dumper;
-my $test_count = 80;
+my $test_count = 81;
 
 ################################################################################
 #Test intiailization: setting test config, instantiating Impl, getting auth token
@@ -18,11 +18,15 @@ my $impl = Bio::KBase::workspaceService::Impl->new();
 my $tokenObj = Bio::KBase::AuthToken->new(
     user_id => 'kbasetest', password => '@Suite525'
 );
+my $tokenObj2 = Bio::KBase::AuthToken->new(
+    user_id => 'kbasetest2', password => '@Suite525'
+);
 #This test should immediately die if we cannot get a valid auth token for kbasetest
-if (!$tokenObj->validate()) {
+if (!$tokenObj->validate() || !$tokenObj2->validate()) {
 	die("Authentication of kbasetest is failing! Check connect to auth subservice!");	
 }
 my $oauth = $tokenObj->token();
+my $oauth2 = $tokenObj2->token();
 #Deleting all existing test objects (note, because we are doing this, you must NEVER use the production config)
 $impl->_clearAllWorkspaces();
 $impl->_clearAllWorkspaceObjects();
@@ -279,7 +283,30 @@ eval{
 };
 isnt($@,'',"Attempt to create workspace without a hash reference  fails");
 ################################################################################
-#Test 32-52: Adding objects to workspace
+#Test 32: Cannot change workspace owner's permissions
+################################################################################ 
+{
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$impl->set_workspace_permissions({workspace => 'testworkspace5',
+										auth => $oauth,
+										users => ['kbasetest2'],
+										new_permission => 'a'
+										});
+										
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$impl->set_workspace_permissions({workspace => 'testworkspace5',
+										auth => $oauth2,
+										users => ['kbasetest'],
+										new_permission => 'n'
+										});
+
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	my $wslist = $impl->list_workspaces({auth => $oauth});
+	ok(@{$wslist} == 4, "Attempt to change owner's permissions failed");
+}
+
+################################################################################
+#Test 33-53: Adding objects to workspace
 ################################################################################ 
 note("Test Adding Objects to the workspace testworkspace");
 my $wsmeta;
@@ -411,7 +438,7 @@ is($bool,0, "Confirm that Test2 does not exist");
 
 note("Retrieving test object data from database");
 ################################################################################
-#Test 53-65: Retreiving, moving, copying, deleting, and reverting objects 
+#Test 54-66: Retreiving, moving, copying, deleting, and reverting objects 
 ################################################################################ 
 #Retrieving test object data from database
 $objmeta = [];
@@ -519,7 +546,7 @@ ok defined($objidhash->{TestCopy}),
 ok defined($objidhash->{TestMove}),
 	"list_workspace_objects returned object list with moved result object TestMove!";
 ################################################################################
-#Test 66-75: Cloning workspaces with objects
+#Test 67-76: Cloning workspaces with objects
 ################################################################################ 
 $conf2 = {
         new_workspace => "clonetestworkspace",
@@ -592,7 +619,7 @@ ok $idhash->{testworkspace} eq "r",
 ok $idhash->{clonetestworkspace} eq "w",
 	"list_workspaces says public has write privelages to clonetestworkspace!";
 ################################################################################
-#Test 76-80: Testing types
+#Test 77-81: Testing types
 ################################################################################ 
 #Testing the very basic type services
 eval {

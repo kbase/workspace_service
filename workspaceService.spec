@@ -764,7 +764,8 @@ module workspaceService {
 	
 	/*
 		Sets the permissions for a list of users for accessing a specified workspace.
-		Must have admin privelages to change workspace permissions.
+		Must have admin privelages to change workspace permissions. Note that only the workspace owner can change the owner's permissions;
+		any other user's attempt to do will silently fail.
 	*/
 	funcdef set_workspace_permissions(set_workspace_permissions_params params) returns (bool success);
 	
