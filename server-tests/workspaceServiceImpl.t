@@ -33,15 +33,15 @@ $impl->_clearAllWorkspaceObjects();
 $impl->_clearAllWorkspaceUsers();
 $impl->_clearAllWorkspaceDataObjects();
 ################################################################################
-#Test 1: did an impl object get defined
+# Did an impl object get defined
 ################################################################################
 ok( defined $impl, "Did an impl object get defined" );
 ################################################################################
-#Test 2: Is the impl object in the right class?
+# Is the impl object in the right class?
 ################################################################################
 isa_ok( $impl, 'Bio::KBase::workspaceService::Impl', "Is it in the right class" );   
 ################################################################################
-#Test 3: Can impl perform all defined functions
+# Can impl perform all defined functions
 ################################################################################
 my @impl_methods = qw(
 	create_workspace
@@ -77,7 +77,7 @@ my @impl_methods = qw(
 );
 can_ok($impl, @impl_methods);
 ################################################################################
-#Test 4-9: Can kbasetest create a workspace, and is the returned metadata correct?
+# Can kbasetest create a workspace, and is the returned metadata correct?
 ################################################################################
 my $meta;
 eval {
@@ -95,7 +95,7 @@ is $meta->[3],0;
 is $meta->[4],"a";
 is $meta->[5],"n";
 ################################################################################
-#Test 10-16: Testing permissions for returning metadata
+# Testing permissions for returning metadata
 ################################################################################
 {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
@@ -152,7 +152,7 @@ is $meta->[5],"n";
 		"Can't get metadata w/ user obj defined and no permissions";
 }
 ################################################################################
-#Test 17: Creating a public workspace w/o auth should fail
+# Creating a public workspace w/o auth should fail
 ################################################################################
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
@@ -164,7 +164,7 @@ eval {
 				"Creating a workspace w/o auth fails";
 };
 ################################################################################
-#Test 18-19: List workspaces returns the right workspaces
+# List workspaces returns the right workspaces
 ################################################################################
 my $metas;
 eval {
@@ -174,7 +174,7 @@ eval {
 is scalar @$metas, 1;
 ok($metas->[0]->[0] eq "testworkspace", "name matches");
 ################################################################################
-#Test 20: Workspace dies when accessed with bad token
+# Workspace dies when accessed with bad token
 ################################################################################
 my $output;
 eval {
@@ -183,7 +183,7 @@ eval {
 };
 is $output, undef, "list_workspaces dies with bad authentication";
 ################################################################################
-#Test 21-26: Can create lots of workspaces and list the right number
+# Can create lots of workspaces and list the right number
 ################################################################################
 # Create a few more workspaces
 $output = undef;
@@ -221,7 +221,7 @@ foreach $ws (@{$workspace_list}) {
 ok(defined($idhash->{testworkspace3}),
    "list_workspaces returns newly created workspace testworkspace!");
 ################################################################################
-#Test 29-2: Cannot create world writeable workspaces
+# Cannot create world writeable workspaces
 ################################################################################
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
@@ -242,7 +242,7 @@ eval {
 				"Can't create global writeable workspace"; 
 };
 ################################################################################
-#Test 29: Dies when attempting to create duplicate workspace
+# Dies when attempting to create duplicate workspace
 ################################################################################   
 $output = undef;
 eval {
@@ -251,7 +251,7 @@ eval {
 };
 ok(!defined($output), "Dies when attempting to create duplicate workspace");
 ################################################################################
-#Test 30-32: Can delete workspace, but cannot delete twice, and cannot delete nonexistant workspace
+# Can delete workspace, but cannot delete twice, and cannot delete nonexistant workspace
 ################################################################################ 
 $output = undef;
 eval {
@@ -274,7 +274,7 @@ eval {
 };
 ok(!defined($output),"duplicate delete fails");
 ################################################################################
-#Test 33-35: Can clone workspace, but cannot clone a deleted or nonexistant workspace
+# Can clone workspace, but cannot clone a deleted or nonexistant workspace
 ################################################################################ 
 $output = undef;
 eval {
@@ -319,7 +319,7 @@ is $output, undef, "clone a non-existent workspace should fail";
 # Does the cloned workspace match the original
 # Does the cloned workspace preserve permissions
 ################################################################################
-#Test 36-38: Cannot make workspace with bad or no permissions, and must use hash ref
+# Cannot make workspace with bad or no permissions, and must use hash ref
 ################################################################################ 
 eval{
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
@@ -340,7 +340,7 @@ eval{
 };
 isnt($@,'',"Attempt to create workspace without a hash reference  fails");
 ################################################################################
-#Test 39: Cannot change workspace owner's permissions
+# Cannot change workspace owner's permissions
 ################################################################################ 
 {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
@@ -363,7 +363,7 @@ isnt($@,'',"Attempt to create workspace without a hash reference  fails");
 }
 
 ################################################################################
-#Test 40-60: Adding objects to workspace
+# Adding objects to workspace
 ################################################################################ 
 note("Test Adding Objects to the workspace testworkspace");
 my $wsmeta;
@@ -495,7 +495,7 @@ is($bool,0, "Confirm that Test2 does not exist");
 
 note("Retrieving test object data from database");
 ################################################################################
-#Test 61-73: Retreiving, moving, copying, deleting, and reverting objects 
+# Retreiving, moving, copying, deleting, and reverting objects 
 ################################################################################ 
 #Retrieving test object data from database
 $objmeta = [];
@@ -603,7 +603,7 @@ ok defined($objidhash->{TestCopy}),
 ok defined($objidhash->{TestMove}),
 	"list_workspace_objects returned object list with moved result object TestMove!";
 ################################################################################
-#Test 74-83: Cloning workspaces with objects
+# Cloning workspaces with objects
 ################################################################################ 
 $conf2 = {
         new_workspace => "clonetestworkspace",
@@ -676,7 +676,7 @@ ok $idhash->{testworkspace} eq "r",
 ok $idhash->{clonetestworkspace} eq "w",
 	"list_workspaces says public has write privelages to clonetestworkspace!";
 ################################################################################
-#Test 84-88: Testing types
+# Testing types
 ################################################################################ 
 #Testing the very basic type services
 eval {

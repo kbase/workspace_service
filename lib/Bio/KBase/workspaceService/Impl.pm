@@ -196,10 +196,6 @@ sub _getContext {
 	return $Bio::KBase::workspaceService::Server::CallContext;
 }
 
-sub _clearContext {
-	my ($self) = @_;
-}
-
 #####################################################################
 #Database interaction routines
 #####################################################################
@@ -1635,7 +1631,6 @@ sub load_media_from_bio
 			push(@{$mediaMetas},$obj->metadata($params->{asHash}));
 		}
 	}
-	$self->_clearContext();
     #END load_media_from_bio
     my @_bad_returns;
     (ref($mediaMetas) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"mediaMetas\" (value was \"$mediaMetas\")");
@@ -1803,7 +1798,6 @@ sub import_bio
 	$data->{uuid} = $params->{bioWS}."/".$params->{bioid};
 	$obj = $ws->saveObject("Biochemistry",$params->{bioid},$data,"import_bio",{});
 	$metadata = $obj->metadata($params->{asHash});
-	$self->_clearContext();
     #END import_bio
     my @_bad_returns;
     (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
@@ -1976,7 +1970,6 @@ sub import_map
 	$data->{uuid} = $params->{mapWS}."/".$params->{mapid};
 	$obj = $ws->saveObject("Mapping",$params->{mapid},$data,"import_map",{});
 	$metadata = $obj->metadata($params->{asHash});
-	$self->_clearContext();
     #END import_map
     my @_bad_returns;
     (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
@@ -2136,7 +2129,6 @@ sub save_object
 		$obj = $ws->saveObject($params->{type},$params->{id},$params->{data},$params->{command},$params->{metadata});	
 	}
 	$metadata = $obj->metadata($params->{asHash});
-	$self->_clearContext();
     #END save_object
     my @_bad_returns;
     (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
@@ -2261,7 +2253,6 @@ sub delete_object
 	my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
 	my $obj = $ws->deleteObject($params->{type},$params->{id});
 	$metadata = $obj->metadata($params->{asHash});
-	$self->_clearContext();
     #END delete_object
     my @_bad_returns;
     (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
@@ -2395,7 +2386,6 @@ sub delete_object_permanently
 		my $obj = $ws->deleteObjectPermanently($params->{type},$params->{id});
 		$metadata = $obj->metadata($params->{asHash});
 	}
-	$self->_clearContext();
     #END delete_object_permanently
     my @_bad_returns;
     (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
@@ -2551,7 +2541,6 @@ sub get_object
 		data => $obj->data(), # TODO fix this, ignores asJSON
 		metadata => $obj->metadata($params->{asHash})
 	};
-	$self->_clearContext();
     #END get_object
     my @_bad_returns;
     (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
@@ -2691,7 +2680,6 @@ sub get_object_by_ref
 		data => $data,
 		metadata => $obj->metadata($params->{asHash})
 	};
-	$self->_clearContext();
     #END get_object_by_ref
     my @_bad_returns;
     (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
@@ -2851,7 +2839,6 @@ sub save_object_by_ref
 	#Dealing with objects that will be saved as references only
 	my $obj = $self->_saveObjectByRef($params->{type},$params->{id},$params->{data},$params->{command},$params->{metadata},$params->{reference},$params->{replace});
 	$metadata = $obj->metadata($params->{asHash});
-	$self->_clearContext();
     #END save_object_by_ref
     my @_bad_returns;
     (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
@@ -2982,7 +2969,6 @@ sub get_objectmeta
 		instance => $params->{instance}
 	});
 	$metadata = $obj->metadata($params->{asHash});
-	$self->_clearContext();
     #END get_objectmeta
     my @_bad_returns;
     (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
@@ -3103,7 +3089,6 @@ sub get_objectmeta_by_ref
 	});
 	my $obj = $self->_getObject($params->{reference},{throwErrorIfMissing => 1});
 	$metadata = $obj->metadata($params->{asHash});
-	$self->_clearContext();
     #END get_objectmeta_by_ref
     my @_bad_returns;
     (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
@@ -3233,7 +3218,6 @@ sub revert_object
 	my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
 	my $obj = $ws->revertObject($params->{type},$params->{id},$params->{instance});
 	$metadata = $obj->metadata($params->{asHash});
-	$self->_clearContext();
     #END revert_object
     my @_bad_returns;
     (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
@@ -3557,7 +3541,6 @@ sub copy_object
 		}
 		$metadata = $newobj->metadata($params->{asHash});
 	}
-	$self->_clearContext();
     #END copy_object
     my @_bad_returns;
     (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
@@ -3701,7 +3684,6 @@ sub move_object
 		$obj = $ws->saveObject($params->{type},$params->{new_id},$obj->data(),"move_object",$obj->meta());
 		$metadata = $obj->metadata($params->{asHash});
 	}
-	$self->_clearContext();
     #END move_object
     my @_bad_returns;
     (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
@@ -3802,7 +3784,6 @@ sub has_object
 	if (!defined($obj)) {
 		$object_present = 0;
 	}
-	$self->_clearContext();
     #END has_object
     my @_bad_returns;
     (!ref($object_present)) or push(@_bad_returns, "Invalid type for return variable \"object_present\" (value was \"$object_present\")");
@@ -3928,7 +3909,6 @@ sub object_history
 	for (my $i=0; $i < @{$history}; $i++) {
 		$metadatas->[$history->[$i]->instance()] = $history->[$i]->metadata($params->{asHash});
 	}
-	$self->_clearContext();
     #END object_history
     my @_bad_returns;
     (ref($metadatas) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadatas\" (value was \"$metadatas\")");
@@ -4045,7 +4025,6 @@ sub create_workspace
 	}
 	$ws = $self->_createWorkspace($params->{workspace},$params->{default_permission});
 	$metadata = $ws->metadata($params->{asHash});
-	$self->_clearContext();
     #END create_workspace
     my @_bad_returns;
     (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
@@ -4156,7 +4135,6 @@ sub get_workspacemeta
 			method_name => 'get_workspacemeta');
 	}
 	$metadata = $ws->metadata($params->{asHash});
-	$self->_clearContext();
     #END get_workspacemeta
     my @_bad_returns;
     (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
@@ -4239,7 +4217,6 @@ sub get_workspacepermissions
 	$self->_validateargs($params,["workspace"],{});
 	my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
 	$user_permissions = $ws->getWorkspaceUserPermissions();
-	$self->_clearContext();
     #END get_workspacepermissions
     my @_bad_returns;
     (ref($user_permissions) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"user_permissions\" (value was \"$user_permissions\")");
@@ -4345,7 +4322,6 @@ sub delete_workspace
 	my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
 	$ws->permanentDelete();
 	$metadata = $ws->metadata($params->{asHash});
-	$self->_clearContext();
     #END delete_workspace
     my @_bad_returns;
     (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
@@ -4665,7 +4641,6 @@ sub clone_workspace
 		}
 		$metadata = $ws->metadata($params->{asHash});
 	}
-	$self->_clearContext();
     #END clone_workspace
     my @_bad_returns;
     (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
@@ -4776,7 +4751,6 @@ sub list_workspaces
 	for (my $i=0; $i < @{$wss}; $i++) {
 		push(@{$workspaces},$wss->[$i]->metadata($params->{asHash}));
 	}
-	$self->_clearContext();
     #END list_workspaces
     my @_bad_returns;
     (ref($workspaces) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"workspaces\" (value was \"$workspaces\")");
@@ -4907,7 +4881,6 @@ sub list_workspace_objects
 			push(@{$objects},$obj->metadata($params->{asHash}));
 		}
 	}
-	$self->_clearContext();
     #END list_workspace_objects
     my @_bad_returns;
     (ref($objects) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"objects\" (value was \"$objects\")");
@@ -5016,7 +4989,6 @@ sub set_global_workspace_permissions
 	my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
 	$ws->setDefaultPermissions($params->{new_permission});
 	$metadata = $ws->metadata($params->{asHash});
-	$self->_clearContext();
     #END set_global_workspace_permissions
     my @_bad_returns;
     (ref($metadata) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"metadata\" (value was \"$metadata\")");
@@ -5108,7 +5080,6 @@ sub set_workspace_permissions
 	my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
 	$ws->setUserPermissions($params->{users},$params->{new_permission});
 	$success = 1;
-	$self->_clearContext();  
     #END set_workspace_permissions
     my @_bad_returns;
     (!ref($success)) or push(@_bad_returns, "Invalid type for return variable \"success\" (value was \"$success\")");
@@ -5189,7 +5160,6 @@ sub get_user_settings
 	$self->_validateargs($params,[],{});
 	my $wsu = $self->_getWorkspaceUser($self->_getUsername(),{createIfMissing => 1});
 	$output = $wsu->settings();
-	$self->_clearContext();
     #END get_user_settings
     my @_bad_returns;
     (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
@@ -5275,7 +5245,6 @@ sub set_user_settings
 	my $wsu = $self->_getWorkspaceUser($self->_getUsername(),{createIfMissing => 1});
 	$wsu->updateSettings($params->{setting},$params->{value});
 	$output = $wsu->settings();
-	$self->_clearContext();
     #END set_user_settings
     my @_bad_returns;
     (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
@@ -5409,7 +5378,6 @@ sub queue_job
 		queuecommand => $params->{queuecommand}
 	};
 	$self->_mongodb()->get_collection('jobObjects')->insert($job);
-	$self->_clearContext();  
     #END queue_job
     my @_bad_returns;
     (ref($job) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"job\" (value was \"$job\")");
@@ -5574,7 +5542,6 @@ sub set_job_status
 	}
 	my $JSON = JSON::XS->new->utf8(1);
 	$job = $JSON->decode($JSON->encode($job));
-	$self->_clearContext();
     #END set_job_status
     my @_bad_returns;
     (ref($job) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"job\" (value was \"$job\")");
@@ -5708,7 +5675,6 @@ sub get_jobs
 		}
 		push(@{$jobs},$newobj);
 	}
-	$self->_clearContext();
     #END get_jobs
     my @_bad_returns;
     (ref($jobs) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"jobs\" (value was \"$jobs\")");
@@ -5868,7 +5834,6 @@ sub add_type
 		permanent => 0
 	});
 	$success = 1;
-	$self->_clearContext();
     #END add_type
     my @_bad_returns;
     (!ref($success)) or push(@_bad_returns, "Invalid type for return variable \"success\" (value was \"$success\")");
@@ -5957,7 +5922,6 @@ sub remove_type
 		my $msg = "Trying to remove a type that doesn't exist  or a permanent type!";
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'queue_job');
 	}
-	$self->_clearContext();
 	$success = 1;
     #END remove_type
     my @_bad_returns;
@@ -6040,7 +6004,6 @@ sub patch
 		Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,method_name => 'add_type');
 	}
 	$self->_patch($params);
-	$self->_clearContext();
 	$success = 1;
     #END patch
     my @_bad_returns;
