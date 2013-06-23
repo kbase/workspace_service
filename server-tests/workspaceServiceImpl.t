@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Data::Dumper;
-my $test_count = 88;
+my $test_count = 89;
 
 ################################################################################
 #Test intiailization: setting test config, instantiating Impl, getting auth token
@@ -120,6 +120,9 @@ is $meta->[5],"n";
 											workspace => 'testworkspace'
 											}),
 		"Can get metadata for world readable workspace with no user obj");
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	ok(defined $impl->get_workspacemeta({workspace => 'testworkspace'}),
+		"Can get metadata for world readable workspace with no auth");
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
 	$impl->set_global_workspace_permissions({auth => $oauth, 
 											workspace => 'testworkspace',
