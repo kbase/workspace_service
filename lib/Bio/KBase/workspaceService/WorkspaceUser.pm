@@ -174,7 +174,6 @@ Description:
 sub isWorkspaceReadable {
 	my ($self, $workspace) = @_;
 	my $perm = $self->getWorkspacePermission($workspace);
-	print STDERR 'perm ' . $perm . "\n";
 	foreach my $p (qw(a r w)) {
 		if ($p eq $perm) {
 			return 1;

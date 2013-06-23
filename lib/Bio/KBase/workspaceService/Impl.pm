@@ -4762,7 +4762,7 @@ sub list_workspaces
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($workspaces);
     #BEGIN list_workspaces
-	$self->_setContext($ctx,$params);
+	$self->_setContext($ctx,$params); #TODO list public workspaces - remove pub user first
 	$self->_validateargs($params,[],{
 		asHash => 0
 	});
