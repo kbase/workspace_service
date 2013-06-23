@@ -1,6 +1,7 @@
 package Bio::KBase::workspaceService::WorkspaceUser;
 use strict;
 use Bio::KBase::Exceptions;
+use Data::Dumper;
 
 our $VERSION = "0";
 
@@ -159,6 +160,27 @@ sub getWorkspacePermission {
 		return $self->workspaces()->{$workspace->id()};
 	}
 	return $workspace->defaultPermissions();
+}
+
+=head3 isWorkspaceReadable
+
+Definition:
+	int isWorkpaceReadable(string:workspace or object:workspace)
+Description:
+	Returns 1 if the user has permission to read a workspace, 0 otherwise
+
+=cut
+
+sub isWorkspaceReadable {
+	my ($self, $workspace) = @_;
+	my $perm = $self->getWorkspacePermission($workspace);
+	print STDERR 'perm ' . $perm . "\n";
+	foreach my $p (qw(a r w)) {
+		if ($p eq $perm) {
+			return 1;
+		}
+	}
+	return 0;
 }
 
 =head3 getUserWorkspaces

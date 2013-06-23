@@ -4144,11 +4144,17 @@ sub get_workspacemeta
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN get_workspacemeta
-	$self->_setContext($ctx,$params);    #  TODO can get meta without creds
+	$self->_setContext($ctx,$params);
 	$self->_validateargs($params,["workspace"],{
 		asHash => 0
 	});
 	my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
+	my $u = $self->_getCurrentUserObj();
+	if(!$ws->isWorldReadable() && 
+		(!defined($u) || !$u->isWorkspaceReadable($ws))) {
+		$ARG_VAL_ERR->throw(error => "No permissions for workspace!",
+			method_name => 'get_workspacemeta');
+	}
 	$metadata = $ws->metadata($params->{asHash});
 	$self->_clearContext();
     #END get_workspacemeta

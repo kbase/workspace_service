@@ -126,6 +126,20 @@ sub defaultPermissions {
 	return $self->{_defaultPermissions};
 }
 
+=head3 isWorldReadable
+
+Definition:
+	boolean = isWorldReadable()
+Description:
+	Returns true if the workspace is world readable.
+
+=cut
+
+sub isWorldReadable {
+	my ($self) = @_;
+	return $self->{_defaultPermissions} eq 'r';
+}
+
 =head3 objects
 
 Definition:
