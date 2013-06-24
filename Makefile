@@ -128,6 +128,7 @@ compile-typespec:
 	-client Bio::KBase::workspaceService::Client \
 	-js javascript/workspaceService/Client \
 	-py biokbase/workspaceService/client \
+	-url http://kbase.us/services/workspace/ \
 	workspaceService.spec lib
 	rm -f lib/workspaceServiceImpl.py
 	rm -f lib/workspaceServiceServer.py

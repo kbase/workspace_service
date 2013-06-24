@@ -84,6 +84,10 @@ sub new
 {
     my($class, $url, @args) = @_;
     
+    if (!defined($url))
+    {
+	$url = 'http://kbase.us/services/workspace/';
+    }
 
     my $self = {
 	client => Bio::KBase::workspaceService::Client::RpcClient->new,
