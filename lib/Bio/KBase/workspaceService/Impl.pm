@@ -186,6 +186,9 @@ sub _setContext {
 			$self->_getContext()->{_override}->{_currentUser} = $output->{user};
 			
 		}
+	} else {
+		# no auth provided, remove previous call's creds
+		$self->_getContext()->{_override} = undef
 	}
 }
 
