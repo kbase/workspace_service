@@ -5,6 +5,7 @@ use strict;
 use Data::Dumper;
 use URI;
 use Bio::KBase::Exceptions;
+use Bio::KBase::AuthToken;
 
 # Client version should match Impl version
 # This is a Semantic Version number,
@@ -41,7 +42,8 @@ control over the sharing and access of workspace contents
 
 To use the API, first you need to instantiate a workspace client object:
 
-my $client = Bio::KBase::workspaceService::Client->new;
+my $client = Bio::KBase::workspaceService::Client->new(user_id => "user", 
+                password => "password");
    
 Next, you can run API commands on the client object:
    
@@ -56,10 +58,16 @@ print map { $_->[0] } @$objs;
 
 =head2 AUTHENTICATION
 
-Each and every function in this service takes a hash reference as
-its single argument. This hash reference may contain a key
-C<auth> whose value is a bearer token for the user making
-the request. If this is not provided only unauthenticated read operations are
+There are several ways to provide authentication for using the workspace
+service.
+Firstly, one can provide a username and password as in the example above.
+Secondly, one can obtain an authorization token via the C<AuthToken.pm> module
+(see the documentation for that module) and provide it to the Client->new()
+method with the keyword argument C<token>.
+Finally, one can provide the token directly to a method via the C<auth>
+parameter. If a token is provided directly to a method, this token takes
+precedence over any previously provided authorization.
+If no authorization is provided only unauthenticated read operations are
 allowed.
 
 =head2 WORKSPACE
@@ -82,6 +90,20 @@ sub new
 	url => $url,
     };
 
+    # This module requires authentication.
+    #
+    # We create an auth token, passing through the arguments that we were (hopefully) given.
+
+    {
+	my $token = Bio::KBase::AuthToken->new(@args);
+	
+	if ($token->error_message)
+	{
+	    die "Authentication failed: " . $token->error_message;
+	}
+	$self->{token} = $token->token;
+	$self->{client}->{token} = $token->token;
+    }
 
     my $ua = $self->{client}->ua;	 
     my $timeout = $ENV{CDMI_TIMEOUT} || (30 * 60);	 
@@ -186,7 +208,7 @@ sub load_media_from_bio
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -322,7 +344,7 @@ sub import_bio
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -460,7 +482,7 @@ sub import_map
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -606,7 +628,7 @@ sub save_object
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -737,7 +759,7 @@ sub delete_object
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -869,7 +891,7 @@ sub delete_object_permanently
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1011,7 +1033,7 @@ sub get_object
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1147,7 +1169,7 @@ sub get_object_by_ref
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1297,7 +1319,7 @@ sub save_object_by_ref
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1430,7 +1452,7 @@ sub get_objectmeta
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1558,7 +1580,7 @@ sub get_objectmeta_by_ref
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1693,7 +1715,7 @@ sub revert_object
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1833,7 +1855,7 @@ sub copy_object
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1970,7 +1992,7 @@ sub move_object
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -2071,7 +2093,7 @@ sub has_object
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -2201,7 +2223,7 @@ sub object_history
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -2315,7 +2337,7 @@ sub create_workspace
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -2427,7 +2449,7 @@ sub get_workspacemeta
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -2519,7 +2541,7 @@ sub get_workspacepermissions
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -2631,7 +2653,7 @@ sub delete_workspace
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -2749,7 +2771,7 @@ sub clone_workspace
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -2859,7 +2881,7 @@ sub list_workspaces
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -2989,7 +3011,7 @@ sub list_workspace_objects
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -3104,7 +3126,7 @@ sub set_global_workspace_permissions
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -3204,7 +3226,7 @@ sub set_workspace_permissions
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -3294,7 +3316,7 @@ sub get_user_settings
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -3388,7 +3410,7 @@ sub set_user_settings
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -3504,7 +3526,7 @@ sub queue_job
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -3621,7 +3643,7 @@ sub set_job_status
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -3735,7 +3757,7 @@ sub get_jobs
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -3892,7 +3914,7 @@ sub add_type
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -3981,7 +4003,7 @@ sub remove_type
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -4069,7 +4091,7 @@ sub patch
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -5980,7 +6002,7 @@ asHash has a value which is a bool
 Input parameters for the "set_workspace_permissions" function.
 
         workspace_id workspace - ID of the workspace for which permissions will be set (an essential argument)
-        list<username> users - list of users for which workspace privaleges are to be reset (an essential argument)
+        list<username> users - list of users for which workspace privileges are to be reset (an essential argument)
         permission new_permission - New permissions to which all users in the user list will be set for the workspace. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
         string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace
 

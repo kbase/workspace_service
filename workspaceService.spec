@@ -22,7 +22,8 @@ control over the sharing and access of workspace contents
 
 To use the API, first you need to instantiate a workspace client object:
 
-my $client = Bio::KBase::workspaceService::Client->new;
+my $client = Bio::KBase::workspaceService::Client->new(user_id => "user", 
+		password => "password");
    
 Next, you can run API commands on the client object:
    
@@ -37,10 +38,16 @@ print map { $_->[0] } @$objs;
 
 =head2 AUTHENTICATION
 
-Each and every function in this service takes a hash reference as
-its single argument. This hash reference may contain a key
-C<auth> whose value is a bearer token for the user making
-the request. If this is not provided only unauthenticated read operations are
+There are several ways to provide authentication for using the workspace
+service.
+Firstly, one can provide a username and password as in the example above.
+Secondly, one can obtain an authorization token via the C<AuthToken.pm> module
+(see the documentation for that module) and provide it to the Client->new()
+method with the keyword argument C<token>.
+Finally, one can provide the token directly to a method via the C<auth>
+parameter. If a token is provided directly to a method, this token takes
+precedence over any previously provided authorization.
+If no authorization is provided only unauthenticated read operations are
 allowed.
 
 =head2 WORKSPACE
@@ -184,7 +191,7 @@ module workspaceService {
 	/*
 		Creates "Media" objects in the workspace for all media contained in the specified biochemistry
 	*/
-	funcdef load_media_from_bio(load_media_from_bio_params params) returns (list<object_metadata> mediaMetas);
+	funcdef load_media_from_bio(load_media_from_bio_params params) returns (list<object_metadata> mediaMetas) authentication optional;
 	
 	/* Input parameters for the "import_bio" function.
 	
@@ -209,7 +216,7 @@ module workspaceService {
 	/*
 		Imports a biochemistry from a URL
 	*/
-	funcdef import_bio(import_bio_params params) returns (object_metadata metadata);
+	funcdef import_bio(import_bio_params params) returns (object_metadata metadata) authentication optional;
 	
 	/* Input parameters for the "import_map" function.
 	
@@ -235,7 +242,7 @@ module workspaceService {
 	/*
 		Imports a mapping from a URL
 	*/
-	funcdef import_map(import_map_params params) returns (object_metadata metadata);
+	funcdef import_map(import_map_params params) returns (object_metadata metadata) authentication optional;
 	
 	/* Input parameters for the "save_objects function.
 	
@@ -269,7 +276,7 @@ module workspaceService {
 	/*
 		Saves the input object data and metadata into the selected workspace, returning the object_metadata of the saved object
 	*/
-	funcdef save_object(save_object_params params) returns (object_metadata metadata);
+	funcdef save_object(save_object_params params) returns (object_metadata metadata) authentication optional;
 	
 	/* Input parameters for the "delete_object" function.
 	
@@ -292,7 +299,7 @@ module workspaceService {
 		Deletes the specified object from the specified workspace, returning the object_metadata of the deleted object.
 		Object is only temporarily deleted and can be recovered by using the revert command.
 	*/
-	funcdef delete_object(delete_object_params params) returns (object_metadata metadata);
+	funcdef delete_object(delete_object_params params) returns (object_metadata metadata) authentication optional;
 	
 	/* Input parameters for the "delete_object_permanently" function.
 	
@@ -316,7 +323,7 @@ module workspaceService {
 		This permanently deletes the object and object history, and the data cannot be recovered.
 		Objects cannot be permanently deleted unless they've been deleted first.
 	*/
-	funcdef delete_object_permanently(delete_object_permanently_params params) returns (object_metadata metadata);
+	funcdef delete_object_permanently(delete_object_permanently_params params) returns (object_metadata metadata) authentication optional;
 	
 	/* Input parameters for the "get_object" function.
 	
@@ -355,7 +362,7 @@ module workspaceService {
 		Both the object data and metadata are returned.
 		This commands provides access to all versions of the object via the instance parameter.
 	*/
-	funcdef get_object(get_object_params params) returns (get_object_output output);	
+	funcdef get_object(get_object_params params) returns (get_object_output output) authentication optional;	
 	
 	/* Input parameters for the "get_object_by_ref" function.
 	
@@ -376,7 +383,7 @@ module workspaceService {
 		Both the object data and metadata are returned.
 		This commands provides access to all versions of the object via the instance parameter.
 	*/
-	funcdef get_object_by_ref(get_object_by_ref_params params) returns (get_object_output output);
+	funcdef get_object_by_ref(get_object_by_ref_params params) returns (get_object_output output) authentication optional;
 
 	/* Input parameters for the "save_object_by_ref" function.
 	
@@ -414,7 +421,7 @@ module workspaceService {
 		Both the object data and metadata are returned.
 		This commands provides access to all versions of the object via the instance parameter.
 	*/
-	funcdef save_object_by_ref(save_object_by_ref_params params) returns (object_metadata metadata);
+	funcdef save_object_by_ref(save_object_by_ref_params params) returns (object_metadata metadata) authentication optional;
 
 	/* Input parameters for the "get_objectmeta" function.
 	
@@ -439,7 +446,7 @@ module workspaceService {
 		Retrieves the metadata for a specified object from the specified workspace.
 		This commands provides access to metadata for all versions of the object via the instance parameter.
 	*/
-	funcdef get_objectmeta(get_objectmeta_params params) returns (object_metadata metadata); 
+	funcdef get_objectmeta(get_objectmeta_params params) returns (object_metadata metadata) authentication optional; 
 	
 	/* Input parameters for the "get_objectmeta_by_ref" function.
 	
@@ -458,7 +465,7 @@ module workspaceService {
 		Both the object data and metadata are returned.
 		This commands provides access to all versions of the object via the instance parameter.
 	*/
-	funcdef get_objectmeta_by_ref(get_objectmeta_by_ref_params params) returns (object_metadata metadata);
+	funcdef get_objectmeta_by_ref(get_objectmeta_by_ref_params params) returns (object_metadata metadata) authentication optional;
 	
 	/* Input parameters for the "revert_object" function.
 	
@@ -485,7 +492,7 @@ module workspaceService {
 		This command still makes a new instance of the object, copying data related to the target instance to the new instance.
 		This ensures that the object instance always increases and no portion of the object history is ever lost.
 	*/
-	funcdef revert_object(revert_object_params params) returns (object_metadata metadata);
+	funcdef revert_object(revert_object_params params) returns (object_metadata metadata) authentication optional;
 	
 	/* Input parameters for the "copy_object" function.
 	
@@ -517,7 +524,7 @@ module workspaceService {
 		Returns the metadata of the newly copied object.
 		It is possible to use the version parameter to copy any version of a workspace object.
 	*/
-	funcdef copy_object(copy_object_params params) returns (object_metadata metadata);
+	funcdef copy_object(copy_object_params params) returns (object_metadata metadata) authentication optional;
 	
 	/* Input parameters for the "move_object" function.
 	
@@ -546,7 +553,7 @@ module workspaceService {
 		Moves a specified object in a specifed workspace to a new ID and/or workspace.
 		Returns the metadata of the newly moved object.
 	*/
-	funcdef move_object(move_object_params params) returns (object_metadata metadata);
+	funcdef move_object(move_object_params params) returns (object_metadata metadata) authentication optional;
 	
 	/* Input parameters for the "has_object" function.
 	
@@ -569,7 +576,7 @@ module workspaceService {
 		Checks if a specified object in a specifed workspace exists.
 		Returns "1" if the object exists, "0" if not
 	*/
-	funcdef has_object(has_object_params params) returns (bool object_present);
+	funcdef has_object(has_object_params params) returns (bool object_present) authentication optional;
 	
 	/* Input parameters for the "object_history" function.
 	
@@ -591,7 +598,7 @@ module workspaceService {
 	/*
 		Returns the metadata associated with every version of a specified object in a specified workspace.
 	*/
-	funcdef object_history(object_history_params params) returns (list<object_metadata> metadatas);
+	funcdef object_history(object_history_params params) returns (list<object_metadata> metadatas) authentication optional;
 	
 	/* Input parameters for the "create_workspace" function.
 	
@@ -611,7 +618,7 @@ module workspaceService {
 	/*
 		Creates a new workspace with the specified name and default permissions.
 	*/
-	funcdef create_workspace(create_workspace_params params) returns (workspace_metadata metadata);
+	funcdef create_workspace(create_workspace_params params) returns (workspace_metadata metadata) authentication optional;
 	
 	/* Input parameters for the "get_workspacemeta" function.
 	
@@ -629,7 +636,7 @@ module workspaceService {
 	/*
 		Retreives the metadata associated with the specified workspace.
 	*/
-	funcdef get_workspacemeta(get_workspacemeta_params params) returns (workspace_metadata metadata);
+	funcdef get_workspacemeta(get_workspacemeta_params params) returns (workspace_metadata metadata) authentication optional;
 	
 	/* Input parameters for the "get_workspacepermissions" function.
 	
@@ -645,7 +652,7 @@ module workspaceService {
 	/*
 		Retreives a list of all users with custom permissions to the workspace.
 	*/
-	funcdef get_workspacepermissions(get_workspacepermissions_params params) returns (mapping<username,permission> user_permissions);
+	funcdef get_workspacepermissions(get_workspacepermissions_params params) returns (mapping<username,permission> user_permissions) authentication optional;
 	
 	/* Input parameters for the "delete_workspace" function.
 	
@@ -663,7 +670,7 @@ module workspaceService {
 	/*
 		Deletes a specified workspace with all objects.
 	*/
-	funcdef delete_workspace(delete_workspace_params params) returns (workspace_metadata metadata);
+	funcdef delete_workspace(delete_workspace_params params) returns (workspace_metadata metadata) authentication optional;
 	
 	/* Input parameters for the "clone_workspace" function.
 	
@@ -687,7 +694,7 @@ module workspaceService {
 	/*
 		Copies a specified workspace with all objects.
 	*/
-	funcdef clone_workspace(clone_workspace_params params) returns (workspace_metadata metadata);
+	funcdef clone_workspace(clone_workspace_params params) returns (workspace_metadata metadata) authentication optional;
 	
 	/* Input parameters for the "list_workspaces" function.
 	
@@ -703,7 +710,7 @@ module workspaceService {
 	/*
 		Lists the metadata of all workspaces a user has access to.
 	*/
-	funcdef list_workspaces(list_workspaces_params params) returns (list<workspace_metadata> workspaces);
+	funcdef list_workspaces(list_workspaces_params params) returns (list<workspace_metadata> workspaces) authentication optional;
 	
 	/* Input parameters for the "list_workspace_objects" function.
 	
@@ -725,7 +732,7 @@ module workspaceService {
 	/*
 		Lists the metadata of all objects in the specified workspace with the specified type (or with any type).
 	*/
-	funcdef list_workspace_objects(list_workspace_objects_params params) returns (list<object_metadata> objects);
+	funcdef list_workspace_objects(list_workspace_objects_params params) returns (list<object_metadata> objects) authentication optional;
 
 	/* Input parameters for the "set_global_workspace_permissions" function.
 	
@@ -746,12 +753,12 @@ module workspaceService {
 		Sets the default permissions for accessing a specified workspace for all users.
 		Must have admin privelages to change workspace global permissions.
 	*/
-	funcdef set_global_workspace_permissions(set_global_workspace_permissions_params params) returns (workspace_metadata metadata);
+	funcdef set_global_workspace_permissions(set_global_workspace_permissions_params params) returns (workspace_metadata metadata) authentication optional;
 	
 	/* Input parameters for the "set_workspace_permissions" function.
 	
 		workspace_id workspace - ID of the workspace for which permissions will be set (an essential argument)
-		list<username> users - list of users for which workspace privaleges are to be reset (an essential argument)
+		list<username> users - list of users for which workspace privileges are to be reset (an essential argument)
 		permission new_permission - New permissions to which all users in the user list will be set for the workspace. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
 		string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace
 			
@@ -768,7 +775,7 @@ module workspaceService {
 		Must have admin privelages to change workspace permissions. Note that only the workspace owner can change the owner's permissions;
 		any other user's attempt to do will silently fail.
 	*/
-	funcdef set_workspace_permissions(set_workspace_permissions_params params) returns (bool success);
+	funcdef set_workspace_permissions(set_workspace_permissions_params params) returns (bool success) authentication optional;
 	
 	/* Input parameters for the "get_user_settings" function.
 	
@@ -782,7 +789,7 @@ module workspaceService {
 	/*
 		Retrieves settings for user account, including currently selected workspace
 	*/
-	funcdef get_user_settings(get_user_settings_params params) returns (user_settings output);
+	funcdef get_user_settings(get_user_settings_params params) returns (user_settings output) authentication optional;
 
 	/* Input parameters for the "set_user_settings" function.
 	
@@ -800,7 +807,7 @@ module workspaceService {
 	/*
 		Retrieves settings for user account, including currently selected workspace
 	*/
-	funcdef set_user_settings(set_user_settings_params params) returns (user_settings output);
+	funcdef set_user_settings(set_user_settings_params params) returns (user_settings output) authentication optional;
 
 	/* Input parameters for the "queue_job" function.
 	
@@ -821,7 +828,7 @@ module workspaceService {
 	/*
 		Queues a new job in the workspace.
 	*/
-	funcdef queue_job(queue_job_params params) returns (JobObject job);
+	funcdef queue_job(queue_job_params params) returns (JobObject job) authentication optional;
 
 	/* Input parameters for the "set_job_status" function.
 	
@@ -844,7 +851,7 @@ module workspaceService {
 		Changes the current status of a currently queued jobs 
 		Used to manage jobs by ensuring multiple server don't claim the same job.
 	*/
-	funcdef set_job_status(set_job_status_params params) returns (JobObject job);
+	funcdef set_job_status(set_job_status_params params) returns (JobObject job) authentication optional;
 	
 	/* Input parameters for the "get_jobs" function.
 		
@@ -859,7 +866,7 @@ module workspaceService {
 		string status;
 		string auth;
 	} get_jobs_params;
-	funcdef get_jobs(get_jobs_params params) returns (list<JobObject> jobs);
+	funcdef get_jobs(get_jobs_params params) returns (list<JobObject> jobs) authentication optional;
 	
 	/*
 		Returns a list of all permanent and optional types currently accepted by the workspace service.
@@ -882,7 +889,7 @@ module workspaceService {
 		Adds a new custom type to the workspace service, so that objects of this type may be retreived.
 		Cannot add a type that already exists.
 	*/
-	funcdef add_type(add_type_params params) returns (bool success);
+	funcdef add_type(add_type_params params) returns (bool success) authentication optional;
 	
 	/* Input parameters for the "remove_type" function.
 	
@@ -899,7 +906,7 @@ module workspaceService {
 		Removes a custom type from the workspace service.
 		Permanent types cannot be removed.
 	*/
-	funcdef remove_type(remove_type_params params) returns (bool success);
+	funcdef remove_type(remove_type_params params) returns (bool success) authentication optional;
 
 	/* Input parameters for the "patch" function.
 		
@@ -915,7 +922,7 @@ module workspaceService {
 	/*
 		This function patches the database after an update. Called remotely, but only callable by the admin user.
 	*/
-	funcdef patch(patch_params params) returns (bool success);
+	funcdef patch(patch_params params) returns (bool success) authentication optional;
 	
 	/* *********************************************************************************************** */
 	/* COMMAND LINE API/WEB API CORRESPONDENCE */

@@ -2,6 +2,7 @@ package Bio::KBase::workspaceService::Server;
 
 use Data::Dumper;
 use Moose;
+use Bio::KBase::AuthToken;
 
 extends 'RPC::Any::Server::JSONRPC::PSGI';
 
@@ -50,6 +51,42 @@ our %return_counts = (
         'version' => 1,
 );
 
+our %method_authentication = (
+        'load_media_from_bio' => 'optional',
+        'import_bio' => 'optional',
+        'import_map' => 'optional',
+        'save_object' => 'optional',
+        'delete_object' => 'optional',
+        'delete_object_permanently' => 'optional',
+        'get_object' => 'optional',
+        'get_object_by_ref' => 'optional',
+        'save_object_by_ref' => 'optional',
+        'get_objectmeta' => 'optional',
+        'get_objectmeta_by_ref' => 'optional',
+        'revert_object' => 'optional',
+        'copy_object' => 'optional',
+        'move_object' => 'optional',
+        'has_object' => 'optional',
+        'object_history' => 'optional',
+        'create_workspace' => 'optional',
+        'get_workspacemeta' => 'optional',
+        'get_workspacepermissions' => 'optional',
+        'delete_workspace' => 'optional',
+        'clone_workspace' => 'optional',
+        'list_workspaces' => 'optional',
+        'list_workspace_objects' => 'optional',
+        'set_global_workspace_permissions' => 'optional',
+        'set_workspace_permissions' => 'optional',
+        'get_user_settings' => 'optional',
+        'set_user_settings' => 'optional',
+        'queue_job' => 'optional',
+        'set_job_status' => 'optional',
+        'get_jobs' => 'optional',
+        'get_types' => 'none',
+        'add_type' => 'optional',
+        'remove_type' => 'optional',
+        'patch' => 'optional',
+);
 
 
 sub _build_valid_methods
@@ -104,7 +141,37 @@ sub call_method {
     
     my $args = $data->{arguments};
 
-    # Service workspaceService does not require authentication.
+{
+    # Service workspaceService requires authentication.
+
+    my $method_auth = $method_authentication{$method};
+    $ctx->authenticated(0);
+    if ($method_auth eq 'none')
+    {
+	# No authentication required here. Move along.
+    }
+    else
+    {
+	my $token = $self->_plack_req->header("Authorization");
+
+	if (!$token && $method_auth eq 'required')
+	{
+	    $self->exception('PerlError', "Authentication required for workspaceService but no authentication header was passed");
+	}
+
+	my $auth_token = Bio::KBase::AuthToken->new(token => $token, ignore_authrc => 1);
+	my $valid = $auth_token->validate();
+	# Only throw an exception if authentication was required and it fails
+	if ($method_auth eq 'required' && !$valid)
+	{
+	    $self->exception('PerlError', "Token validation failed: " . $auth_token->error_message);
+	} elsif ($valid) {
+	    $ctx->authenticated(1);
+	    $ctx->user_id($auth_token->user_id);
+	    $ctx->token( $token);
+	}
+    }
+}
     
     my $new_isa = $self->get_package_isa($module);
     no strict 'refs';

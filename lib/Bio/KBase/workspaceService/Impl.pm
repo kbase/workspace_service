@@ -34,7 +34,8 @@ control over the sharing and access of workspace contents
 
 To use the API, first you need to instantiate a workspace client object:
 
-my $client = Bio::KBase::workspaceService::Client->new;
+my $client = Bio::KBase::workspaceService::Client->new(user_id => "user", 
+                password => "password");
    
 Next, you can run API commands on the client object:
    
@@ -49,10 +50,16 @@ print map { $_->[0] } @$objs;
 
 =head2 AUTHENTICATION
 
-Each and every function in this service takes a hash reference as
-its single argument. This hash reference may contain a key
-C<auth> whose value is a bearer token for the user making
-the request. If this is not provided only unauthenticated read operations are
+There are several ways to provide authentication for using the workspace
+service.
+Firstly, one can provide a username and password as in the example above.
+Secondly, one can obtain an authorization token via the C<AuthToken.pm> module
+(see the documentation for that module) and provide it to the Client->new()
+method with the keyword argument C<token>.
+Finally, one can provide the token directly to a method via the C<auth>
+parameter. If a token is provided directly to a method, this token takes
+precedence over any previously provided authorization.
+If no authorization is provided only unauthenticated read operations are
 allowed.
 
 =head2 WORKSPACE
@@ -175,7 +182,9 @@ sub _authenticate {
 }
 
 sub _setContext {
-	my ($self, $ctx, $auth, $auth_err, $method) = @_;
+	# note you *must* wipe out _override when resetting the token and user
+	# as it contains the memoized user object
+	my ($self, $auth, $auth_err, $method) = @_;
 	my $c = $self->_getContext();
 	if (defined($auth) && length($auth) > 0) {
 		if (!defined($c->{_override}) ||
@@ -186,6 +195,10 @@ sub _setContext {
 			$c->{_override}->{_currentUser} = $output->{user};
 			
 		}
+	} elsif ($c->{authenticated}){
+		$c->{_override} = undef;
+		$c->{_override}->{_authentication} = $c->{token};
+		$c->{_override}->{_currentUser} = $c->{user_id}
 	} else {
 		# no auth provided, remove previous call's creds
 		$c->{_override} = undef;
@@ -1608,7 +1621,7 @@ sub load_media_from_bio
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($mediaMetas);
     #BEGIN load_media_from_bio
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$params = $self->_validateargs($params,[],{
 		mediaWS => "KBaseMedia",
 		bioid => "default",
@@ -1761,7 +1774,7 @@ sub import_bio
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN import_bio
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$params = $self->_validateargs($params,[],{
 		bioid => "default",
 		bioWS => "kbase",
@@ -1930,7 +1943,7 @@ sub import_map
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN import_map
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$params = $self->_validateargs($params,[],{
 		bioid => "default",
 		bioWS => "kbase",
@@ -2110,7 +2123,7 @@ sub save_object
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN save_object
-	$self->_setContext($ctx,$params->{auth}, 'Save object', 'save_object');
+	$self->_setContext($params->{auth}, 'Save object', 'save_object');
 	$params = $self->_validateargs($params,["id","type","data","workspace"],{
 		command => undef,
 		metadata => {},
@@ -2254,7 +2267,7 @@ sub delete_object
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN delete_object
-	$self->_setContext($ctx,$params->{auth}, 'Delete object', 'delete_object');
+	$self->_setContext($params->{auth}, 'Delete object', 'delete_object');
 	$self->_validateargs($params,["id","type","workspace"],{
 		asHash => 0
 	});
@@ -2379,7 +2392,7 @@ sub delete_object_permanently
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN delete_object_permanently
-	$self->_setContext($ctx,$params->{auth}, 'Permanently delete an object',
+	$self->_setContext($params->{auth}, 'Permanently delete an object',
 						'delete_object_permanently');
 	$self->_validateargs($params,["id","type","workspace"],{
 		asHash => 0
@@ -2523,7 +2536,7 @@ sub get_object
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($output);
     #BEGIN get_object
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$self->_validateargs($params,["id","type","workspace"],{
 		instance => undef,
 		asHash => 0,
@@ -2672,7 +2685,7 @@ sub get_object_by_ref
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($output);
     #BEGIN get_object_by_ref
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$self->_validateargs($params,["reference"],{
 		asHash => 0,
 		asJSON => 0
@@ -2825,7 +2838,7 @@ sub save_object_by_ref
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN save_object_by_ref
-	$self->_setContext($ctx,$params->{auth}, 'Save object by reference',
+	$self->_setContext($params->{auth}, 'Save object by reference',
 						'save_object_by_ref');
 	$params = $self->_validateargs($params,["data","id","type"],{
 		reference => undef,
@@ -2968,7 +2981,7 @@ sub get_objectmeta
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN get_objectmeta
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$self->_validateargs($params,["id","type","workspace"],{
 		instance => undef,
 		asHash => 0
@@ -3093,7 +3106,7 @@ sub get_objectmeta_by_ref
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN get_objectmeta_by_ref
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$self->_validateargs($params,["reference"],{
 		asHash => 0
 	});
@@ -3220,7 +3233,7 @@ sub revert_object
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN revert_object
-	$self->_setContext($ctx,$params->{auth}, 'Revert object', 'revert_object');
+	$self->_setContext($params->{auth}, 'Revert object', 'revert_object');
 	$self->_validateargs($params,["id","type","workspace"],{
 		instance => undef,
 		asHash => 0
@@ -3354,7 +3367,7 @@ sub copy_object
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN copy_object
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$self->_validateargs($params,["new_id","new_workspace","source_id","type","source_workspace"],{
 		instance => undef,
 		asHash => 0,
@@ -3674,7 +3687,7 @@ sub move_object
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN move_object
-	$self->_setContext($ctx,$params->{auth}, 'Move object', 'move_object');
+	$self->_setContext($params->{auth}, 'Move object', 'move_object');
 	$self->_validateargs($params,["new_id","new_workspace","source_id","type","source_workspace"],{
 		asHash => 0
 	});
@@ -3781,7 +3794,7 @@ sub has_object
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($object_present);
     #BEGIN has_object
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$self->_validateargs($params,["id","type","workspace"],{
 		instance => undef
 	});
@@ -3910,7 +3923,7 @@ sub object_history
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadatas);
     #BEGIN object_history
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$self->_validateargs($params,["id","type","workspace"],{
 		asHash => 0
 	});
@@ -4019,7 +4032,7 @@ sub create_workspace
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN create_workspace
-	$self->_setContext($ctx,$params->{auth}, 'Create workspace',
+	$self->_setContext($params->{auth}, 'Create workspace',
 						'create_workspace');
 	$self->_validateargs($params,["workspace"],{
 		default_permission => "n",
@@ -4130,7 +4143,7 @@ sub get_workspacemeta
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN get_workspacemeta
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$self->_validateargs($params,["workspace"],{
 		asHash => 0
 	});
@@ -4214,7 +4227,7 @@ sub get_workspacepermissions
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($user_permissions);
     #BEGIN get_workspacepermissions
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$self->_validateargs($params,["workspace"],{});
 	my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
 	$user_permissions = $ws->getWorkspaceUserPermissions();
@@ -4316,7 +4329,7 @@ sub delete_workspace
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN delete_workspace
-	$self->_setContext($ctx,$params->{auth}, 'Delete workspace',
+	$self->_setContext($params->{auth}, 'Delete workspace',
 						'delete_workspace');
 	$self->_validateargs($params,["workspace"],{
 		asHash => 0
@@ -4428,7 +4441,7 @@ sub clone_workspace
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN clone_workspace
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$self->_validateargs($params,["new_workspace","current_workspace"],{
 		default_permissions => "n",
 		asHash => 0,
@@ -4739,7 +4752,7 @@ sub list_workspaces
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($workspaces);
     #BEGIN list_workspaces
-	$self->_setContext($ctx,$params->{auth}); #TODO list public workspaces - remove pub user first
+	$self->_setContext($params->{auth}); #TODO list public workspaces - remove pub user first
 	$self->_validateargs($params,[],{
 		asHash => 0
 	});
@@ -4875,7 +4888,7 @@ sub list_workspace_objects
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($objects);
     #BEGIN list_workspace_objects
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$self->_validateargs($params,["workspace"],{
 		type => undef,
 		showDeletedObject => 0,
@@ -4990,7 +5003,7 @@ sub set_global_workspace_permissions
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN set_global_workspace_permissions
-	$self->_setContext($ctx,$params->{auth}, 'Set workspace global permissions',
+	$self->_setContext($params->{auth}, 'Set workspace global permissions',
 						'set_global_workspace_permissions');
 	$self->_validateargs($params,["new_permission","workspace"],{
 		asHash => 0
@@ -5084,7 +5097,7 @@ sub set_workspace_permissions
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($success);
     #BEGIN set_workspace_permissions
-	$self->_setContext($ctx,$params->{auth}, 'Set workspace permissions',
+	$self->_setContext($params->{auth}, 'Set workspace permissions',
 						'set_workspace_permissions');
 	$self->_validateargs($params,["users","new_permission","workspace"],{});
 	my $ws = $self->_getWorkspace($params->{workspace},{throwErrorIfMissing => 1});
@@ -5166,7 +5179,7 @@ sub get_user_settings
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($output);
     #BEGIN get_user_settings
-	$self->_setContext($ctx,$params->{auth}, 'Get user settings', 
+	$self->_setContext($params->{auth}, 'Get user settings', 
 						'get_user_settings');
 	$self->_validateargs($params,[],{});
 	my $wsu = $self->_getWorkspaceUser($self->_getUsername(),{createIfMissing => 1});
@@ -5251,7 +5264,7 @@ sub set_user_settings
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($output);
     #BEGIN set_user_settings
-	$self->_setContext($ctx,$params->{auth}, 'Set user settings',
+	$self->_setContext($params->{auth}, 'Set user settings',
 						'set_user_settings');
 	$self->_validateargs($params,["setting","value"],{});
 	my $wsu = $self->_getWorkspaceUser($self->_getUsername(),{createIfMissing => 1});
@@ -5359,7 +5372,7 @@ sub queue_job
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($job);
     #BEGIN queue_job
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$params = $self->_validateargs($params,["type"],{
 		"state" => "queued",
 		jobdata => {},
@@ -5493,7 +5506,7 @@ sub set_job_status
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($job);
     #BEGIN set_job_status
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$self->_validateargs($params,["jobid","status"],{
 		currentStatus => undef,
 		jobdata => {}
@@ -5654,7 +5667,7 @@ sub get_jobs
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($jobs);
     #BEGIN get_jobs
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$self->_validateargs($params,[],{
 		status => undef,
 		jobids => undef,
@@ -5823,7 +5836,7 @@ sub add_type
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($success);
     #BEGIN add_type
-	$self->_setContext($ctx,$params->{auth}, 'Add new type', 'add_type');
+	$self->_setContext($params->{auth}, 'Add new type', 'add_type');
 	$self->_validateargs($params,["type"],{});
 	$self->_validateTypeName($params->{type});
 	if (defined($self->_permanentTypes()->{$params->{type}})) {
@@ -5917,7 +5930,7 @@ sub remove_type
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($success);
     #BEGIN remove_type
-	$self->_setContext($ctx,$params->{auth}, 'Remove type', 'remove_type');
+	$self->_setContext($params->{auth}, 'Remove type', 'remove_type');
 	$self->_validateargs($params,["type"],{});
 	my $cursor = $self->_mongodb()->get_collection('typeObjects')->find({id => $params->{type},permanent => 0});
 	if (my $object = $cursor->next) {
@@ -6001,7 +6014,7 @@ sub patch
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($success);
     #BEGIN patch
-	$self->_setContext($ctx,$params->{auth});
+	$self->_setContext($params->{auth});
 	$self->_validateargs($params,["patch_id"],{});
 	if ($self->_getUsername() ne "workspaceroot") {
 		my $msg = "Only root user can run the patch command!";
@@ -7873,7 +7886,7 @@ asHash has a value which is a bool
 Input parameters for the "set_workspace_permissions" function.
 
         workspace_id workspace - ID of the workspace for which permissions will be set (an essential argument)
-        list<username> users - list of users for which workspace privaleges are to be reset (an essential argument)
+        list<username> users - list of users for which workspace privileges are to be reset (an essential argument)
         permission new_permission - New permissions to which all users in the user list will be set for the workspace. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
         string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace
 
