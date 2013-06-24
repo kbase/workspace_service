@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Data::Dumper;
-my $test_count = 89;
+my $test_count = 85;
 
 ################################################################################
 #Test intiailization: setting test config, instantiating Impl, getting auth token
@@ -107,7 +107,7 @@ is $meta->[5],"n";
 	throws_ok {$impl->get_workspacemeta({auth => $oauth2, 
 											workspace => 'testworkspace'
 											})
-	} qr/No permissions for workspace!/, 
+	} qr/User lacks permissions for the specified activity!/, 
 		"Can't get metadata w/ no user obj defined and global perms = n";
 
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
@@ -151,7 +151,7 @@ is $meta->[5],"n";
 	throws_ok {$impl->get_workspacemeta({auth => $oauth2, 
 											workspace => 'testworkspace'
 											})
-	} qr/No permissions for workspace!/, 
+	} qr/User lacks permissions for the specified activity!/, 
 		"Can't get metadata w/ user obj defined and no permissions";
 }
 ################################################################################
@@ -163,7 +163,7 @@ eval {
 										workspace => "test_two",
 										default_permission => "n",
 										})
-				} qr/Must be authenticated to create a workspace!/,
+				} qr/Authentication required: Create workspace/,
 				"Creating a workspace w/o auth fails";
 };
 ################################################################################
@@ -645,19 +645,22 @@ is($@,'',"set_global_workspace_permissions - testworkspace to r - Command ran wi
 ok $wsmeta->[5] eq "r",
 	"set_global_workspace_permissions - Value = $wsmeta->[5] ";
 
-#Changing workspace user permissions global permissions
-$conf = {
-        workspace => "clonetestworkspace",
-        new_permission => "w",
-		users => ["public"],
-		auth => $oauth
-    };
-eval {
-	local $Bio::KBase::workspaceService::Server::CallContext = {};
-	$bool = $impl->set_workspace_permissions($conf);
-};
-is($@,'',"set_workspace_permissions - user global permissions for clonetestworkspace to w - Command ran without errors");
-ok $bool == 1,"set_workspace_permissions - Value = ".$bool;
+# Changing workspace user permissions global permissions - commented out,
+# 'public' is not longer a special user, also comment out two tests below for
+# same reason
+
+#$conf = {
+#        workspace => "clonetestworkspace",
+#        new_permission => "w",
+#		users => ["public"],
+#		auth => $oauth
+#    };
+#eval {
+#	local $Bio::KBase::workspaceService::Server::CallContext = {};
+#	$bool = $impl->set_workspace_permissions($conf);
+#};
+#is($@,'',"set_workspace_permissions - user global permissions for clonetestworkspace to w - Command ran without errors");
+#ok $bool == 1,"set_workspace_permissions - Value = ".$bool;
 #print Dumper($wsmeta);
 my $wsmetas;
 eval {
@@ -672,12 +675,12 @@ foreach $wsmeta (@{$wsmetas}) {
 }
 ok defined($idhash->{testworkspace}),
 	"list_workspaces reveals read oly workspace testworkspace to public!";
-ok defined($idhash->{clonetestworkspace}),
-	"list_workspaces reveals nonreadable workspace clonetestworkspace with write privelages granted to testuser1!";
+#ok defined($idhash->{clonetestworkspace}),
+#	"list_workspaces reveals nonreadable workspace clonetestworkspace with write privelages granted to testuser1!";
 ok $idhash->{testworkspace} eq "r",
 	"list_workspaces says public has read only privileges to testworkspace!";
-ok $idhash->{clonetestworkspace} eq "w",
-	"list_workspaces says public has write privelages to clonetestworkspace!";
+#ok $idhash->{clonetestworkspace} eq "w",
+#	"list_workspaces says public has write privelages to clonetestworkspace!";
 ################################################################################
 # Testing types
 ################################################################################ 

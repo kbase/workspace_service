@@ -200,7 +200,7 @@ sub getUserWorkspaces {
 			$workspaceHash->{$key} = $self->workspaces()->{$key};
 		}
 	}
-	return $self->parent()->_getWorkspaces([keys(%{$workspaceHash})],{orQuery => [{defaultPermissions => {'$in' => ["a","w","r"]}}]});
+	return $self->parent()->_getWorkspaces([keys(%{$workspaceHash})],{orQuery => [{defaultPermissions => 'r'}]});
 }
 
 =head3 updateSettings

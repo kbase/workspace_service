@@ -165,6 +165,7 @@ Description:
 
 sub metadata {
 	my ($self,$ashash) = @_;
+	$self->checkPermissions(['r', 'w', 'a']);
 	my $objects += keys(%{$self->objects()});
 #	foreach my $key (keys(%{$self->objects()})) {
 #		$objects += keys(%{$self->objects()->{$key}});
