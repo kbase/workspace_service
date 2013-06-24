@@ -181,6 +181,7 @@ sub _setContext {
 	if (defined($auth) && length($auth) > 0) {
 		if (!defined($self->_getContext()->{_override}) ||
 			$self->_getContext()->{_override}->{_authentication} ne $auth) {
+			$self->_getContext()->{_override} = undef;
 			my $output = $self->_authenticate($auth);
 			$self->_getContext()->{_override}->{_authentication} = $output->{authentication};
 			$self->_getContext()->{_override}->{_currentUser} = $output->{user};
@@ -188,7 +189,7 @@ sub _setContext {
 		}
 	} else {
 		# no auth provided, remove previous call's creds
-		$self->_getContext()->{_override} = undef
+		$self->_getContext()->{_override} = undef;
 	}
 }
 
