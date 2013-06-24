@@ -52,7 +52,8 @@ print map { $_->[0] } @$objs;
 Each and every function in this service takes a hash reference as
 its single argument. This hash reference may contain a key
 C<auth> whose value is a bearer token for the user making
-the request. If this is not provided a default user "public" is assumed.
+the request. If this is not provided only unauthenticated read operations are
+allowed.
 
 =head2 WORKSPACE
 
@@ -5653,7 +5654,7 @@ sub get_jobs
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($jobs);
     #BEGIN get_jobs
-	$self->_setContext($ctx,$params->{auth}, 'Get jobs', 'get_jobs');
+	$self->_setContext($ctx,$params->{auth});
 	$self->_validateargs($params,[],{
 		status => undef,
 		jobids => undef,
@@ -6778,7 +6779,7 @@ Input parameters for the "save_objects function.
         ObjectData data - string or reference to complex datastructure to be saved in the workspace (an essential argument)
         string command - the name of the KBase command that is calling the "save_object" function (an optional argument with default "unknown")
         mapping<string,string> metadata - a hash of metadata to be associated with the object (an optional argument with default "{}")
-        string auth - the authentication token of the KBase account to associate this save command (an optional argument, user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account to associate this save command
         bool retrieveFromURL - a flag indicating that the "data" argument contains a URL from which the actual data should be downloaded (an optional argument with default "0")
         bool json - a flag indicating if the input data is encoded as a JSON string (an optional argument with default "0")
         bool compressed - a flag indicating if the input data in zipped (an optional argument with default "0")
@@ -6842,7 +6843,7 @@ Input parameters for the "delete_object" function.
         object_type type - type of the object to be deleted (an essential argument)
         workspace_id workspace - ID of the workspace where the object is to be deleted (an essential argument)
         object_id id - ID of the object to be deleted (an essential argument)
-        string auth - the authentication token of the KBase account to associate this deletion command (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account to associate this deletion command
         bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
@@ -6891,7 +6892,7 @@ Input parameters for the "delete_object_permanently" function.
         object_type type - type of the object to be permanently deleted (an essential argument)
         workspace_id workspace - ID of the workspace where the object is to be permanently deleted (an essential argument)
         object_id id - ID of the object to be permanently deleted (an essential argument)
-        string auth - the authentication token of the KBase account to associate with this permanent deletion command (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account to associate with this permanent deletion command
         bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
@@ -6941,7 +6942,7 @@ Input parameters for the "get_object" function.
         workspace_id workspace - ID of the workspace containing the object to be retrieved (an essential argument)
         object_id id - ID of the object to be retrieved (an essential argument)
         int instance - Version of the object to be retrieved, enabling retrieval of any previous version of an object (an optional argument; the current version is retrieved if no version is provides)
-        string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument)
         bool asHash - a boolean indicating if metadata should be returned as a hash
         bool asJSON - indicates that data should be returned in JSON format (an optional argument; default is '0')
 
@@ -7033,7 +7034,7 @@ metadata has a value which is an object_metadata
 Input parameters for the "get_object_by_ref" function.
 
         workspace_ref reference - reference to a specific instance of a specific object in a workspace (an essential argument)
-        string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument)
         bool asHash - a boolean indicating if metadata should be returned as a hash
         bool asJSON - indicates that data should be returned in JSON format (an optional argument; default is '0')
 
@@ -7088,7 +7089,7 @@ Input parameters for the "save_object_by_ref" function.
         bool compressed - a flag indicating if the input data in zipped (an optional argument with default "0")
         bool retrieveFromURL - a flag indicating that the "data" argument contains a URL from which the actual data should be downloaded (an optional argument with default "0")
         bool replace - a flag indicating any existing object located at the specified reference should be overwritten (an optional argument with default "0")
-        string auth - the authentication token of the KBase account to associate this save command (an optional argument, user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account to associate this save command
         bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
@@ -7152,7 +7153,7 @@ Input parameters for the "get_objectmeta" function.
         workspace_id workspace - ID of the workspace containing the object for which metadata is to be retrieved (an essential argument)
         object_id id - ID of the object for which metadata is to be retrieved (an essential argument)
         int instance - Version of the object for which metadata is to be retrieved, enabling retrieval of any previous version of an object (an optional argument; the current metadata is retrieved if no version is provides)
-        string auth - the authentication token of the KBase account to associate with this object metadata retrieval command (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account to associate with this object metadata retrieval command (an optional argument)
         bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
@@ -7201,7 +7202,7 @@ asHash has a value which is a bool
 Input parameters for the "get_objectmeta_by_ref" function.
 
         workspace_ref reference - reference to a specific instance of a specific object in a workspace (an essential argument)
-        string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument)
         bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
@@ -7247,7 +7248,7 @@ Input parameters for the "revert_object" function.
         workspace_id workspace - ID of the workspace containing the object to be reverted (an essential argument)
         object_id id - ID of the object to be reverted (an essential argument)
         int instance - Previous version of the object to which the object should be reset (an essential argument)
-        string auth - the authentication token of the KBase account to associate with this object reversion command (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account to associate with this object reversion command
         bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
@@ -7302,7 +7303,7 @@ Input parameters for the "copy_object" function.
         workspace_id new_workspace - ID of the workspace the object to be copied to (an essential argument)
         object_id new_id - ID the object is to be copied to (an essential argument)
         string new_workspace_url - URL of workspace server where object should be copied (an optional argument - object will be saved in the same server if not provided)
-        string auth - the authentication token of the KBase account to associate with this object copy command (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account to associate with this object copy command (an optional argument)
         bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
@@ -7362,7 +7363,7 @@ Input parameters for the "move_object" function.
          workspace_id new_workspace - ID of the workspace the object to be moved to (an essential argument)
         object_id new_id - ID the object is to be moved to (an essential argument)
         string new_workspace_url - URL of workspace server where object should be copied (an optional argument - object will be saved in the same server if not provided)
-        string auth - the authentication token of the KBase account to associate with this object move command (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account to associate with this object move command
         bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
@@ -7418,7 +7419,7 @@ Input parameters for the "has_object" function.
         workspace_id workspace - ID of the workspace containing the object to be checked for existance (an essential argument)
         object_id id - ID of the object to be checked for existance (an essential argument)
         int instance - Version of the object to be checked for existance (an optional argument; the current object is checked if no version is provided)
-        string auth - the authentication token of the KBase account to associate with this object check command (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account to associate with this object check command (an optional argument)
 
 
 =item Definition
@@ -7466,7 +7467,7 @@ Input parameters for the "object_history" function.
         object_type type - type of the object to have history printed (an essential argument)
         workspace_id workspace - ID of the workspace containing the object to have history printed (an essential argument)
         object_id id - ID of the object to have history printed (an essential argument)
-        string auth - the authentication token of the KBase account to associate with this object history command (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account to associate with this object history command (an optional argument)
         bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
@@ -7514,7 +7515,7 @@ Input parameters for the "create_workspace" function.
 
         workspace_id workspace - ID of the workspace to be created (an essential argument)
         permission default_permission - Default permissions of the workspace to be created. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (optional argument with default "n")
-        string auth - the authentication token of the KBase account that will own the created workspace (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account that will own the created workspace
         bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
@@ -7559,7 +7560,7 @@ asHash has a value which is a bool
 Input parameters for the "get_workspacemeta" function.
 
         workspace_id workspace - ID of the workspace for which metadata should be returned (an essential argument)
-        string auth - the authentication token of the KBase account accessing workspace metadata (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account accessing workspace metadata (an optional argument)
         bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
@@ -7602,7 +7603,7 @@ asHash has a value which is a bool
 Input parameters for the "get_workspacepermissions" function.
 
         workspace_id workspace - ID of the workspace for which custom user permissions should be returned (an essential argument)
-        string auth - the authentication token of the KBase account accessing workspace permissions; must have admin privelages to workspace (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account accessing workspace permissions; must have admin privelages to workspace (an optional argument)
 
 
 =item Definition
@@ -7642,7 +7643,7 @@ auth has a value which is a string
 Input parameters for the "delete_workspace" function.
 
         workspace_id workspace - ID of the workspace to be deleted (an essential argument)
-        string auth - the authentication token of the KBase account deleting the workspace; must be the workspace owner (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account deleting the workspace; must be the workspace owner
         bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
@@ -7688,7 +7689,7 @@ Input parameters for the "clone_workspace" function.
         workspace_id new_workspace - ID of the workspace to which the cloned workspace will be copied (an essential argument)
         string new_workspace_url - URL of workspace server where workspace should be cloned (an optional argument - workspace will be cloned in the same server if not provided)
         permission default_permission - Default permissions of the workspace created by the cloning process. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
-        string auth - the authentication token of the KBase account that will own the cloned workspace (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account that will own the cloned workspace (an optional argument)
         bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
@@ -7736,7 +7737,7 @@ asHash has a value which is a bool
 
 Input parameters for the "list_workspaces" function.
 
-        string auth - the authentication token of the KBase account accessing the list of workspaces (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account accessing the list of workspaces (an optional argument)
         bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
@@ -7779,7 +7780,7 @@ Input parameters for the "list_workspace_objects" function.
         workspace_id workspace - ID of the workspace for which objects should be listed (an essential argument)
         string type - type of the objects to be listed (an optional argument; all object types will be listed if left unspecified)
         bool showDeletedObject - a flag that, if set to '1', causes any deleted objects to be included in the output (an optional argument; default is '0')
-        string auth - the authentication token of the KBase account listing workspace objects; must have at least 'read' privelages (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account listing workspace objects; must have at least 'read' privileges (an optional argument)
         bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
@@ -7827,7 +7828,7 @@ Input parameters for the "set_global_workspace_permissions" function.
 
         workspace_id workspace - ID of the workspace for which permissions will be set (an essential argument)
         permission new_permission - New default permissions to which the workspace should be set. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
-        string auth - the authentication token of the KBase account changing workspace default permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account changing workspace default permissions; must have 'admin' privelages to workspace
         bool asHash - a boolean indicating if metadata should be returned as a hash
 
 
@@ -7874,7 +7875,7 @@ Input parameters for the "set_workspace_permissions" function.
         workspace_id workspace - ID of the workspace for which permissions will be set (an essential argument)
         list<username> users - list of users for which workspace privaleges are to be reset (an essential argument)
         permission new_permission - New permissions to which all users in the user list will be set for the workspace. Accepted values are 'a' => admin, 'w' => write, 'r' => read, 'n' => none (an essential argument)
-        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace
 
 
 =item Definition
@@ -7917,7 +7918,7 @@ auth has a value which is a string
 
 Input parameters for the "get_user_settings" function.
 
-        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace
 
 
 =item Definition
@@ -7956,7 +7957,7 @@ Input parameters for the "set_user_settings" function.
 
         string setting - the setting to be set (an essential argument)
         string value - new value to be set (an essential argument)
-        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account changing workspace permissions; must have 'admin' privelages to workspace
 
 
 =item Definition
@@ -7997,7 +7998,7 @@ auth has a value which is a string
 
 Input parameters for the "queue_job" function.
 
-        string auth - the authentication token of the KBase account queuing the job; must have access to the job being queued (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account queuing the job; must have access to the job being queued (an optional argument)
         string state - the initial state to assign to the job being queued (an optional argument; default is "queued")
         string type - the type of the job being queued
         mapping<string,string> jobdata - hash of data associated with job
@@ -8047,7 +8048,7 @@ Input parameters for the "set_job_status" function.
 
         string jobid - ID of the job to be have status changed (an essential argument)
         string status - Status to which job should be changed; accepted values are 'queued', 'running', and 'done' (an essential argument)
-        string auth - the authentication token of the KBase account requesting job status; only status for owned jobs can be retrieved (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account requesting job status; only status for owned jobs can be retrieved (an optional argument)
         string currentStatus - Indicates the current statues of the selected job (an optional argument; default is "undef")
         mapping<string,string> jobdata - hash of data associated with job
 
@@ -8096,7 +8097,7 @@ Input parameters for the "get_jobs" function.
 
 list<string> jobids - list of specific jobs to be retrieved (an optional argument; default is an empty list)
 string status - Status of all jobs to be retrieved; accepted values are 'queued', 'running', and 'done' (an essential argument)
-string auth - the authentication token of the KBase account accessing job list; only owned jobs will be returned (an optional argument; user is "public" if auth is not provided)
+string auth - the authentication token of the KBase account accessing job list; only owned jobs will be returned (an optional argument)
 
 
 =item Definition
@@ -8140,7 +8141,7 @@ auth has a value which is a string
 Input parameters for the "add_type" function.
 
         string type - Name of type being added (an essential argument)
-        string auth - the authentication token of the KBase account adding a type (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account adding a type
 
 
 =item Definition
@@ -8180,7 +8181,7 @@ auth has a value which is a string
 Input parameters for the "remove_type" function.
 
         string type - name of custom type to be removed from workspace service (an essential argument)
-        string auth - the authentication token of the KBase account removing a custom type (an optional argument; user is "public" if auth is not provided)
+        string auth - the authentication token of the KBase account removing a custom type
 
 
 =item Definition
@@ -8220,7 +8221,7 @@ auth has a value which is a string
 Input parameters for the "patch" function.
 
 string patch_id - ID of the patch that should be run on the workspace
-string auth - the authentication token of the KBase account removing a custom type (an optional argument; user is "public" if auth is not provided)
+string auth - the authentication token of the KBase account removing a custom type
 
 
 =item Definition
