@@ -7,7 +7,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Data::Dumper;
-my $test_count = 22;
+my $test_count = 24;
 
 #  Test 1 - Can a new client object be created without parameters? 
 #Creating new workspace services implementation connected to testdb
@@ -25,6 +25,10 @@ ok( defined $client, "Did an impl object get defined" );
 isa_ok( $client, 'Bio::KBase::workspaceService::Client', "Is it in the right class" );
 
 my $oauth_token = $token->token();
+
+# make a client with embedded authorization
+my $authed_client = Bio::KBase::workspaceService::Client->new($url,
+						user_id => 'kbasetest', password => '@Suite525');
 
 # Can I delete a workspace
 eval { $client->delete_workspace({workspace=>"testworkspace1",auth=>$oauth_token})  };
@@ -45,16 +49,30 @@ ok($wsmeta1->[4] eq "a", "ws has a user perms");
 
 ok($wsmeta1->[5] eq "n", "ws has n global perms");
 
-# Is the workspace listed
+# Do embedded auth and parameter auth list the same workspaces
 
 my $workspace_list = $client->list_workspaces({auth=>$oauth_token});
-my $idhash1={};
-foreach my $ws1 (@{$workspace_list}) {
-    $idhash1->{$ws1->[0]} = 1;
+my $authed_list = $authed_client->list_workspaces({});
+for my $l (($workspace_list, $authed_list)) {
+	my $idhash1={};
+	foreach my $ws1 (@{$l}) {
+	    $idhash1->{$ws1->[0]} = 1;
+	}
+	ok(defined($idhash1->{testworkspace1}),
+	   "list_workspaces returns newly created workspace testworkspace1!");
 }
 
-ok(defined($idhash1->{testworkspace1}),
-   "list_workspaces returns newly created workspace testworkspace1!");
+# no auth can't see the workspace
+
+{
+	my $no_auth_ws_list = $client->list_workspaces({});
+	my $idhash1={};
+	foreach my $ws1 (@{$no_auth_ws_list}) {
+	    $idhash1->{$ws1->[0]} = 1;
+	}
+	ok(!defined($idhash1->{testworkspace1}),
+	   "list_workspaces doesn't return testworkspace1 w/o auth");
+}
 
 # Create a few more workspaces
 lives_ok { $client->create_workspace({workspace=>"testworkspace2",default_permission=>"r",auth=>$oauth_token}); } "create read-only ws";
