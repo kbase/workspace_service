@@ -192,7 +192,7 @@ Description:
 =cut
 
 sub getUserWorkspaces {
-	my ($self) = @_;
+	my ($self, $excludeGlobal) = @_;
 	my $workspaceHash = {};
 	my $workspaces = $self->workspaces();
 	foreach my $key (keys(%{$workspaces})) {
@@ -200,7 +200,11 @@ sub getUserWorkspaces {
 			$workspaceHash->{$key} = $self->workspaces()->{$key};
 		}
 	}
-	return $self->parent()->_getWorkspaces([keys(%{$workspaceHash})],{orQuery => [{defaultPermissions => 'r'}]});
+	my $query = {};
+	if(!$excludeGlobal) {
+		$query = {orQuery => [{defaultPermissions => 'r'}]};
+	}
+	return $self->parent()->_getWorkspaces([keys(%{$workspaceHash})], $query);
 }
 
 =head3 updateSettings

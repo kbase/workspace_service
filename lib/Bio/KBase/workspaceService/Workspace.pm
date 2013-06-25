@@ -583,10 +583,17 @@ Description:
 sub getWorkspaceUserPermissions {
 	my ($self) = @_;
 	$self->checkPermissions(["r","w","a"]);
-	my $output = {"default" => $self->defaultPermissions()};
+	my $output = {"~global" => $self->defaultPermissions()};
 	my $wsus = $self->parent()->_getAllWorkspaceUsersByWorkspace($self->id());
 	for (my $i=0; $i < @{$wsus}; $i++) {
 		$output->{$wsus->[$i]->id()} = $wsus->[$i]->workspaces()->{$self->id()};
+	}
+	if($self->currentPermission() ne 'a') {
+		my $cu = $self->currentUser();
+		if(!defined $output->{$cu}) {
+			return {$cu => 'n'};
+		}
+		return {$cu => $output->{$cu}};
 	}
 	return $output;
 }

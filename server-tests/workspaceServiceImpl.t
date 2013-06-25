@@ -5,8 +5,9 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Exception;
+use Test::Deep;
 use Data::Dumper;
-my $test_count = 85;
+my $test_count = 89;
 
 ################################################################################
 #Test intiailization: setting test config, instantiating Impl, getting auth token
@@ -223,6 +224,43 @@ foreach $ws (@{$workspace_list}) {
 }
 ok(defined($idhash->{testworkspace3}),
    "list_workspaces returns newly created workspace testworkspace!");
+
+{
+	my $wsl = $impl->list_workspaces({auth => $oauth2});
+	ok(scalar(@{$wsl}) == 2, "Return public workspaces when excludeGlobal is undef");
+	$wsl = $impl->list_workspaces({auth => $oauth2, excludeGlobal => 1});
+	ok(scalar(@{$wsl}) == 0, "Don't return public workspaces when excludeGlobal = 1");
+}
+###############################################################################
+# returns correct permissions
+###############################################################################
+{
+	$impl->set_workspace_permissions({auth => $oauth, 
+										workspace => 'testworkspace5',
+										users => ['kbasetest2'],
+										new_permission => 'r'});
+	my $perms = $impl->get_workspacepermissions({auth => $oauth2,
+												workspace => 'testworkspace5'
+												});
+	cmp_deeply($perms, {'kbasetest2' => 'r'}, 
+			'Returns only user perm with no admin creds');
+	
+	$impl->set_workspace_permissions({auth => $oauth, 
+										workspace => 'testworkspace5',
+										users => ['kbasetest2'],
+										new_permission => 'a'});
+	$perms = $impl->get_workspacepermissions({auth => $oauth2,
+												workspace => 'testworkspace5'
+												});
+	my $expected = {'kbasetest2' => 'a',
+					'kbasetest' => 'a',
+					'~global' => 'n'
+					};
+	cmp_deeply($perms, $expected, 
+			'Returns all perms with admin creds');
+}
+
+
 ################################################################################
 # Cannot create world writeable workspaces
 ################################################################################
@@ -644,24 +682,6 @@ eval {
 is($@,'',"set_global_workspace_permissions - testworkspace to r - Command ran without errors");
 ok $wsmeta->[5] eq "r",
 	"set_global_workspace_permissions - Value = $wsmeta->[5] ";
-
-# Changing workspace user permissions global permissions - commented out,
-# 'public' is not longer a special user, also comment out two tests below for
-# same reason
-
-#$conf = {
-#        workspace => "clonetestworkspace",
-#        new_permission => "w",
-#		users => ["public"],
-#		auth => $oauth
-#    };
-#eval {
-#	local $Bio::KBase::workspaceService::Server::CallContext = {};
-#	$bool = $impl->set_workspace_permissions($conf);
-#};
-#is($@,'',"set_workspace_permissions - user global permissions for clonetestworkspace to w - Command ran without errors");
-#ok $bool == 1,"set_workspace_permissions - Value = ".$bool;
-#print Dumper($wsmeta);
 my $wsmetas;
 eval {
 	local $Bio::KBase::workspaceService::Server::CallContext = {};
@@ -675,12 +695,8 @@ foreach $wsmeta (@{$wsmetas}) {
 }
 ok defined($idhash->{testworkspace}),
 	"list_workspaces reveals read oly workspace testworkspace to public!";
-#ok defined($idhash->{clonetestworkspace}),
-#	"list_workspaces reveals nonreadable workspace clonetestworkspace with write privelages granted to testuser1!";
 ok $idhash->{testworkspace} eq "r",
 	"list_workspaces says public has read only privileges to testworkspace!";
-#ok $idhash->{clonetestworkspace} eq "w",
-#	"list_workspaces says public has write privelages to clonetestworkspace!";
 ################################################################################
 # Testing types
 ################################################################################ 

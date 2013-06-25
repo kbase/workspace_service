@@ -2535,7 +2535,8 @@ permission is a string
 
 =item Description
 
-Retreives a list of all users with custom permissions to the workspace.
+Retreives a list of all users with custom permissions to the workspace if an admin, returns 
+the user's own permissions otherwise.
 
 =back
 
@@ -2833,6 +2834,7 @@ $workspaces is a reference to a list where each element is a workspace_metadata
 list_workspaces_params is a reference to a hash where the following keys are defined:
 	auth has a value which is a string
 	asHash has a value which is a bool
+	excludeGlobal has a value which is a bool
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
@@ -2857,6 +2859,7 @@ $workspaces is a reference to a list where each element is a workspace_metadata
 list_workspaces_params is a reference to a hash where the following keys are defined:
 	auth has a value which is a string
 	asHash has a value which is a bool
+	excludeGlobal has a value which is a bool
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
@@ -5736,7 +5739,7 @@ asHash has a value which is a bool
 Input parameters for the "get_workspacepermissions" function.
 
         workspace_id workspace - ID of the workspace for which custom user permissions should be returned (an essential argument)
-        string auth - the authentication token of the KBase account accessing workspace permissions; must have admin privelages to workspace (an optional argument)
+        string auth - the authentication token of the KBase account accessing workspace permissions (an optional argument)
 
 
 =item Definition
@@ -5872,6 +5875,7 @@ Input parameters for the "list_workspaces" function.
 
         string auth - the authentication token of the KBase account accessing the list of workspaces (an optional argument)
         bool asHash - a boolean indicating if metadata should be returned as a hash
+        bool excludeGlobal - if credentials are supplied and excludeGlobal is true exclude world readable workspaces
 
 
 =item Definition
@@ -5882,6 +5886,7 @@ Input parameters for the "list_workspaces" function.
 a reference to a hash where the following keys are defined:
 auth has a value which is a string
 asHash has a value which is a bool
+excludeGlobal has a value which is a bool
 
 </pre>
 
@@ -5892,6 +5897,7 @@ asHash has a value which is a bool
 a reference to a hash where the following keys are defined:
 auth has a value which is a string
 asHash has a value which is a bool
+excludeGlobal has a value which is a bool
 
 
 =end text

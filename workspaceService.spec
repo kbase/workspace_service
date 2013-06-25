@@ -641,7 +641,7 @@ module workspaceService {
 	/* Input parameters for the "get_workspacepermissions" function.
 	
 		workspace_id workspace - ID of the workspace for which custom user permissions should be returned (an essential argument)
-		string auth - the authentication token of the KBase account accessing workspace permissions; must have admin privelages to workspace (an optional argument)
+		string auth - the authentication token of the KBase account accessing workspace permissions (an optional argument)
 			
 	*/
 	typedef structure { 
@@ -650,7 +650,8 @@ module workspaceService {
 	} get_workspacepermissions_params;
 	
 	/*
-		Retreives a list of all users with custom permissions to the workspace.
+		Retreives a list of all users with custom permissions to the workspace if an admin, returns 
+		the user's own permissions otherwise.
 	*/
 	funcdef get_workspacepermissions(get_workspacepermissions_params params) returns (mapping<username,permission> user_permissions) authentication optional;
 	
@@ -700,11 +701,13 @@ module workspaceService {
 	
 		string auth - the authentication token of the KBase account accessing the list of workspaces (an optional argument)
 		bool asHash - a boolean indicating if metadata should be returned as a hash
+		bool excludeGlobal - if credentials are supplied and excludeGlobal is true exclude world readable workspaces
 		
 	*/
 	typedef structure { 
 		string auth;
 		bool asHash;
+		bool excludeGlobal;
 	} list_workspaces_params;
 	
 	/*
