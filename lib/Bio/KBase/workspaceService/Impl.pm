@@ -168,7 +168,6 @@ sub _authenticate {
 		}
 		$token =~ s/\s/\t/;
 		$split = [split(/\t/,$token)];
-		print "Logged user:".$split->[0]."\n";
 		return {
 			authentication => $token,
 			user => $split->[0]
