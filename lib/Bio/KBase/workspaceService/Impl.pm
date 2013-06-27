@@ -227,11 +227,14 @@ sub _mongodb {
     if (!defined($self->{_mongodb})) {
     	my $config = {
 	        host => $self->{_host},
-	        host => $self->{_host},
 	        db_name        => $self->{_db},
 	        auto_connect   => 1,
 	        auto_reconnect => 1
 	    };
+	    if(defined $self->{_user} && defined $self->{_pwd}) {
+	    	$config->{username} = $self->{_user};
+	    	$config->{password} = $self->{_pwd};
+	    }
 	    my $conn = MongoDB::Connection->new(%$config);
     	Bio::KBase::Exceptions::KBaseException->throw(error => "Unable to connect: $@",
 							       method_name => 'workspaceDocumentDB::_mongodb') if (!defined($conn));
@@ -1405,7 +1408,9 @@ sub new
     $self->{'_mssserver-url'} = "http://biologin-4.mcs.anl.gov:7050";
     $self->{_host} = "localhost";
     $self->{_db} = "workspace_service";
-    my $paramlist = [qw(mongodb-database mongodb-host testuser mssserver-url accounttype idserver-url)];
+    $self->{_user} = undef;
+	$self->{_pwd} = undef;
+	my $paramlist = [qw(mongodb-database mongodb-host mongodb-user mongodb-pwd testuser mssserver-url accounttype idserver-url)];
 
     # so it looks like params is created by looping over the config object
     # if deployment.cfg exists
@@ -1443,7 +1448,7 @@ sub new
 			$params->{$p} = $options->{$p};
         }
     }
-    
+	
     # now, if params has one of the predefined set of parameter keys,
     # use that value to override object instance variable values. The
     # default object instance variable values were set above.
@@ -1453,7 +1458,13 @@ sub new
     }
 	if (defined $params->{'mongodb-database'}) {
 		$self->{_db} = $params->{'mongodb-database'};
-    }
+	}
+	if (defined $params->{'mongodb-user'}) {
+		$self->{_user} = $params->{'mongodb-user'};
+	}
+	if (defined $params->{'mongodb-pwd'}) {
+		$self->{_pwd} = $params->{'mongodb-pwd'};
+	}
     if (defined $params->{accounttype}) {
 		$self->{_accounttype} = $params->{accounttype};
     }
@@ -1466,6 +1477,15 @@ sub new
     if (defined $params->{'mssserver-url'}) {
     		$self->{'_mssserver-url'} = $params->{'mssserver-url'};
     }
+	print STDERR "***Starting workspace service with parameters:***\n";
+	for my $k (keys %{$self}) {
+		if($k eq "_pwd") {
+			print STDERR "$k: Password of length " . length($self->{$k}) . "\n";
+		}
+		else {
+			print STDERR "$k: $self->{$k}\n";
+		}
+	}
     
     #END_CONSTRUCTOR
 
