@@ -45,6 +45,8 @@ Run 'make deploy-client' to deploy just the client.
 
 The contents of deploy.cfg should be copied into /kb/deployment/deployment.cfg.
 Otherwise the service will default to running against mongodb on localhost.
+If the mongod server requires authentication, add the user and password to the
+mongodb-user and mongodb-pwd params.
 
 ### Start the Service ###
 
