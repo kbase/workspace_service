@@ -12,6 +12,38 @@ datasets and workflows with users. A KOW could be considered supplementary mater
 paper. Finally, the KOWs maintain complete history of all objects, enabling a user to
 review the revisions made to an object over time.
 
+VERSION: 0.0.4rc1 (Released 6/27/2013)
+--------------------------------------
+NEW FEATURES:
+- Type compiler provided embedded authorization works
+- Connect to mongodb databases requiring authorization
+- Optionally exclude world readable workspaces from the output of
+    list_workspaces()
+
+UPDATED FEATURES / MAJOR BUG FIXES:
+- Authentication is required for all writes, including workspace creation. The
+    'public' user is now no different from any other user
+- Workspace default permissions are now limited to none and read only
+- A user must have at least read access to a workspace to get its metadata
+- Only the user's own permission level is now returned by 
+    get_workspacepermissions() if a user has read or write access to a workspace 
+- Only the workspace's owner can change the owner's permissions
+- Type names are now limited to ascii alphanumeric characters and _
+- Object names are now limited to ascii alphanumeric characters and .|_-
+- Object names must now be unique per workspace, even if the objects are
+    different types
+
+ANTICIPATED FUTURE DEVELOPMENTS:
+- Shock integration
+- More rigorous handling of types using something like JSON schema
+- Rework of object references, automatic reference verification
+- Remove or alter many object deletion methods to prevent breaking references
+- Data provenance
+- Freeze and publish workspaces
+- Workspaces namespaced by user
+- Permissions for Globus groups
+- Workspace descriptions
+
 VERSION: 0.0.3 (Released 1/1/2012)
 ------------------------------------------
 NEW FEATURES:
