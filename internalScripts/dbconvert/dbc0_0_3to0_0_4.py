@@ -8,9 +8,9 @@ import pymongo
 import sys
 import re
 from collections import defaultdict
-import json
 
 DRY_RUN = True
+SUPPRESS_NO_WORKSPACE_ID_CHANGE_OUTPUT = True
 
 HOST = 'localhost:27017'
 DB = 'workspace_service'
@@ -178,19 +178,30 @@ for wso in wsdb[WSO].find():
     oldtype = wso[TYPE]
     oldid = wso[ID]
     wso[TYPE] = newtype[wso[TYPE]]
+#    print 'uuid ' + wso['uuid']
+#    print 'w[' + wso['workspace'] + ']'
+#    print 'i[' + str(wso[ID]) + ']'
+#    print 'oi[' + str(oldid) + ']'
+#    print 't[' + wso[TYPE] + ']'
     if wso[TYPE] in ws_obj_ids[wso['workspace']][wso[ID]]:
         newid, uuid = ws_obj_ids[wso['workspace']][wso[ID]][wso[TYPE]]
-        if uuid != wso['uuid']:
-            print 'UUID mismatch'
-            print uuid
-            print newid
-            print oldtype
-            print wso
-            sys.exit(1)
+        # note instances earlier than current won't match on UUIDs
+#        if uuid != wso['uuid']:
+#            print '********UUID mismatch'
+#            print uuid
+#            print 'newid ' + newid
+#            print 'oldid ' + oldid
+#            print 'oldtype ' + oldtype
+#            print 'newtype ' + wso[TYPE]
+#            print wso
+#            sys.exit(1)
         wso[ID] = newid
+    changeUUID = False
     if wso['workspace'] == 'NO_WORKSPACE':
         wso[ID] = wso['uuid']
-    if oldtype != wso[TYPE] or oldid != wso[ID]:
+        changeUUID = True
+    if (not (changeUUID and SUPPRESS_NO_WORKSPACE_ID_CHANGE_OUTPUT) and
+            (oldtype != wso[TYPE] or oldid != wso[ID])):
         print "Updating object {}/{}/{}->{} {}->{}".format(
             wso[OWNER], wso['workspace'], oldid, wso[ID], oldtype, wso[TYPE])
         if not DRY_RUN:
