@@ -178,23 +178,9 @@ for wso in wsdb[WSO].find():
     oldtype = wso[TYPE]
     oldid = wso[ID]
     wso[TYPE] = newtype[wso[TYPE]]
-#    print 'uuid ' + wso['uuid']
-#    print 'w[' + wso['workspace'] + ']'
-#    print 'i[' + str(wso[ID]) + ']'
-#    print 'oi[' + str(oldid) + ']'
-#    print 't[' + wso[TYPE] + ']'
     if wso[TYPE] in ws_obj_ids[wso['workspace']][wso[ID]]:
         newid, uuid = ws_obj_ids[wso['workspace']][wso[ID]][wso[TYPE]]
         # note instances earlier than current won't match on UUIDs
-#        if uuid != wso['uuid']:
-#            print '********UUID mismatch'
-#            print uuid
-#            print 'newid ' + newid
-#            print 'oldid ' + oldid
-#            print 'oldtype ' + oldtype
-#            print 'newtype ' + wso[TYPE]
-#            print wso
-#            sys.exit(1)
         wso[ID] = newid
     changeUUID = False
     if wso['workspace'] == 'NO_WORKSPACE':
