@@ -224,20 +224,6 @@ Description:
 
 sub _mongodb {
     my ($self) = @_;
-    if (!defined($self->{_mongodb})) {
-    	my $config = {
-	        host => $self->{_host},
-	        host => $self->{_host},
-	        db_name        => $self->{_db},
-	        auto_connect   => 1,
-	        auto_reconnect => 1
-	    };
-	    my $conn = MongoDB::Connection->new(%$config);
-    	Bio::KBase::Exceptions::KBaseException->throw(error => "Unable to connect: $@",
-							       method_name => 'workspaceDocumentDB::_mongodb') if (!defined($conn));
-    	my $db_name = $self->{_db};
-    	$self->{_mongodb} = $conn->get_database($db_name);
-    }    
     return $self->{_mongodb};
 }
 
@@ -1403,14 +1389,16 @@ sub new
     $self->{_accounttype} = "kbase";
     $self->{'_idserver-url'} = "http://bio-data-1.mcs.anl.gov/services/idserver";
     $self->{'_mssserver-url'} = "http://biologin-4.mcs.anl.gov:7050";
-    $self->{_host} = "localhost";
-    $self->{_db} = "workspace_service";
-    my $paramlist = [qw(mongodb-database mongodb-host testuser mssserver-url accounttype idserver-url)];
+    my $host = "localhost";
+    my $db = "workspace_service";
+    my $user = undef;
+	my $pwd = undef;
+	my $paramlist = [qw(mongodb-database mongodb-host mongodb-user mongodb-pwd testuser mssserver-url accounttype idserver-url)];
 
     # so it looks like params is created by looping over the config object
     # if deployment.cfg exists
 
-    # the keys in the params hash are the same as in the config obuject 
+    # the keys in the params hash are the same as in the config object 
     # except the block name from the config file is ommitted.
 
     # the block name is picked up from KB_SERVICE_NAME. this has to be set
@@ -1419,16 +1407,16 @@ sub new
     # looping over a set of predefined set of parameter keys, see if there
     # is a value for that key in the config object
 
-    if ((my $e = $ENV{KB_DEPLOYMENT_CONFIG}) && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
+	if ((my $e = $ENV{KB_DEPLOYMENT_CONFIG}) && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
 		my $service = $ENV{KB_SERVICE_NAME};
 		if (defined($service)) {
 			my $c = Config::Simple->new();
 			$c->read($e);
 			for my $p (@{$paramlist}) {
-			  	my $v = $c->param("$service.$p");
-			    if ($v) {
+				my $v = $c->param("$service.$p");
+				if ($v) {
 					$params->{$p} = $v;
-			    }
+				}
 			}
 		}
     }
@@ -1443,17 +1431,23 @@ sub new
 			$params->{$p} = $options->{$p};
         }
     }
-    
+	
     # now, if params has one of the predefined set of parameter keys,
     # use that value to override object instance variable values. The
     # default object instance variable values were set above.
 
 	if (defined $params->{'mongodb-host'}) {
-		$self->{_host} = $params->{'mongodb-host'};
+		$host = $params->{'mongodb-host'};
     }
 	if (defined $params->{'mongodb-database'}) {
-		$self->{_db} = $params->{'mongodb-database'};
-    }
+		$db = $params->{'mongodb-database'};
+	}
+	if (defined $params->{'mongodb-user'}) {
+		$user = $params->{'mongodb-user'};
+	}
+	if (defined $params->{'mongodb-pwd'}) {
+		$pwd = $params->{'mongodb-pwd'};
+	}
     if (defined $params->{accounttype}) {
 		$self->{_accounttype} = $params->{accounttype};
     }
@@ -1467,6 +1461,28 @@ sub new
     		$self->{'_mssserver-url'} = $params->{'mssserver-url'};
     }
     
+	print STDERR "***Starting workspace service with mongo parameters:***\n";
+	print STDERR "Host: $host\n";
+	print STDERR "Database: $db\n";
+	print STDERR "User: $user\n";
+	if($pwd) {
+		print STDERR "Password of length " . length($pwd) . "\n";
+	}
+	my $config = {
+		host => $host,
+		db_name => $db,
+		auto_connect => 1,
+		auto_reconnect => 1
+	};
+	if(defined $user && defined $pwd) {
+		$config->{username} = $user;
+		$config->{password} = $pwd;
+	}
+	my $conn = MongoDB::Connection->new(%$config);
+	Bio::KBase::Exceptions::KBaseException->throw(error => "Unable to connect: $@",
+								method_name => 'Impl::new') if (!defined($conn));
+	$self->{_mongodb} = $conn->get_database($db);
+	
     #END_CONSTRUCTOR
 
     if ($self->can('_init_instance'))
