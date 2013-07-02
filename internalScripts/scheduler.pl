@@ -184,6 +184,8 @@ sub monitor {
 				}
 			}
 		}
+		print "Deleting old files...\n";
+		$self->clearAllOldFiles();
 		print "Sleeping...\n";
 		sleep(60);
 	}
@@ -324,6 +326,32 @@ sub jobstatus {
 sub accounttype {
 	my($self) = @_;
 	return $self->{_accounttype};
+}
+
+sub clearOldDirectoryFiles {
+	my($self,$directory) = @_;
+	my $now = time();       # get current time
+	my $age = 60*60*24*3;  # convert 3 days into seconds
+	my $files = [];
+	opendir(DIR,$directory) || die "Can't open $directory : $!\n";
+	push(@{$files},readdir(DIR));
+	close(DIR);
+	foreach my $file (@{$files}) {	
+		my @stat = stat($file);
+		if ($stat[9] < ($now - $age)) {
+			print "Deleting $file...";
+			#unlink($file);
+			print "Done.\n";
+		}
+	}
+}
+
+sub clearAllOldFiles {
+	my($self) = @_;
+	my $directories = [qw(errors output jobs)];
+	for (my $i=0; $i < @{$directories}; $i++) {
+		$self->clearOldDirectoryFiles($sched->jobdirectory()."/".$directories->[$i]."/");
+	}
 }
 
 1;
