@@ -337,11 +337,10 @@ sub clearOldDirectoryFiles {
 	push(@{$files},readdir(DIR));
 	close(DIR);
 	foreach my $file (@{$files}) {	
-		my @stat = stat($file);
+		my @stat = stat($directory."/".$file);
 		if ($stat[9] < ($now - $age)) {
 			print "Deleting $file...";
-			#unlink($file);
-			print "Done.\n";
+			unlink($directory."/".$file);
 		}
 	}
 }
