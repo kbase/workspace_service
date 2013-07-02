@@ -52,6 +52,7 @@ del user, pwd
 pubws = {w[ID] for w in wsdb[WS].find({OWNER: PUBLIC})}
 
 # get the public user and set all perms to read only
+print '***Swapping public user permissions for read only...'
 publicuser = wsdb[USERS].find({ID: PUBLIC}).next()
 
 for pws in publicuser[WS].keys():
@@ -63,9 +64,10 @@ for pws in publicuser[WS].keys():
 if not DRY_RUN:
     wsdb[USERS].save(publicuser)
 del publicuser
+print '...done.\n'
 
 # remove all permissions to public workspaces from all users except public
-print 'Removing permissions for public workspaces...'
+print '***Removing permissions for public workspaces...'
 for u in wsdb[USERS].find({ID: {'$ne': PUBLIC}}):
     p = False
     workspaces = u[WS].keys()
@@ -78,9 +80,10 @@ for u in wsdb[USERS].find({ID: {'$ne': PUBLIC}}):
             del u[WS][ws]
     if not DRY_RUN:
         wsdb[USERS].save(u)
-print '...done.'
+print '...done.\n'
 
 # fix type names
+print '***Correcting type names...'
 types = set([t[ID] for t in wsdb[TYPES].find()])
 types |= set([t[TYPE] for t in wsdb[WSO].find({}, {TYPE: True})])
 
@@ -102,8 +105,10 @@ for t in wsdb[TYPES].find():
     t[ID] = newtype[t[ID]]
     if not DRY_RUN:
         wsdb[TYPES].save(t)
+print '...done.\n'
 
 # run through workspaces and fix
+print '***Correcting workspaces...'
 ws_obj_ids = defaultdict(lambda: defaultdict(dict))
 #            workspace->id->type->(new_id, uuid)
 
@@ -173,7 +178,9 @@ for ws in wsdb[WS].find():
     # Save. Must have every single one, schema changed
     if not DRY_RUN:
         wsdb[WS].save(ws)
+print '...done.\n'
 
+print '***Correcting workspaceObjects...'
 for wso in wsdb[WSO].find():
     oldtype = wso[TYPE]
     oldid = wso[ID]
@@ -188,7 +195,9 @@ for wso in wsdb[WSO].find():
         changeUUID = True
     if (not (changeUUID and SUPPRESS_NO_WORKSPACE_ID_CHANGE_OUTPUT) and
             (oldtype != wso[TYPE] or oldid != wso[ID])):
-        print "Updating object {}/{}/{}->{} {}->{}".format(
-            wso[OWNER], wso['workspace'], oldid, wso[ID], oldtype, wso[TYPE])
+        print "Updating object {}/{}/{}/{}->{} {}->{}".format(
+            wso[OWNER], wso['workspace'], oldid, wso['instance'], wso[ID],
+            oldtype, wso[TYPE])
         if not DRY_RUN:
             wsdb[WSO].save(wso)
+print '...done. Database converted.\n'
