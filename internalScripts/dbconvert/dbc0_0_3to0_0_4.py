@@ -68,7 +68,7 @@ print '...done.\n'
 
 # remove all permissions to public workspaces from all users except public
 print '***Removing permissions for public workspaces...'
-for u in wsdb[USERS].find({ID: {'$ne': PUBLIC}}):
+for u in wsdb[USERS].find({ID: {'$ne': PUBLIC}}, snapshot=True):
     p = False
     workspaces = u[WS].keys()
     for ws in workspaces:
@@ -101,7 +101,7 @@ for t in types:
 del nts
 del types
 
-for t in wsdb[TYPES].find():
+for t in wsdb[TYPES].find(snapshot=True):
     t[ID] = newtype[t[ID]]
     if not DRY_RUN:
         wsdb[TYPES].save(t)
@@ -111,8 +111,11 @@ print '...done.\n'
 print '***Correcting workspaces...'
 ws_obj_ids = defaultdict(lambda: defaultdict(dict))
 #            workspace->id->type->(new_id, uuid)
-
-for ws in wsdb[WS].find():
+wsids = set()
+for ws in wsdb[WS].find(snapshot=True):
+    if ws[ID] in wsids:
+        print 'already seen {}!'.format(ws[ID])
+        sys.exit(1)
     # if it's public make it read only
     oldperm = ws[PER_DEF]
     if ws[ID] in pubws:
@@ -130,6 +133,7 @@ for ws in wsdb[WS].find():
             print "Missing type, database is corrupted"
             print type_
             print newtype
+            print ws
             sys.exit(1)
         type_ = newtype[type_]  # fix type names
         for id_ in ws[OBJS][type_]:
@@ -181,7 +185,7 @@ for ws in wsdb[WS].find():
 print '...done.\n'
 
 print '***Correcting workspaceObjects...'
-for wso in wsdb[WSO].find():
+for wso in wsdb[WSO].find(snapshot=True):
     oldtype = wso[TYPE]
     oldid = wso[ID]
     wso[TYPE] = newtype[wso[TYPE]]
