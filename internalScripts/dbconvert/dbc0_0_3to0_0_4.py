@@ -48,6 +48,9 @@ if user and pwd:
 
 del user, pwd
 
+if DRY_RUN:
+    print '***In DRY RUN mode - no changes will be made to the database'
+
 # find all the public workspace names
 pubws = {w[ID] for w in wsdb[WS].find({OWNER: PUBLIC})}
 
@@ -205,3 +208,6 @@ for wso in wsdb[WSO].find(snapshot=True):
         if not DRY_RUN:
             wsdb[WSO].save(wso)
 print '...done. Database converted.\n'
+
+if DRY_RUN:
+    print '***In DRY RUN mode - no changes were made to the database'
