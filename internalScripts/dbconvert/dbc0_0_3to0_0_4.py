@@ -138,10 +138,10 @@ for ws in wsdb[WS].find(snapshot=True):
             print newtype
             print ws
             sys.exit(1)
-        type_ = newtype[type_]  # fix type names
+        fixedtype = newtype[type_]  # fix type names
         for id_ in ws[OBJS][type_]:
             fixedid = id_.replace('_DOT_', '.')
-            obj_types[fixedid][type_] = ws[OBJS][type_][id_]
+            obj_types[fixedid][fixedtype] = ws[OBJS][type_][id_]
     ws[OBJS] = {}  # delete the ws subdoc
     # fix the id names
     id_to_fix = {}
