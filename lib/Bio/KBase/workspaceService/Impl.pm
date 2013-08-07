@@ -1597,7 +1597,7 @@ sub load_media_from_bio
 							       method_name => 'load_media_from_bio');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($mediaMetas);
     #BEGIN load_media_from_bio
     $self->_setContext($ctx,$params);
@@ -1749,7 +1749,7 @@ sub import_bio
 							       method_name => 'import_bio');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN import_bio
     $self->_setContext($ctx,$params);
@@ -1917,7 +1917,7 @@ sub import_map
 							       method_name => 'import_map');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN import_map
     $self->_setContext($ctx,$params);
@@ -2096,7 +2096,7 @@ sub save_object
 							       method_name => 'save_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN save_object
     $self->_setContext($ctx,$params);
@@ -2239,7 +2239,7 @@ sub delete_object
 							       method_name => 'delete_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN delete_object
     $self->_setContext($ctx,$params);
@@ -2363,7 +2363,7 @@ sub delete_object_permanently
 							       method_name => 'delete_object_permanently');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN delete_object_permanently
     $self->_setContext($ctx,$params);
@@ -2505,7 +2505,7 @@ sub get_object
 							       method_name => 'get_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($output);
     #BEGIN get_object
     $self->_setContext($ctx,$params);
@@ -2543,6 +2543,189 @@ sub get_object
 	my $msg = "Invalid returns passed to get_object:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_object');
+    }
+    return($output);
+}
+
+
+
+
+=head2 get_objects
+
+  $output = $obj->get_objects($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a get_objects_params
+$output is a reference to a list where each element is a get_object_output
+get_objects_params is a reference to a hash where the following keys are defined:
+	ids has a value which is a reference to a list where each element is an object_id
+	types has a value which is a reference to a list where each element is an object_type
+	workspaces has a value which is a reference to a list where each element is a workspace_id
+	instances has a value which is a reference to a list where each element is an int
+	auth has a value which is a string
+	asHash has a value which is a bool
+	asJSON has a value which is a bool
+object_id is a string
+object_type is a string
+workspace_id is a string
+get_object_output is a reference to a hash where the following keys are defined:
+	data has a value which is a string
+	metadata has a value which is an object_metadata
+object_metadata is a reference to a list containing 11 items:
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
+	3: (instance) an int
+	4: (command) a string
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
+	9: (chsum) a string
+	10: (metadata) a reference to a hash where the key is a string and the value is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a get_objects_params
+$output is a reference to a list where each element is a get_object_output
+get_objects_params is a reference to a hash where the following keys are defined:
+	ids has a value which is a reference to a list where each element is an object_id
+	types has a value which is a reference to a list where each element is an object_type
+	workspaces has a value which is a reference to a list where each element is a workspace_id
+	instances has a value which is a reference to a list where each element is an int
+	auth has a value which is a string
+	asHash has a value which is a bool
+	asJSON has a value which is a bool
+object_id is a string
+object_type is a string
+workspace_id is a string
+get_object_output is a reference to a hash where the following keys are defined:
+	data has a value which is a string
+	metadata has a value which is an object_metadata
+object_metadata is a reference to a list containing 11 items:
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
+	3: (instance) an int
+	4: (command) a string
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
+	9: (chsum) a string
+	10: (metadata) a reference to a hash where the key is a string and the value is a string
+timestamp is a string
+username is a string
+workspace_ref is a string
+
+
+=end text
+
+
+
+=item Description
+
+Retrieves the specified objects from the specified workspaces.
+Both the object data and metadata are returned.
+This commands provides access to all versions of the objects via the instances parameter.
+
+=back
+
+=cut
+
+sub get_objects
+{
+    my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_objects:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_objects');
+    }
+
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my($output);
+    #BEGIN get_objects
+    $self->_setContext($ctx,$params);
+    $params = $self->_validateargs($params,["ids","types","workspaces"],{
+    	instances => [],
+    	asHash => 0,
+    	asJSON => 0
+    });
+    my $idHash = {};
+    my $refs = [];
+    my $refIndecies = {};
+    my $wsHash = {};
+	for (my $i=0; $i < @{$params->{ids}}; $i++) {
+    	if ($params->{workspaces}->[$i] eq "NO_WORKSPACE") {
+    		$refIndecies->{$params->{ids}->[$i]} = $i;
+    		push(@{$refs},$params->{ids}->[$i]);
+    	} else {
+    		$idHash->{$params->{workspaces}->[$i]}->{$params->{types}->[$i]}->{$params->{ids}->[$i]} = $i;
+    		if (!defined($wsHash->{$params->{workspaces}->[$i]})) {
+    			$wsHash->{$params->{workspaces}->[$i]} = {
+    				types => [],ids => [],instances => []
+    			}
+    		}
+    		push(@{$wsHash->{$params->{workspaces}->[$i]}->{types}},$params->{types}->[$i]);
+    		push(@{$wsHash->{$params->{workspaces}->[$i]}->{ids}},$params->{ids}->[$i]);
+    		push(@{$wsHash->{$params->{workspaces}->[$i]}->{instances}},$params->{instances}->[$i]);
+   		}
+    }
+    #Retreiving references
+    if (@{$refs} > 0) {
+    	my $objs = $self->_getObjects($refs,{throwErrorIfMissing => 1});
+    	for (my $i=0; $i < @{$objs}; $i++) {
+    		$output->[$refIndecies->{$refs->[$i]}] = {
+    			data => $objs->[$i]->data(),
+    			metadata => $objs->[$i]->metadata($params->{asHash})
+    		};
+    	}
+    }
+    #Retrieving workspace objects
+    if (keys(%{$wsHash}) > 0) {
+    	my $wsList = $self->_getWorkspaces([keys(%{$wsHash})],{throwErrorIfMissing => 1});
+    	for (my $i=0; $i < @{$wsList}; $i++) {
+    		my $ws = $wsList->[$i]->id();
+    		my $objs = $wsList->[$i]->getObjects($wsHash->{$ws}->{types},$wsHash->{$ws}->{ids},$wsHash->{$ws}->{instances},{throwErrorIfMissing => 1});
+    		for (my $j=0; $j < @{$objs}; $j++) {
+    			$output->[$idHash->{$ws}->{$wsHash->{$ws}->{types}->[$j]}->{$wsHash->{$ws}->{ids}->[$j]}] = {
+	    			data => $objs->[$j]->data(),
+	    			metadata => $objs->[$j]->metadata($params->{asHash})
+	    		};
+    		} 
+    	}
+    }
+    if ($params->{asJSON} == 1) {
+    	my $JSON = JSON::XS->new->utf8(1);
+    	for (my $i=0; $i < @{$output}; $i++) {
+    		$output->[$i]->{data} = $JSON->encode($output->[$i]->{data});
+    	}
+    }
+    $self->_clearContext();
+    #END get_objects
+    my @_bad_returns;
+    (ref($output) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_objects:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_objects');
     }
     return($output);
 }
@@ -2653,7 +2836,7 @@ sub get_object_by_ref
 							       method_name => 'get_object_by_ref');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($output);
     #BEGIN get_object_by_ref
     $self->_setContext($ctx,$params);
@@ -2805,7 +2988,7 @@ sub save_object_by_ref
 							       method_name => 'save_object_by_ref');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN save_object_by_ref
     $self->_setContext($ctx,$params);
@@ -2946,7 +3129,7 @@ sub get_objectmeta
 							       method_name => 'get_objectmeta');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN get_objectmeta
     $self->_setContext($ctx,$params);
@@ -3070,7 +3253,7 @@ sub get_objectmeta_by_ref
 							       method_name => 'get_objectmeta_by_ref');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN get_objectmeta_by_ref
 	$self->_setContext($ctx,$params);
@@ -3196,7 +3379,7 @@ sub revert_object
 							       method_name => 'revert_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN revert_object
     $self->_setContext($ctx,$params);
@@ -3329,7 +3512,7 @@ sub copy_object
 							       method_name => 'copy_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN copy_object
     $self->_setContext($ctx,$params);
@@ -3648,7 +3831,7 @@ sub move_object
 							       method_name => 'move_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN move_object
     $self->_setContext($ctx,$params);
@@ -3754,7 +3937,7 @@ sub has_object
 							       method_name => 'has_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($object_present);
     #BEGIN has_object
     $self->_setContext($ctx,$params);
@@ -3882,7 +4065,7 @@ sub object_history
 							       method_name => 'object_history');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadatas);
     #BEGIN object_history
     $self->_setContext($ctx,$params);
@@ -3990,7 +4173,7 @@ sub create_workspace
 							       method_name => 'create_workspace');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN create_workspace
     $self->_setContext($ctx,$params);
@@ -4099,7 +4282,7 @@ sub get_workspacemeta
 							       method_name => 'get_workspacemeta');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN get_workspacemeta
     $self->_setContext($ctx,$params);
@@ -4184,7 +4367,7 @@ sub get_workspacepermissions
 							       method_name => 'get_workspacepermissions');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($user_permissions);
     #BEGIN get_workspacepermissions
     $self->_setContext($ctx,$params);
@@ -4285,7 +4468,7 @@ sub delete_workspace
 							       method_name => 'delete_workspace');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN delete_workspace
     $self->_setContext($ctx,$params);
@@ -4395,7 +4578,7 @@ sub clone_workspace
 							       method_name => 'clone_workspace');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN clone_workspace
     $self->_setContext($ctx,$params);
@@ -4705,7 +4888,7 @@ sub list_workspaces
 							       method_name => 'list_workspaces');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($workspaces);
     #BEGIN list_workspaces
     $self->_setContext($ctx,$params);
@@ -4834,7 +5017,7 @@ sub list_workspace_objects
 							       method_name => 'list_workspace_objects');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($objects);
     #BEGIN list_workspace_objects
     $self->_setContext($ctx,$params);
@@ -4948,7 +5131,7 @@ sub set_global_workspace_permissions
 							       method_name => 'set_global_workspace_permissions');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN set_global_workspace_permissions
     $self->_setContext($ctx,$params);
@@ -5039,7 +5222,7 @@ sub set_workspace_permissions
 							       method_name => 'set_workspace_permissions');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($success);
     #BEGIN set_workspace_permissions
     $self->_setContext($ctx,$params);
@@ -5121,7 +5304,7 @@ sub get_user_settings
 							       method_name => 'get_user_settings');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($output);
     #BEGIN get_user_settings
     $self->_setContext($ctx,$params);
@@ -5206,7 +5389,7 @@ sub set_user_settings
 							       method_name => 'set_user_settings');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($output);
     #BEGIN set_user_settings
     $self->_setContext($ctx,$params);
@@ -5314,7 +5497,7 @@ sub queue_job
 							       method_name => 'queue_job');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($job);
     #BEGIN queue_job
     $self->_setContext($ctx,$params);
@@ -5449,7 +5632,7 @@ sub set_job_status
 							       method_name => 'set_job_status');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($job);
     #BEGIN set_job_status
     $self->_setContext($ctx,$params);
@@ -5611,7 +5794,7 @@ sub get_jobs
 							       method_name => 'get_jobs');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($jobs);
     #BEGIN get_jobs
     $self->_setContext($ctx,$params);
@@ -5701,7 +5884,7 @@ sub get_types
 {
     my $self = shift;
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($types);
     #BEGIN get_types
     $types = [keys(%{$self->_permanentTypes()})];
@@ -5779,7 +5962,7 @@ sub add_type
 							       method_name => 'add_type');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($success);
     #BEGIN add_type
     $self->_setContext($ctx,$params);
@@ -5875,7 +6058,7 @@ sub remove_type
 							       method_name => 'remove_type');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($success);
     #BEGIN remove_type
     $self->_setContext($ctx,$params);
@@ -5962,7 +6145,7 @@ sub patch
 							       method_name => 'patch');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($success);
     #BEGIN patch
     $self->_setContext($ctx,$params);
@@ -6949,6 +7132,61 @@ metadata has a value which is an object_metadata
 a reference to a hash where the following keys are defined:
 data has a value which is a string
 metadata has a value which is an object_metadata
+
+
+=end text
+
+=back
+
+
+
+=head2 get_objects_params
+
+=over 4
+
+
+
+=item Description
+
+Input parameters for the "get_object" function.
+
+        list<object_id> ids - ID of the object to be retrieved (an essential argument)
+        list<object_type> types - type of the object to be retrieved (an essential argument)
+        list<workspace_id> workspaces - ID of the workspace containing the object to be retrieved (an essential argument)
+        list<int> instances  - Version of the object to be retrieved, enabling retrieval of any previous version of an object (an optional argument; the current version is retrieved if no version is provides)
+        string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument; user is "public" if auth is not provided)
+        bool asHash - a boolean indicating if metadata should be returned as a hash
+        bool asJSON - indicates that data should be returned in JSON format (an optional argument; default is '0')
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+ids has a value which is a reference to a list where each element is an object_id
+types has a value which is a reference to a list where each element is an object_type
+workspaces has a value which is a reference to a list where each element is a workspace_id
+instances has a value which is a reference to a list where each element is an int
+auth has a value which is a string
+asHash has a value which is a bool
+asJSON has a value which is a bool
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+ids has a value which is a reference to a list where each element is an object_id
+types has a value which is a reference to a list where each element is an object_type
+workspaces has a value which is a reference to a list where each element is a workspace_id
+instances has a value which is a reference to a list where each element is an int
+auth has a value which is a string
+asHash has a value which is a bool
+asJSON has a value which is a bool
 
 
 =end text
