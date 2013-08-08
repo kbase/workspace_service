@@ -60,6 +60,7 @@ our %method_authentication = (
         'delete_object' => 'optional',
         'delete_object_permanently' => 'optional',
         'get_object' => 'optional',
+        'get_objects' => 'optional',
         'get_object_by_ref' => 'optional',
         'save_object_by_ref' => 'optional',
         'get_objectmeta' => 'optional',

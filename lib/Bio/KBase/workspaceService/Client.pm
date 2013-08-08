@@ -143,6 +143,7 @@ load_media_from_bio_params is a reference to a hash where the following keys are
 	asHash has a value which is a bool
 workspace_id is a string
 object_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -178,6 +179,7 @@ load_media_from_bio_params is a reference to a hash where the following keys are
 	asHash has a value which is a bool
 workspace_id is a string
 object_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -276,6 +278,7 @@ import_bio_params is a reference to a hash where the following keys are defined:
 	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -312,6 +315,7 @@ import_bio_params is a reference to a hash where the following keys are defined:
 	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -411,6 +415,7 @@ import_map_params is a reference to a hash where the following keys are defined:
 	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -448,6 +453,7 @@ import_map_params is a reference to a hash where the following keys are defined:
 	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -552,6 +558,7 @@ object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -593,6 +600,7 @@ object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -688,6 +696,7 @@ delete_object_params is a reference to a hash where the following keys are defin
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -721,6 +730,7 @@ delete_object_params is a reference to a hash where the following keys are defin
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -817,6 +827,7 @@ delete_object_permanently_params is a reference to a hash where the following ke
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -850,6 +861,7 @@ delete_object_permanently_params is a reference to a hash where the following ke
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -949,6 +961,7 @@ get_object_params is a reference to a hash where the following keys are defined:
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is a string
 	metadata has a value which is an object_metadata
@@ -987,6 +1000,7 @@ get_object_params is a reference to a hash where the following keys are defined:
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is a string
 	metadata has a value which is an object_metadata
@@ -1165,7 +1179,7 @@ sub get_objects
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1226,6 +1240,7 @@ get_object_by_ref_params is a reference to a hash where the following keys are d
 	asHash has a value which is a bool
 	asJSON has a value which is a bool
 workspace_ref is a string
+bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is a string
 	metadata has a value which is an object_metadata
@@ -1261,6 +1276,7 @@ get_object_by_ref_params is a reference to a hash where the following keys are d
 	asHash has a value which is a bool
 	asJSON has a value which is a bool
 workspace_ref is a string
+bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is a string
 	metadata has a value which is an object_metadata
@@ -1372,6 +1388,7 @@ object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
 workspace_ref is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -1414,6 +1431,7 @@ object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
 workspace_ref is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -1512,6 +1530,7 @@ get_objectmeta_params is a reference to a hash where the following keys are defi
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -1546,6 +1565,7 @@ get_objectmeta_params is a reference to a hash where the following keys are defi
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -1638,6 +1658,7 @@ get_objectmeta_by_ref_params is a reference to a hash where the following keys a
 	auth has a value which is a string
 	asHash has a value which is a bool
 workspace_ref is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -1669,6 +1690,7 @@ get_objectmeta_by_ref_params is a reference to a hash where the following keys a
 	auth has a value which is a string
 	asHash has a value which is a bool
 workspace_ref is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -1769,6 +1791,7 @@ revert_object_params is a reference to a hash where the following keys are defin
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -1803,6 +1826,7 @@ revert_object_params is a reference to a hash where the following keys are defin
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -1905,6 +1929,7 @@ copy_object_params is a reference to a hash where the following keys are defined
 object_id is a string
 workspace_id is a string
 object_type is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -1942,6 +1967,7 @@ copy_object_params is a reference to a hash where the following keys are defined
 object_id is a string
 workspace_id is a string
 object_type is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -2042,6 +2068,7 @@ move_object_params is a reference to a hash where the following keys are defined
 object_id is a string
 workspace_id is a string
 object_type is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -2078,6 +2105,7 @@ move_object_params is a reference to a hash where the following keys are defined
 object_id is a string
 workspace_id is a string
 object_type is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -2174,6 +2202,7 @@ has_object_params is a reference to a hash where the following keys are defined:
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 
 </pre>
 
@@ -2192,6 +2221,7 @@ has_object_params is a reference to a hash where the following keys are defined:
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 
 
 =end text
@@ -2273,6 +2303,7 @@ object_history_params is a reference to a hash where the following keys are defi
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -2306,6 +2337,7 @@ object_history_params is a reference to a hash where the following keys are defi
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -2399,6 +2431,7 @@ create_workspace_params is a reference to a hash where the following keys are de
 	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -2424,6 +2457,7 @@ create_workspace_params is a reference to a hash where the following keys are de
 	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -2509,6 +2543,7 @@ get_workspacemeta_params is a reference to a hash where the following keys are d
 	auth has a value which is a string
 	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -2533,6 +2568,7 @@ get_workspacemeta_params is a reference to a hash where the following keys are d
 	auth has a value which is a string
 	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -2712,6 +2748,7 @@ delete_workspace_params is a reference to a hash where the following keys are de
 	auth has a value which is a string
 	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -2736,6 +2773,7 @@ delete_workspace_params is a reference to a hash where the following keys are de
 	auth has a value which is a string
 	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -2826,6 +2864,7 @@ clone_workspace_params is a reference to a hash where the following keys are def
 	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -2853,6 +2892,7 @@ clone_workspace_params is a reference to a hash where the following keys are def
 	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -2937,6 +2977,7 @@ list_workspaces_params is a reference to a hash where the following keys are def
 	auth has a value which is a string
 	asHash has a value which is a bool
 	excludeGlobal has a value which is a bool
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -2961,6 +3002,7 @@ list_workspaces_params is a reference to a hash where the following keys are def
 	auth has a value which is a string
 	asHash has a value which is a bool
 	excludeGlobal has a value which is a bool
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -3050,6 +3092,7 @@ list_workspace_objects_params is a reference to a hash where the following keys 
 	auth has a value which is a string
 	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -3083,6 +3126,7 @@ list_workspace_objects_params is a reference to a hash where the following keys 
 	auth has a value which is a string
 	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -3178,6 +3222,7 @@ set_global_workspace_permissions_params is a reference to a hash where the follo
 	asHash has a value which is a bool
 permission is a string
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -3203,6 +3248,7 @@ set_global_workspace_permissions_params is a reference to a hash where the follo
 	asHash has a value which is a bool
 permission is a string
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -3292,6 +3338,7 @@ set_workspace_permissions_params is a reference to a hash where the following ke
 username is a string
 permission is a string
 workspace_id is a string
+bool is an int
 
 </pre>
 
@@ -3309,6 +3356,7 @@ set_workspace_permissions_params is a reference to a hash where the following ke
 username is a string
 permission is a string
 workspace_id is a string
+bool is an int
 
 
 =end text
@@ -3984,6 +4032,7 @@ $success is a bool
 add_type_params is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	auth has a value which is a string
+bool is an int
 
 </pre>
 
@@ -3996,6 +4045,7 @@ $success is a bool
 add_type_params is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	auth has a value which is a string
+bool is an int
 
 
 =end text
@@ -4071,6 +4121,7 @@ $success is a bool
 remove_type_params is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	auth has a value which is a string
+bool is an int
 
 </pre>
 
@@ -4083,6 +4134,7 @@ $success is a bool
 remove_type_params is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	auth has a value which is a string
+bool is an int
 
 
 =end text
@@ -4158,6 +4210,7 @@ $success is a bool
 patch_params is a reference to a hash where the following keys are defined:
 	patch_id has a value which is a string
 	auth has a value which is a string
+bool is an int
 
 </pre>
 
@@ -4170,6 +4223,7 @@ $success is a bool
 patch_params is a reference to a hash where the following keys are defined:
 	patch_id has a value which is a string
 	auth has a value which is a string
+bool is an int
 
 
 =end text
@@ -4282,6 +4336,37 @@ sub _validate_version {
 }
 
 =head1 TYPES
+
+
+
+=head2 bool
+
+=over 4
+
+
+
+=item Description
+
+indicates true or false values, false <= 0, true >=1
+
+
+=item Definition
+
+=begin html
+
+<pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
+
+=end text
+
+=back
 
 
 

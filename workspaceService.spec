@@ -390,7 +390,7 @@ module workspaceService {
 		Both the object data and metadata are returned.
 		This commands provides access to all versions of the objects via the instances parameter.
 	*/
-	funcdef get_objects(get_objects_params params) returns (list<get_object_output> output);
+	funcdef get_objects(get_objects_params params) returns (list<get_object_output> output) authentication optional;
 	
 	/* Input parameters for the "get_object_by_ref" function.
 	

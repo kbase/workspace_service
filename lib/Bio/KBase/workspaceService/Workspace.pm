@@ -298,9 +298,9 @@ sub getObjects {
 	my $uuidRef = {};
 	my $inst = {ids => [],types => [],instances => [],wss => [],indecies => {}};
 	for (my $i=0; $i < @{$types}; $i++) {
-		if (!defined($objects->{$types->[$i]}->{$ids->[$i]})) {
+		if (!defined($objects->{$ids->[$i]})) {
 			if (defined($options->{throwErrorIfMissing}) && $options->{throwErrorIfMissing} == 1) {
-				Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Specified object ".$types->[$i]."/".$self->id()."/".$ids->[$i]." not found in the workspace!",
+				Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Specified object ".$self->id()."/".$ids->[$i]." not found in the workspace!",
 								       method_name => 'getObject');
 			}
 			$output->[$i] = undef;
@@ -311,7 +311,7 @@ sub getObjects {
 			push(@{$inst->{wss}},$self->id());
 			$inst->{indecies}->{$ids->[$i]}->{$types->[$i]}->{$instances->[$i]} = $i;
 		} else {
-			$uuidRef->{$objects->{$types->[$i]}->{$ids->[$i]}} = $i;
+			$uuidRef->{$objects->{$ids->[$i]}} = $i;
 		}
 	}
 	if (keys(%{$uuidRef}) > 0) {
@@ -323,7 +323,7 @@ sub getObjects {
 	if (@{$inst->{ids}} > 0) {
 		my $objs = $self->parent()->_getObjectsByID($inst->{ids},$inst->{types},$inst->{wss},$inst->{instances},$options);
 		for (my $i=0; $i < @{$objs}; $i++) {
-			$output->[$inst->{indecies}->{$inst->{ids}->[$i]}->{$inst->{types}->[$i]}->{$inst->{instances}->[$i]}] = $objs->[$i];
+			$output->[$inst->{indecies}->{$inst->{ids}->[$i]}->{$inst->{instances}->[$i]}] = $objs->[$i];
 		}
 	}
 	return $output;
