@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 use Data::Dumper;
-my $test_count = 65;
+my $test_count = 67;
 
 ################################################################################
 #Test intiailization: setting test config, instantiating Impl, getting auth token

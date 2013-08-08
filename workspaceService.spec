@@ -55,6 +55,9 @@ module workspaceService {
 	/* WORKSPACE DATA TYPES */
 	/* *********************************************************************************************** */
 	
+	/* indicates true or false values, false <= 0, true >=1 */
+	typedef int bool;
+
 	/* ID of a job object */
 	typedef string job_id;
 		

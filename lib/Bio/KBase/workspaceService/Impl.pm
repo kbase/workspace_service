@@ -1519,6 +1519,7 @@ load_media_from_bio_params is a reference to a hash where the following keys are
 	asHash has a value which is a bool
 workspace_id is a string
 object_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -1554,6 +1555,7 @@ load_media_from_bio_params is a reference to a hash where the following keys are
 	asHash has a value which is a bool
 workspace_id is a string
 object_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -1597,7 +1599,7 @@ sub load_media_from_bio
 							       method_name => 'load_media_from_bio');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($mediaMetas);
     #BEGIN load_media_from_bio
     $self->_setContext($ctx,$params);
@@ -1670,6 +1672,7 @@ import_bio_params is a reference to a hash where the following keys are defined:
 	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -1706,6 +1709,7 @@ import_bio_params is a reference to a hash where the following keys are defined:
 	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -1749,7 +1753,7 @@ sub import_bio
 							       method_name => 'import_bio');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN import_bio
     $self->_setContext($ctx,$params);
@@ -1837,6 +1841,7 @@ import_map_params is a reference to a hash where the following keys are defined:
 	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -1874,6 +1879,7 @@ import_map_params is a reference to a hash where the following keys are defined:
 	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -1917,7 +1923,7 @@ sub import_map
 							       method_name => 'import_map');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN import_map
     $self->_setContext($ctx,$params);
@@ -2013,6 +2019,7 @@ object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -2054,6 +2061,7 @@ object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -2096,7 +2104,7 @@ sub save_object
 							       method_name => 'save_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN save_object
     $self->_setContext($ctx,$params);
@@ -2163,6 +2171,7 @@ delete_object_params is a reference to a hash where the following keys are defin
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -2196,6 +2205,7 @@ delete_object_params is a reference to a hash where the following keys are defin
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -2239,7 +2249,7 @@ sub delete_object
 							       method_name => 'delete_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN delete_object
     $self->_setContext($ctx,$params);
@@ -2286,6 +2296,7 @@ delete_object_permanently_params is a reference to a hash where the following ke
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -2319,6 +2330,7 @@ delete_object_permanently_params is a reference to a hash where the following ke
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -2363,7 +2375,7 @@ sub delete_object_permanently
 							       method_name => 'delete_object_permanently');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN delete_object_permanently
     $self->_setContext($ctx,$params);
@@ -2420,6 +2432,7 @@ get_object_params is a reference to a hash where the following keys are defined:
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is a string
 	metadata has a value which is an object_metadata
@@ -2458,6 +2471,7 @@ get_object_params is a reference to a hash where the following keys are defined:
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is a string
 	metadata has a value which is an object_metadata
@@ -2505,7 +2519,7 @@ sub get_object
 							       method_name => 'get_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($output);
     #BEGIN get_object
     $self->_setContext($ctx,$params);
@@ -2574,6 +2588,7 @@ get_objects_params is a reference to a hash where the following keys are defined
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is a string
 	metadata has a value which is an object_metadata
@@ -2612,6 +2627,7 @@ get_objects_params is a reference to a hash where the following keys are defined
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is a string
 	metadata has a value which is an object_metadata
@@ -2659,7 +2675,7 @@ sub get_objects
 							       method_name => 'get_objects');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($output);
     #BEGIN get_objects
     $self->_setContext($ctx,$params);
@@ -2752,6 +2768,7 @@ get_object_by_ref_params is a reference to a hash where the following keys are d
 	asHash has a value which is a bool
 	asJSON has a value which is a bool
 workspace_ref is a string
+bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is a string
 	metadata has a value which is an object_metadata
@@ -2787,6 +2804,7 @@ get_object_by_ref_params is a reference to a hash where the following keys are d
 	asHash has a value which is a bool
 	asJSON has a value which is a bool
 workspace_ref is a string
+bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is a string
 	metadata has a value which is an object_metadata
@@ -2836,7 +2854,7 @@ sub get_object_by_ref
 							       method_name => 'get_object_by_ref');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($output);
     #BEGIN get_object_by_ref
     $self->_setContext($ctx,$params);
@@ -2902,6 +2920,7 @@ object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
 workspace_ref is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -2944,6 +2963,7 @@ object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
 	version has a value which is an int
 workspace_ref is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -2988,7 +3008,7 @@ sub save_object_by_ref
 							       method_name => 'save_object_by_ref');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN save_object_by_ref
     $self->_setContext($ctx,$params);
@@ -3052,6 +3072,7 @@ get_objectmeta_params is a reference to a hash where the following keys are defi
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -3086,6 +3107,7 @@ get_objectmeta_params is a reference to a hash where the following keys are defi
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -3129,7 +3151,7 @@ sub get_objectmeta
 							       method_name => 'get_objectmeta');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN get_objectmeta
     $self->_setContext($ctx,$params);
@@ -3176,6 +3198,7 @@ get_objectmeta_by_ref_params is a reference to a hash where the following keys a
 	auth has a value which is a string
 	asHash has a value which is a bool
 workspace_ref is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -3207,6 +3230,7 @@ get_objectmeta_by_ref_params is a reference to a hash where the following keys a
 	auth has a value which is a string
 	asHash has a value which is a bool
 workspace_ref is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -3253,7 +3277,7 @@ sub get_objectmeta_by_ref
 							       method_name => 'get_objectmeta_by_ref');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN get_objectmeta_by_ref
 	$self->_setContext($ctx,$params);
@@ -3300,6 +3324,7 @@ revert_object_params is a reference to a hash where the following keys are defin
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -3334,6 +3359,7 @@ revert_object_params is a reference to a hash where the following keys are defin
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -3379,7 +3405,7 @@ sub revert_object
 							       method_name => 'revert_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN revert_object
     $self->_setContext($ctx,$params);
@@ -3431,6 +3457,7 @@ copy_object_params is a reference to a hash where the following keys are defined
 object_id is a string
 workspace_id is a string
 object_type is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -3468,6 +3495,7 @@ copy_object_params is a reference to a hash where the following keys are defined
 object_id is a string
 workspace_id is a string
 object_type is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -3512,7 +3540,7 @@ sub copy_object
 							       method_name => 'copy_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN copy_object
     $self->_setContext($ctx,$params);
@@ -3752,6 +3780,7 @@ move_object_params is a reference to a hash where the following keys are defined
 object_id is a string
 workspace_id is a string
 object_type is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -3788,6 +3817,7 @@ move_object_params is a reference to a hash where the following keys are defined
 object_id is a string
 workspace_id is a string
 object_type is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -3831,7 +3861,7 @@ sub move_object
 							       method_name => 'move_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN move_object
     $self->_setContext($ctx,$params);
@@ -3891,6 +3921,7 @@ has_object_params is a reference to a hash where the following keys are defined:
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 
 </pre>
 
@@ -3909,6 +3940,7 @@ has_object_params is a reference to a hash where the following keys are defined:
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 
 
 =end text
@@ -3937,7 +3969,7 @@ sub has_object
 							       method_name => 'has_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($object_present);
     #BEGIN has_object
     $self->_setContext($ctx,$params);
@@ -3990,6 +4022,7 @@ object_history_params is a reference to a hash where the following keys are defi
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -4023,6 +4056,7 @@ object_history_params is a reference to a hash where the following keys are defi
 object_id is a string
 object_type is a string
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -4065,7 +4099,7 @@ sub object_history
 							       method_name => 'object_history');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadatas);
     #BEGIN object_history
     $self->_setContext($ctx,$params);
@@ -4112,6 +4146,7 @@ create_workspace_params is a reference to a hash where the following keys are de
 	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -4137,6 +4172,7 @@ create_workspace_params is a reference to a hash where the following keys are de
 	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -4173,7 +4209,7 @@ sub create_workspace
 							       method_name => 'create_workspace');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN create_workspace
     $self->_setContext($ctx,$params);
@@ -4221,6 +4257,7 @@ get_workspacemeta_params is a reference to a hash where the following keys are d
 	auth has a value which is a string
 	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -4245,6 +4282,7 @@ get_workspacemeta_params is a reference to a hash where the following keys are d
 	auth has a value which is a string
 	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -4282,7 +4320,7 @@ sub get_workspacemeta
 							       method_name => 'get_workspacemeta');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN get_workspacemeta
     $self->_setContext($ctx,$params);
@@ -4367,7 +4405,7 @@ sub get_workspacepermissions
 							       method_name => 'get_workspacepermissions');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($user_permissions);
     #BEGIN get_workspacepermissions
     $self->_setContext($ctx,$params);
@@ -4407,6 +4445,7 @@ delete_workspace_params is a reference to a hash where the following keys are de
 	auth has a value which is a string
 	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -4431,6 +4470,7 @@ delete_workspace_params is a reference to a hash where the following keys are de
 	auth has a value which is a string
 	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -4468,7 +4508,7 @@ sub delete_workspace
 							       method_name => 'delete_workspace');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN delete_workspace
     $self->_setContext($ctx,$params);
@@ -4515,6 +4555,7 @@ clone_workspace_params is a reference to a hash where the following keys are def
 	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -4542,6 +4583,7 @@ clone_workspace_params is a reference to a hash where the following keys are def
 	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -4578,7 +4620,7 @@ sub clone_workspace
 							       method_name => 'clone_workspace');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN clone_workspace
     $self->_setContext($ctx,$params);
@@ -4827,6 +4869,7 @@ $workspaces is a reference to a list where each element is a workspace_metadata
 list_workspaces_params is a reference to a hash where the following keys are defined:
 	auth has a value which is a string
 	asHash has a value which is a bool
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -4850,6 +4893,7 @@ $workspaces is a reference to a list where each element is a workspace_metadata
 list_workspaces_params is a reference to a hash where the following keys are defined:
 	auth has a value which is a string
 	asHash has a value which is a bool
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -4888,7 +4932,7 @@ sub list_workspaces
 							       method_name => 'list_workspaces');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($workspaces);
     #BEGIN list_workspaces
     $self->_setContext($ctx,$params);
@@ -4940,6 +4984,7 @@ list_workspace_objects_params is a reference to a hash where the following keys 
 	auth has a value which is a string
 	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -4973,6 +5018,7 @@ list_workspace_objects_params is a reference to a hash where the following keys 
 	auth has a value which is a string
 	asHash has a value which is a bool
 workspace_id is a string
+bool is an int
 object_metadata is a reference to a list containing 11 items:
 	0: (id) an object_id
 	1: (type) an object_type
@@ -5017,7 +5063,7 @@ sub list_workspace_objects
 							       method_name => 'list_workspace_objects');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($objects);
     #BEGIN list_workspace_objects
     $self->_setContext($ctx,$params);
@@ -5069,6 +5115,7 @@ set_global_workspace_permissions_params is a reference to a hash where the follo
 	asHash has a value which is a bool
 permission is a string
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -5094,6 +5141,7 @@ set_global_workspace_permissions_params is a reference to a hash where the follo
 	asHash has a value which is a bool
 permission is a string
 workspace_id is a string
+bool is an int
 workspace_metadata is a reference to a list containing 6 items:
 	0: (id) a workspace_id
 	1: (owner) a username
@@ -5131,7 +5179,7 @@ sub set_global_workspace_permissions
 							       method_name => 'set_global_workspace_permissions');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($metadata);
     #BEGIN set_global_workspace_permissions
     $self->_setContext($ctx,$params);
@@ -5177,6 +5225,7 @@ set_workspace_permissions_params is a reference to a hash where the following ke
 username is a string
 permission is a string
 workspace_id is a string
+bool is an int
 
 </pre>
 
@@ -5194,6 +5243,7 @@ set_workspace_permissions_params is a reference to a hash where the following ke
 username is a string
 permission is a string
 workspace_id is a string
+bool is an int
 
 
 =end text
@@ -5222,7 +5272,7 @@ sub set_workspace_permissions
 							       method_name => 'set_workspace_permissions');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($success);
     #BEGIN set_workspace_permissions
     $self->_setContext($ctx,$params);
@@ -5304,7 +5354,7 @@ sub get_user_settings
 							       method_name => 'get_user_settings');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($output);
     #BEGIN get_user_settings
     $self->_setContext($ctx,$params);
@@ -5389,7 +5439,7 @@ sub set_user_settings
 							       method_name => 'set_user_settings');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($output);
     #BEGIN set_user_settings
     $self->_setContext($ctx,$params);
@@ -5497,7 +5547,7 @@ sub queue_job
 							       method_name => 'queue_job');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($job);
     #BEGIN queue_job
     $self->_setContext($ctx,$params);
@@ -5632,7 +5682,7 @@ sub set_job_status
 							       method_name => 'set_job_status');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($job);
     #BEGIN set_job_status
     $self->_setContext($ctx,$params);
@@ -5794,7 +5844,7 @@ sub get_jobs
 							       method_name => 'get_jobs');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($jobs);
     #BEGIN get_jobs
     $self->_setContext($ctx,$params);
@@ -5884,7 +5934,7 @@ sub get_types
 {
     my $self = shift;
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($types);
     #BEGIN get_types
     $types = [keys(%{$self->_permanentTypes()})];
@@ -5922,6 +5972,7 @@ $success is a bool
 add_type_params is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	auth has a value which is a string
+bool is an int
 
 </pre>
 
@@ -5934,6 +5985,7 @@ $success is a bool
 add_type_params is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	auth has a value which is a string
+bool is an int
 
 
 =end text
@@ -5962,7 +6014,7 @@ sub add_type
 							       method_name => 'add_type');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($success);
     #BEGIN add_type
     $self->_setContext($ctx,$params);
@@ -6018,6 +6070,7 @@ $success is a bool
 remove_type_params is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	auth has a value which is a string
+bool is an int
 
 </pre>
 
@@ -6030,6 +6083,7 @@ $success is a bool
 remove_type_params is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	auth has a value which is a string
+bool is an int
 
 
 =end text
@@ -6058,7 +6112,7 @@ sub remove_type
 							       method_name => 'remove_type');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($success);
     #BEGIN remove_type
     $self->_setContext($ctx,$params);
@@ -6106,6 +6160,7 @@ $success is a bool
 patch_params is a reference to a hash where the following keys are defined:
 	patch_id has a value which is a string
 	auth has a value which is a string
+bool is an int
 
 </pre>
 
@@ -6118,6 +6173,7 @@ $success is a bool
 patch_params is a reference to a hash where the following keys are defined:
 	patch_id has a value which is a string
 	auth has a value which is a string
+bool is an int
 
 
 =end text
@@ -6145,7 +6201,7 @@ sub patch
 							       method_name => 'patch');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($success);
     #BEGIN patch
     $self->_setContext($ctx,$params);
@@ -6206,6 +6262,37 @@ sub version {
 }
 
 =head1 TYPES
+
+
+
+=head2 bool
+
+=over 4
+
+
+
+=item Description
+
+indicates true or false values, false <= 0, true >=1
+
+
+=item Definition
+
+=begin html
+
+<pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
+
+=end text
+
+=back
 
 
 
