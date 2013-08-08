@@ -281,6 +281,54 @@ sub getObject {
 	return $obj;
 }
 
+=head3 getObjects
+
+Definition:
+	Bio::KBase::workspaceService::Object = getObjects([string]:types,[string]:aliases,[int]:instances)
+Description:
+	Returns Workspace objects
+
+=cut
+
+sub getObjects {
+	my ($self,$types,$ids,$instances,$options) = @_;
+	$self->checkPermissions(["r","w","a"]);
+	my $objects = $self->objects();
+	my $output = [];
+	my $uuidRef = {};
+	my $inst = {ids => [],types => [],instances => [],wss => [],indecies => {}};
+	for (my $i=0; $i < @{$types}; $i++) {
+		if (!defined($objects->{$types->[$i]}->{$ids->[$i]})) {
+			if (defined($options->{throwErrorIfMissing}) && $options->{throwErrorIfMissing} == 1) {
+				Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Specified object ".$types->[$i]."/".$self->id()."/".$ids->[$i]." not found in the workspace!",
+								       method_name => 'getObject');
+			}
+			$output->[$i] = undef;
+		} elsif (defined($instances->[$i])) {
+			push(@{$inst->{ids}},$ids->[$i]);
+			push(@{$inst->{types}},$types->[$i]);
+			push(@{$inst->{instances}},$instances->[$i]);
+			push(@{$inst->{wss}},$self->id());
+			$inst->{indecies}->{$ids->[$i]}->{$types->[$i]}->{$instances->[$i]} = $i;
+		} else {
+			$uuidRef->{$objects->{$types->[$i]}->{$ids->[$i]}} = $i;
+		}
+	}
+	if (keys(%{$uuidRef}) > 0) {
+		my $objs = $self->parent()->_getObjects([keys(%{$uuidRef})],$options);
+		for (my $i=0; $i < @{$objs}; $i++) {
+			$output->[$uuidRef->{$objs->[$i]->uuid()}] = $objs->[$i];
+		}	
+	}
+	if (@{$inst->{ids}} > 0) {
+		my $objs = $self->parent()->_getObjectsByID($inst->{ids},$inst->{types},$inst->{wss},$inst->{instances},$options);
+		for (my $i=0; $i < @{$objs}; $i++) {
+			$output->[$inst->{indecies}->{$inst->{ids}->[$i]}->{$inst->{types}->[$i]}->{$inst->{instances}->[$i]}] = $objs->[$i];
+		}
+	}
+	return $output;
+}
+
 =head3 getObjectHistory
 
 Definition:

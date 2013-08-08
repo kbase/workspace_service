@@ -7,7 +7,7 @@ use Test::More;
 use Test::Exception;
 use Test::Deep;
 use Data::Dumper;
-my $test_count = 89;
+my $test_count = 91;
 
 ################################################################################
 #Test intiailization: setting test config, instantiating Impl, getting auth token
@@ -640,9 +640,20 @@ ok !defined($objidhash->{Test1}),
 	"list_workspace_objects returned object list without deleted object Test1!";
 #Checking that the copied objects still exist
 ok defined($objidhash->{TestCopy}),
-	"list_workspace_objects returned object list without copied object TestCopy!";
+	"list_workspace_objects returned object list with copied object TestCopy!";
 ok defined($objidhash->{TestMove}),
 	"list_workspace_objects returned object list with moved result object TestMove!";
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	$output = $impl->get_objects({
+		ids => ["TestCopy","TestMove","Test1"],
+		types => ["TestData","TestData","TestData"],
+		workspaces => ["testworkspace2","testworkspace2","testworkspace"],
+		auth => $oauth
+	});
+};
+ok defined($output), "Multiple objects retrieved at once!";
+ok @{$output} == 3, "Three objects retrieved at once!";
 ################################################################################
 # Cloning workspaces with objects
 ################################################################################ 

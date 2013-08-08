@@ -63,6 +63,9 @@ module workspaceService {
 	/* WORKSPACE DATA TYPES */
 	/* *********************************************************************************************** */
 	
+	/* indicates true or false values, false <= 0, true >=1 */
+	typedef int bool;
+
 	/* ID of a job object */
 	typedef string job_id;
 		
@@ -360,6 +363,34 @@ module workspaceService {
 		This commands provides access to all versions of the object via the instance parameter.
 	*/
 	funcdef get_object(get_object_params params) returns (get_object_output output) authentication optional;	
+	
+	/* Input parameters for the "get_object" function.
+	
+		list<object_id> ids - ID of the object to be retrieved (an essential argument)
+		list<object_type> types - type of the object to be retrieved (an essential argument)
+		list<workspace_id> workspaces - ID of the workspace containing the object to be retrieved (an essential argument)
+		list<int> instances  - Version of the object to be retrieved, enabling retrieval of any previous version of an object (an optional argument; the current version is retrieved if no version is provides)
+		string auth - the authentication token of the KBase account to associate with this object retrieval command (an optional argument; user is "public" if auth is not provided)
+		bool asHash - a boolean indicating if metadata should be returned as a hash
+		bool asJSON - indicates that data should be returned in JSON format (an optional argument; default is '0')
+			
+	*/
+	typedef structure { 
+		list<object_id> ids;
+		list<object_type> types;
+		list<workspace_id> workspaces;
+		list<int> instances;
+		string auth;
+		bool asHash;
+		bool asJSON;
+	} get_objects_params;
+	
+	/*
+		Retrieves the specified objects from the specified workspaces.
+		Both the object data and metadata are returned.
+		This commands provides access to all versions of the objects via the instances parameter.
+	*/
+	funcdef get_objects(get_objects_params params) returns (list<get_object_output> output);
 	
 	/* Input parameters for the "get_object_by_ref" function.
 	
