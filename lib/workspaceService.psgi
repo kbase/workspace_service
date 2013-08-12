@@ -1,6 +1,6 @@
 use Bio::KBase::workspaceService::Impl;
 
-use Bio::KBase::workspaceService::Service;
+use Bio::KBase::workspaceService::Server;
 use Plack::Middleware::CrossOrigin;
 
 
@@ -13,7 +13,7 @@ my @dispatch;
 }
 
 
-my $server = Bio::KBase::workspaceService::Service->new(instance_dispatch => { @dispatch },
+my $server = Bio::KBase::workspaceService::Server->new(instance_dispatch => { @dispatch },
 				allow_get => 0,
 			       );
 
