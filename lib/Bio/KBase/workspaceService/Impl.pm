@@ -2668,6 +2668,7 @@ sub get_objects
     	asHash => 0,
     	asJSON => 0
     });
+    $output = [];
     my $idHash = {};
     my $refs = [];
     my $refIndecies = {};

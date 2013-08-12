@@ -9,7 +9,7 @@ compile_typespec                \
     -impl $db_base::Impl        \
     -service $db_base::Service  \
     -psgi workspaceService.psgi      \
-    -client $db_base            \
+    -client $db_base::Client \
     -js workspaceService     \
     -py workspaceService     \
     workspaceService.spec lib
