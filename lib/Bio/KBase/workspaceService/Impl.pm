@@ -2712,10 +2712,11 @@ sub get_objects
 		asHash => 0,
 		asJSON => 0
 	});
-	my $idHash = {};
-	my $refs = [];
-	my $refIndecies = {};
-	my $wsHash = {};
+    $output = [];
+    my $idHash = {};
+    my $refs = [];
+    my $refIndecies = {};
+    my $wsHash = {};
 	for (my $i=0; $i < @{$params->{ids}}; $i++) {
 		if ($params->{workspaces}->[$i] eq "NO_WORKSPACE") {
 			$refIndecies->{$params->{ids}->[$i]} = $i;
