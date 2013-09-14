@@ -58,7 +58,7 @@ while ($line = <$fh>) {
 		delete($data->{contigs});
 		my $path = $directory."/".$array->[1]."/".$array->[2]."/";
 		File::Path::mkpath ($path);
-		open(my $fho, "<".$path.$array->[0]);
+		open(my $fho, ">".$path.$array->[0]);
 		print $fho $array->[2]."/".$array->[1]."/".$array->[0]."\n";
 		print $fho to_json( $data, { utf8 => 1, pretty => 0 } )."\n";
 		close($fho);
