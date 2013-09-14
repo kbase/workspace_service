@@ -36,7 +36,9 @@ open(my $fh, "<".$filename);
 my $line = <$fh>;
 while ($line = <$fh>) {
 	my $array = [split(/\t/,$line)];
-	if (defined($types->{$array->[2]})) {
+	my $path = $directory."/".$array->[1]."/".$array->[2]."/";
+	my $filename = $path.$array->[0].".v.".$array->[3];
+	if (defined($types->{$array->[2]}) && !-e $filename) {
 		print $array->[2]."/".$array->[1]."/".$array->[0]."\n";
 		my $output;
 		while(!defined($output)) {
@@ -56,10 +58,9 @@ while ($line = <$fh>) {
 		delete($data->{_wsID});
 		delete($data->{_wsUUID});
 		delete($data->{contigs});
-		my $path = $directory."/".$array->[1]."/".$array->[2]."/";
 		File::Path::mkpath ($path);
-		open(my $fho, ">".$path.$array->[0]);
-		print $fho $array->[2]."/".$array->[1]."/".$array->[0]."\n";
+		open(my $fho, ">".$filename);
+		print $fho $array->[2]."/".$array->[1]."/".$array->[0]."/".$array->[3]."\n";
 		print $fho to_json( $data, { utf8 => 1, pretty => 0 } )."\n";
 		close($fho);
 	}
