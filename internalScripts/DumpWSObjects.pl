@@ -39,7 +39,7 @@ while ($line = <$fh>) {
 	if (defined($types->{$array->[2]})) {
 		print $array->[2]."/".$array->[1]."/".$array->[0]."\n";
 		my $output;
-		while(defined($output)) {
+		while(!defined($output)) {
 			eval {
 				$output = $wss->get_object({
 					id => $array->[0],
