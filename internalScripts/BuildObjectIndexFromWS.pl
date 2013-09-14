@@ -29,7 +29,7 @@ print $fh "ID\tWorkspace\tType\tInstance\tRef\tCommand\tModdate\tOwner\n";
 my $workspace_list = $wss->list_workspaces({auth => $c->param("kbclientconfig.auth")});
 foreach my $workspace (@{$workspace_list}) {
 	my $wsid = $workspace->[0];
-	my $object_list = $wss->list_workspace_objects({auth => $c->param("kbclientconfig.auth")});
+	my $object_list = $wss->list_workspace_objects({workspace => $wsid,auth => $c->param("kbclientconfig.auth")});
 	foreach my $object (@{$object_list}) {
 		if (!defined($typeCount->{$object->[1]})) {
 			$typeCount->{$object->[1]} = 0;
