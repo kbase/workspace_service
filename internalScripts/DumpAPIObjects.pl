@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Config::Simple;
 use Bio::KBase::workspaceService::Client;
-use Bio::KBase::fbaModelServices::Impl;
+use Bio::KBase::fbaModelServices::Client;
 use JSON -support_by_pp;
 use File::Path;
 
@@ -25,7 +25,7 @@ if (!-e $config) {
 my $c = Config::Simple->new();
 $c->read($config);
 my $wss = Bio::KBase::workspaceService::Client->new($c->param("kbclientconfig.wsurl"));
-my $fbas = Bio::KBase::fbaModelServices::Impl->new($c->param("kbclientconfig.fbaurl"));
+my $fbas = Bio::KBase::fbaModelServices::Client->new($c->param("kbclientconfig.fbaurl"));
 my $types = {
 	ModelTemplate => 1,
 	Model => 1,
