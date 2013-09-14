@@ -21,15 +21,15 @@ if (!-e $config) {
 #Params: writesbml.wsurl, writesbml.fbaurl, writesbml.auth
 my $c = Config::Simple->new();
 $c->read($config);
-my $wserv = Bio::KBase::workspaceService::Client->new($c->param("kbclientconfig.wsurl"));
+my $wss = Bio::KBase::workspaceService::Client->new($c->param("kbclientconfig.wsurl"));
 
 my $typeCount = {};
 open(my $fh, ">".$filename); 
 print $fh "ID\tWorkspace\tType\tInstance\tRef\tCommand\tModdate\tOwner\n";
-my $workspace_list = $wss->list_workspaces({auth => $workspaceRootAuth});
+my $workspace_list = $wss->list_workspaces({auth => $c->param("kbclientconfig.auth")});
 foreach my $workspace (@{$workspace_list}) {
 	my $wsid = $workspace->[0];
-	my $object_list = $wss->list_workspace_objects({auth => $workspaceRootAuth});
+	my $object_list = $wss->list_workspace_objects({auth => $c->param("kbclientconfig.auth")});
 	foreach my $object (@{$object_list}) {
 		if (!defined($typeCount->{$object->[1]})) {
 			$typeCount->{$object->[1]} = 0;
