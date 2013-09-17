@@ -41,7 +41,7 @@ while ($line = <$fh>) {
 	if (defined($types->{$array->[2]}) && !-e $filename) {
 		print $array->[2]."/".$array->[1]."/".$array->[0]."\n";
 		my $output;
-		while(!defined($output)) {
+		#while(!defined($output)) {
 			eval {
 				if ($array->[2] eq "Model") {
 					$output = $fbas->get_models({
@@ -78,6 +78,9 @@ while ($line = <$fh>) {
 					}
 				}
 			};
+		#}
+		if (!defined($output)) {
+			print "Load failed: ".$array->[2]."/".$array->[1]."/".$array->[0]."\n"; 	
 		}
 		my $data = $output;
 		delete($data->{_wsWS});
