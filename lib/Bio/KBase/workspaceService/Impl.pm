@@ -5576,27 +5576,26 @@ sub queue_job
     my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
     my($job);
     #BEGIN queue_job
-	$self->_setContext($params->{auth});
-	$params = $self->_validateargs($params,["type"],{
-		"state" => "queued",
-		jobdata => {},
-		queuecommand => "unknown"
-	});
-	#Obtaining new job ID
-	my $id = $self->_get_new_id("job.");
-	#Checking that job doesn't already exist
-	my $cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $id});
-	while (my $object = $cursor->next) {
-		if ($id =~ m/job\.(\d+)/) {
-			my $num = $1;
-			$num++;
-			$id = "job.".$num;
-		}
-		print stderr "Getting new ID:".$id."\n";
-		$cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $id});
-	}
-	#Inserting jobs in database
-	$job = {
+   $self->_setContext($params->{auth});
+    $params = $self->_validateargs($params,["type"],{
+    	"state" => "queued",
+    	jobdata => {},
+    	queuecommand => "unknown"
+    });
+    #Obtaining new job ID
+    my $id = "job.13000";
+    my $cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $id});
+    while (my $object = $cursor->next) {
+    	if ($id =~ m/job\.(\d+)/) {
+    		my $num = $1;
+    		$num++;
+    		$id = "job.".$num;
+    	}
+    	#print stderr "Getting new ID:".$id."\n";
+    	$cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $id});
+    }
+    #Inserting jobs in database
+    $job = {
 		id => $id,
 		type => $params->{type},
 		auth => $params->{auth},

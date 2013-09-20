@@ -94,6 +94,7 @@ sub new
 	url => $url,
     };
 
+    #
     # This module requires authentication.
     #
     # We create an auth token, passing through the arguments that we were (hopefully) given.
@@ -101,12 +102,11 @@ sub new
     {
 	my $token = Bio::KBase::AuthToken->new(@args);
 	
-	if ($token->error_message)
+	if (!$token->error_message)
 	{
-	    die "Authentication failed: " . $token->error_message;
+	    $self->{token} = $token->token;
+	    $self->{client}->{token} = $token->token;
 	}
-	$self->{token} = $token->token;
-	$self->{client}->{token} = $token->token;
     }
 
     my $ua = $self->{client}->ua;	 
