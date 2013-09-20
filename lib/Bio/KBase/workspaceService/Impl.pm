@@ -5558,8 +5558,7 @@ sub queue_job
     	queuecommand => "unknown"
     });
     #Obtaining new job ID
-    my $id = $self->_get_new_id("job.");
-    #Checking that job doesn't already exist
+    $id = "job.13000";
     my $cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $id});
     while (my $object = $cursor->next) {
     	if ($id =~ m/job\.(\d+)/) {
@@ -5567,7 +5566,7 @@ sub queue_job
     		$num++;
     		$id = "job.".$num;
     	}
-    	print stderr "Getting new ID:".$id."\n";
+    	#print stderr "Getting new ID:".$id."\n";
     	$cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $id});
     }
     #Inserting jobs in database
