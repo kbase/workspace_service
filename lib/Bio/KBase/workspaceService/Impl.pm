@@ -5558,7 +5558,7 @@ sub queue_job
     	queuecommand => "unknown"
     });
     #Obtaining new job ID
-    $id = "job.13000";
+    my $id = "job.13000";
     my $cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $id});
     while (my $object = $cursor->next) {
     	if ($id =~ m/job\.(\d+)/) {
