@@ -5581,7 +5581,7 @@ sub queue_job
 		queuecommand => $params->{queuecommand}
     };
     $self->_mongodb()->get_collection('jobObjects')->insert($job);
-	$self->_clearContext();  
+	$self->_clearContext();
     #END queue_job
     my @_bad_returns;
     (ref($job) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"job\" (value was \"$job\")");
