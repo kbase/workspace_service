@@ -24,7 +24,7 @@ if (!-e $config) {
 my $c = Config::Simple->new();
 $c->read($config);
 my $wss = Bio::KBase::workspaceService::Client->new($c->param("kbclientconfig.wsurl"));
-my $job = $wss->client()->get_jobs({
+my $job = $wss->get_jobs({
 	jobids => [$jobid],
 	auth => $c->param("kbclientconfig.auth")
 });
