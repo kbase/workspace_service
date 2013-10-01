@@ -24,14 +24,14 @@ if (!-e $config) {
 my $c = Config::Simple->new();
 $c->read($config);
 my $wss = Bio::KBase::workspaceService::Client->new($c->param("kbclientconfig.wsurl"));
-my $job = $wss->get_jobs({
+my $jobs = $wss->get_jobs({
 	jobids => [$jobid],
 	auth => $c->param("kbclientconfig.auth")
 });
 
 my $JSON = JSON::XS->new();
-my $data = $JSON->encode($job);
-my $directory = $jobdir."/jobs/".$job->{id}."/";
+my $data = $JSON->encode($jobs->[0]);
+my $directory = $jobdir."/jobs/".$jobs->[0]->{id}."/";
 if (!-d $directory) {
 	mkdir $directory;
 }
