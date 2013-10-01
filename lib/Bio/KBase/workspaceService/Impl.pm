@@ -246,7 +246,7 @@ Description:
 sub _idServer {
 	my $self = shift;
 	if (!defined($self->{_idserver})) {
-		$self->{_idserver} = Bio::KBase::IDServer::Client->new($self->{'_idserver-url'});
+		$self->{_idserver} = Bio::KBase::IDServer::Client->new("http://kbase.us/services/idserver");
 	}
     return $self->{_idserver};
 }
@@ -5558,7 +5558,7 @@ sub queue_job
     	queuecommand => "unknown"
     });
     #Obtaining new job ID
-    my $id = "job.13000";
+	my $id = $self->_get_new_id("job.");
     my $cursor = $self->_mongodb()->get_collection('jobObjects')->find({id => $id});
     while (my $object = $cursor->next) {
     	if ($id =~ m/job\.(\d+)/) {
