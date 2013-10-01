@@ -41,7 +41,7 @@ if (-e $directory."jobfile.json") {
 if (-e $directory."pid") {
 	unlink $directory."pid";
 }
-open(my $fh, ">", $directory."jobfile.json") || return;
+open(my $fh, ">", $directory.$jobs->[0]->{id}.".json");
 print $fh $data;
 close($fh);
 
