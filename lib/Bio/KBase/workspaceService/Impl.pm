@@ -77,6 +77,7 @@ use Bio::KBase::workspaceService::Object;
 use Bio::KBase::workspaceService::Workspace;
 use Bio::KBase::workspaceService::WorkspaceUser;
 use Bio::KBase::workspaceService::DataObject;
+use Bio::KBase::IDServer::Client;
 use Config::Simple;
 use IO::Compress::Gzip qw(gzip);
 use IO::Uncompress::Gunzip qw(gunzip);
