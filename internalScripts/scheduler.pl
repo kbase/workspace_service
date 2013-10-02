@@ -280,7 +280,7 @@ sub readconfig {
 	my $statuses = [split(/;/,$c->param("scheduler.jobstatus"))];
 	my $threads = [split(/;/,$c->param("scheduler.threads"))];
 	for (my $i=0; $i < @{$types}; $i++) {
-		$self->{_jobtypes}->{$types->[$i]}} = {
+		$self->{_jobtypes}->{$types->[$i]} = {
 			type => $types->[$i],
 			executable => $executables->[$i],
 			status => $statuses->[$i],
@@ -305,6 +305,7 @@ sub jobdirectory {
 }
 
 sub jobtypes {
+	my($self) = @_;
 	return $self->{_jobtypes};
 }
 
