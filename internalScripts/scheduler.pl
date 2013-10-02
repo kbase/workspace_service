@@ -166,7 +166,7 @@ sub monitor {
 						}
 					}
 				}
-				print "JOBS:".$runningCount."\n";
+				print $runningCount." jobs of type ".$type." now running!\n";
 				#Queuing new jobs
 				my $openSlots = ($count - $runningCount);
 				$jobs = undef;
@@ -177,6 +177,7 @@ sub monitor {
 						auth => $self->auth()
 					});
 				};
+				print @{$jobs}." jobs of type ".$type." with ".$openSlots." open slots!\n";
 				if (defined($jobs) && $openSlots > 0) {
 					while ($openSlots > 0 && @{$jobs} > 0) {
 						my $job = shift(@{$jobs});
@@ -338,7 +339,6 @@ sub clearOldDirectoryFiles {
 	foreach my $file (@{$files}) {	
 		my @stat = stat($directory."/".$file);
 		if ($stat[9] < ($now - $age)) {
-			print "Deleting $file...";
 			unlink($directory."/".$file);
 		}
 	}
