@@ -1542,29 +1542,29 @@ sub new
 =begin html
 
 <pre>
-$params is a workspaceService.load_media_from_bio_params
-$mediaMetas is a reference to a list where each element is a workspaceService.object_metadata
+$params is a load_media_from_bio_params
+$mediaMetas is a reference to a list where each element is an object_metadata
 load_media_from_bio_params is a reference to a hash where the following keys are defined:
-	mediaWS has a value which is a workspaceService.workspace_id
-	bioid has a value which is a workspaceService.object_id
-	bioWS has a value which is a workspaceService.workspace_id
-	clearExisting has a value which is a workspaceService.bool
-	overwrite has a value which is a workspaceService.bool
+	mediaWS has a value which is a workspace_id
+	bioid has a value which is an object_id
+	bioWS has a value which is a workspace_id
+	clearExisting has a value which is a bool
+	overwrite has a value which is a bool
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 workspace_id is a string
 object_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 object_type is a string
@@ -1578,29 +1578,29 @@ workspace_ref is a string
 
 =begin text
 
-$params is a workspaceService.load_media_from_bio_params
-$mediaMetas is a reference to a list where each element is a workspaceService.object_metadata
+$params is a load_media_from_bio_params
+$mediaMetas is a reference to a list where each element is an object_metadata
 load_media_from_bio_params is a reference to a hash where the following keys are defined:
-	mediaWS has a value which is a workspaceService.workspace_id
-	bioid has a value which is a workspaceService.object_id
-	bioWS has a value which is a workspaceService.workspace_id
-	clearExisting has a value which is a workspaceService.bool
-	overwrite has a value which is a workspaceService.bool
+	mediaWS has a value which is a workspace_id
+	bioid has a value which is an object_id
+	bioWS has a value which is a workspace_id
+	clearExisting has a value which is a bool
+	overwrite has a value which is a bool
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 workspace_id is a string
 object_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 object_type is a string
@@ -1693,30 +1693,30 @@ sub load_media_from_bio
 =begin html
 
 <pre>
-$params is a workspaceService.import_bio_params
-$metadata is a workspaceService.object_metadata
+$params is an import_bio_params
+$metadata is an object_metadata
 import_bio_params is a reference to a hash where the following keys are defined:
-	bioid has a value which is a workspaceService.object_id
-	bioWS has a value which is a workspaceService.workspace_id
+	bioid has a value which is an object_id
+	bioWS has a value which is a workspace_id
 	url has a value which is a string
-	compressed has a value which is a workspaceService.bool
-	clearExisting has a value which is a workspaceService.bool
-	overwrite has a value which is a workspaceService.bool
+	compressed has a value which is a bool
+	clearExisting has a value which is a bool
+	overwrite has a value which is a bool
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 object_type is a string
@@ -1730,30 +1730,30 @@ workspace_ref is a string
 
 =begin text
 
-$params is a workspaceService.import_bio_params
-$metadata is a workspaceService.object_metadata
+$params is an import_bio_params
+$metadata is an object_metadata
 import_bio_params is a reference to a hash where the following keys are defined:
-	bioid has a value which is a workspaceService.object_id
-	bioWS has a value which is a workspaceService.workspace_id
+	bioid has a value which is an object_id
+	bioWS has a value which is a workspace_id
 	url has a value which is a string
-	compressed has a value which is a workspaceService.bool
-	clearExisting has a value which is a workspaceService.bool
-	overwrite has a value which is a workspaceService.bool
+	compressed has a value which is a bool
+	clearExisting has a value which is a bool
+	overwrite has a value which is a bool
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 object_type is a string
@@ -1860,31 +1860,31 @@ sub import_bio
 =begin html
 
 <pre>
-$params is a workspaceService.import_map_params
-$metadata is a workspaceService.object_metadata
+$params is an import_map_params
+$metadata is an object_metadata
 import_map_params is a reference to a hash where the following keys are defined:
-	bioid has a value which is a workspaceService.object_id
-	bioWS has a value which is a workspaceService.workspace_id
-	mapid has a value which is a workspaceService.object_id
-	mapWS has a value which is a workspaceService.workspace_id
+	bioid has a value which is an object_id
+	bioWS has a value which is a workspace_id
+	mapid has a value which is an object_id
+	mapWS has a value which is a workspace_id
 	url has a value which is a string
-	compressed has a value which is a workspaceService.bool
-	overwrite has a value which is a workspaceService.bool
+	compressed has a value which is a bool
+	overwrite has a value which is a bool
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 object_type is a string
@@ -1898,31 +1898,31 @@ workspace_ref is a string
 
 =begin text
 
-$params is a workspaceService.import_map_params
-$metadata is a workspaceService.object_metadata
+$params is an import_map_params
+$metadata is an object_metadata
 import_map_params is a reference to a hash where the following keys are defined:
-	bioid has a value which is a workspaceService.object_id
-	bioWS has a value which is a workspaceService.workspace_id
-	mapid has a value which is a workspaceService.object_id
-	mapWS has a value which is a workspaceService.workspace_id
+	bioid has a value which is an object_id
+	bioWS has a value which is a workspace_id
+	mapid has a value which is an object_id
+	mapWS has a value which is a workspace_id
 	url has a value which is a string
-	compressed has a value which is a workspaceService.bool
-	overwrite has a value which is a workspaceService.bool
+	compressed has a value which is a bool
+	overwrite has a value which is a bool
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 object_type is a string
@@ -2032,20 +2032,20 @@ sub import_map
 =begin html
 
 <pre>
-$params is a workspaceService.save_object_params
-$metadata is a workspaceService.object_metadata
+$params is a save_object_params
+$metadata is an object_metadata
 save_object_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	data has a value which is a workspaceService.ObjectData
-	workspace has a value which is a workspaceService.workspace_id
+	id has a value which is an object_id
+	type has a value which is an object_type
+	data has a value which is an ObjectData
+	workspace has a value which is a workspace_id
 	command has a value which is a string
 	metadata has a value which is a reference to a hash where the key is a string and the value is a string
 	auth has a value which is a string
-	json has a value which is a workspaceService.bool
-	compressed has a value which is a workspaceService.bool
-	retrieveFromURL has a value which is a workspaceService.bool
-	asHash has a value which is a workspaceService.bool
+	json has a value which is a bool
+	compressed has a value which is a bool
+	retrieveFromURL has a value which is a bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -2053,15 +2053,15 @@ ObjectData is a reference to a hash where the following keys are defined:
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -2074,20 +2074,20 @@ workspace_ref is a string
 
 =begin text
 
-$params is a workspaceService.save_object_params
-$metadata is a workspaceService.object_metadata
+$params is a save_object_params
+$metadata is an object_metadata
 save_object_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	data has a value which is a workspaceService.ObjectData
-	workspace has a value which is a workspaceService.workspace_id
+	id has a value which is an object_id
+	type has a value which is an object_type
+	data has a value which is an ObjectData
+	workspace has a value which is a workspace_id
 	command has a value which is a string
 	metadata has a value which is a reference to a hash where the key is a string and the value is a string
 	auth has a value which is a string
-	json has a value which is a workspaceService.bool
-	compressed has a value which is a workspaceService.bool
-	retrieveFromURL has a value which is a workspaceService.bool
-	asHash has a value which is a workspaceService.bool
+	json has a value which is a bool
+	compressed has a value which is a bool
+	retrieveFromURL has a value which is a bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -2095,15 +2095,15 @@ ObjectData is a reference to a hash where the following keys are defined:
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -2191,28 +2191,28 @@ sub save_object
 =begin html
 
 <pre>
-$params is a workspaceService.delete_object_params
-$metadata is a workspaceService.object_metadata
+$params is a delete_object_params
+$metadata is an object_metadata
 delete_object_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	workspace has a value which is a workspaceService.workspace_id
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -2225,28 +2225,28 @@ workspace_ref is a string
 
 =begin text
 
-$params is a workspaceService.delete_object_params
-$metadata is a workspaceService.object_metadata
+$params is a delete_object_params
+$metadata is an object_metadata
 delete_object_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	workspace has a value which is a workspaceService.workspace_id
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -2315,28 +2315,28 @@ sub delete_object
 =begin html
 
 <pre>
-$params is a workspaceService.delete_object_permanently_params
-$metadata is a workspaceService.object_metadata
+$params is a delete_object_permanently_params
+$metadata is an object_metadata
 delete_object_permanently_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	workspace has a value which is a workspaceService.workspace_id
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -2349,28 +2349,28 @@ workspace_ref is a string
 
 =begin text
 
-$params is a workspaceService.delete_object_permanently_params
-$metadata is a workspaceService.object_metadata
+$params is a delete_object_permanently_params
+$metadata is an object_metadata
 delete_object_permanently_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	workspace has a value which is a workspaceService.workspace_id
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -2449,33 +2449,33 @@ sub delete_object_permanently
 =begin html
 
 <pre>
-$params is a workspaceService.get_object_params
-$output is a workspaceService.get_object_output
+$params is a get_object_params
+$output is a get_object_output
 get_object_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	workspace has a value which is a workspaceService.workspace_id
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
-	asJSON has a value which is a workspaceService.bool
+	asHash has a value which is a bool
+	asJSON has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is a string
-	metadata has a value which is a workspaceService.object_metadata
+	metadata has a value which is an object_metadata
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -2488,33 +2488,33 @@ workspace_ref is a string
 
 =begin text
 
-$params is a workspaceService.get_object_params
-$output is a workspaceService.get_object_output
+$params is a get_object_params
+$output is a get_object_output
 get_object_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	workspace has a value which is a workspaceService.workspace_id
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
-	asJSON has a value which is a workspaceService.bool
+	asHash has a value which is a bool
+	asJSON has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is a string
-	metadata has a value which is a workspaceService.object_metadata
+	metadata has a value which is an object_metadata
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -2604,33 +2604,33 @@ sub get_object
 =begin html
 
 <pre>
-$params is a workspaceService.get_objects_params
-$output is a reference to a list where each element is a workspaceService.get_object_output
+$params is a get_objects_params
+$output is a reference to a list where each element is a get_object_output
 get_objects_params is a reference to a hash where the following keys are defined:
-	ids has a value which is a reference to a list where each element is a workspaceService.object_id
-	types has a value which is a reference to a list where each element is a workspaceService.object_type
-	workspaces has a value which is a reference to a list where each element is a workspaceService.workspace_id
+	ids has a value which is a reference to a list where each element is an object_id
+	types has a value which is a reference to a list where each element is an object_type
+	workspaces has a value which is a reference to a list where each element is a workspace_id
 	instances has a value which is a reference to a list where each element is an int
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
-	asJSON has a value which is a workspaceService.bool
+	asHash has a value which is a bool
+	asJSON has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is a string
-	metadata has a value which is a workspaceService.object_metadata
+	metadata has a value which is an object_metadata
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -2643,33 +2643,33 @@ workspace_ref is a string
 
 =begin text
 
-$params is a workspaceService.get_objects_params
-$output is a reference to a list where each element is a workspaceService.get_object_output
+$params is a get_objects_params
+$output is a reference to a list where each element is a get_object_output
 get_objects_params is a reference to a hash where the following keys are defined:
-	ids has a value which is a reference to a list where each element is a workspaceService.object_id
-	types has a value which is a reference to a list where each element is a workspaceService.object_type
-	workspaces has a value which is a reference to a list where each element is a workspaceService.workspace_id
+	ids has a value which is a reference to a list where each element is an object_id
+	types has a value which is a reference to a list where each element is an object_type
+	workspaces has a value which is a reference to a list where each element is a workspace_id
 	instances has a value which is a reference to a list where each element is an int
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
-	asJSON has a value which is a workspaceService.bool
+	asHash has a value which is a bool
+	asJSON has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is a string
-	metadata has a value which is a workspaceService.object_metadata
+	metadata has a value which is an object_metadata
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -2789,28 +2789,28 @@ sub get_objects
 =begin html
 
 <pre>
-$params is a workspaceService.get_object_by_ref_params
-$output is a workspaceService.get_object_output
+$params is a get_object_by_ref_params
+$output is a get_object_output
 get_object_by_ref_params is a reference to a hash where the following keys are defined:
-	reference has a value which is a workspaceService.workspace_ref
+	reference has a value which is a workspace_ref
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
-	asJSON has a value which is a workspaceService.bool
+	asHash has a value which is a bool
+	asJSON has a value which is a bool
 workspace_ref is a string
 bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is a string
-	metadata has a value which is a workspaceService.object_metadata
+	metadata has a value which is an object_metadata
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 object_id is a string
@@ -2825,28 +2825,28 @@ workspace_id is a string
 
 =begin text
 
-$params is a workspaceService.get_object_by_ref_params
-$output is a workspaceService.get_object_output
+$params is a get_object_by_ref_params
+$output is a get_object_output
 get_object_by_ref_params is a reference to a hash where the following keys are defined:
-	reference has a value which is a workspaceService.workspace_ref
+	reference has a value which is a workspace_ref
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
-	asJSON has a value which is a workspaceService.bool
+	asHash has a value which is a bool
+	asJSON has a value which is a bool
 workspace_ref is a string
 bool is an int
 get_object_output is a reference to a hash where the following keys are defined:
 	data has a value which is a string
-	metadata has a value which is a workspaceService.object_metadata
+	metadata has a value which is an object_metadata
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 object_id is a string
@@ -2928,21 +2928,21 @@ sub get_object_by_ref
 =begin html
 
 <pre>
-$params is a workspaceService.save_object_by_ref_params
-$metadata is a workspaceService.object_metadata
+$params is a save_object_by_ref_params
+$metadata is an object_metadata
 save_object_by_ref_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	data has a value which is a workspaceService.ObjectData
+	id has a value which is an object_id
+	type has a value which is an object_type
+	data has a value which is an ObjectData
 	command has a value which is a string
 	metadata has a value which is a reference to a hash where the key is a string and the value is a string
-	reference has a value which is a workspaceService.workspace_ref
-	json has a value which is a workspaceService.bool
-	compressed has a value which is a workspaceService.bool
-	retrieveFromURL has a value which is a workspaceService.bool
-	replace has a value which is a workspaceService.bool
+	reference has a value which is a workspace_ref
+	json has a value which is a bool
+	compressed has a value which is a bool
+	retrieveFromURL has a value which is a bool
+	replace has a value which is a bool
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -2950,15 +2950,15 @@ ObjectData is a reference to a hash where the following keys are defined:
 workspace_ref is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -2971,21 +2971,21 @@ workspace_id is a string
 
 =begin text
 
-$params is a workspaceService.save_object_by_ref_params
-$metadata is a workspaceService.object_metadata
+$params is a save_object_by_ref_params
+$metadata is an object_metadata
 save_object_by_ref_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	data has a value which is a workspaceService.ObjectData
+	id has a value which is an object_id
+	type has a value which is an object_type
+	data has a value which is an ObjectData
 	command has a value which is a string
 	metadata has a value which is a reference to a hash where the key is a string and the value is a string
-	reference has a value which is a workspaceService.workspace_ref
-	json has a value which is a workspaceService.bool
-	compressed has a value which is a workspaceService.bool
-	retrieveFromURL has a value which is a workspaceService.bool
-	replace has a value which is a workspaceService.bool
+	reference has a value which is a workspace_ref
+	json has a value which is a bool
+	compressed has a value which is a bool
+	retrieveFromURL has a value which is a bool
+	replace has a value which is a bool
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 ObjectData is a reference to a hash where the following keys are defined:
@@ -2993,15 +2993,15 @@ ObjectData is a reference to a hash where the following keys are defined:
 workspace_ref is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -3088,29 +3088,29 @@ sub save_object_by_ref
 =begin html
 
 <pre>
-$params is a workspaceService.get_objectmeta_params
-$metadata is a workspaceService.object_metadata
+$params is a get_objectmeta_params
+$metadata is an object_metadata
 get_objectmeta_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	workspace has a value which is a workspaceService.workspace_id
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -3123,29 +3123,29 @@ workspace_ref is a string
 
 =begin text
 
-$params is a workspaceService.get_objectmeta_params
-$metadata is a workspaceService.object_metadata
+$params is a get_objectmeta_params
+$metadata is an object_metadata
 get_objectmeta_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	workspace has a value which is a workspaceService.workspace_id
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -3218,24 +3218,24 @@ sub get_objectmeta
 =begin html
 
 <pre>
-$params is a workspaceService.get_objectmeta_by_ref_params
-$metadata is a workspaceService.object_metadata
+$params is a get_objectmeta_by_ref_params
+$metadata is an object_metadata
 get_objectmeta_by_ref_params is a reference to a hash where the following keys are defined:
-	reference has a value which is a workspaceService.workspace_ref
+	reference has a value which is a workspace_ref
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 workspace_ref is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 object_id is a string
@@ -3250,24 +3250,24 @@ workspace_id is a string
 
 =begin text
 
-$params is a workspaceService.get_objectmeta_by_ref_params
-$metadata is a workspaceService.object_metadata
+$params is a get_objectmeta_by_ref_params
+$metadata is an object_metadata
 get_objectmeta_by_ref_params is a reference to a hash where the following keys are defined:
-	reference has a value which is a workspaceService.workspace_ref
+	reference has a value which is a workspace_ref
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 workspace_ref is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 object_id is a string
@@ -3338,29 +3338,29 @@ sub get_objectmeta_by_ref
 =begin html
 
 <pre>
-$params is a workspaceService.revert_object_params
-$metadata is a workspaceService.object_metadata
+$params is a revert_object_params
+$metadata is an object_metadata
 revert_object_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	workspace has a value which is a workspaceService.workspace_id
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -3373,29 +3373,29 @@ workspace_ref is a string
 
 =begin text
 
-$params is a workspaceService.revert_object_params
-$metadata is a workspaceService.object_metadata
+$params is a revert_object_params
+$metadata is an object_metadata
 revert_object_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	workspace has a value which is a workspaceService.workspace_id
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
 	instance has a value which is an int
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -3467,32 +3467,32 @@ sub revert_object
 =begin html
 
 <pre>
-$params is a workspaceService.copy_object_params
-$metadata is a workspaceService.object_metadata
+$params is a copy_object_params
+$metadata is an object_metadata
 copy_object_params is a reference to a hash where the following keys are defined:
 	new_workspace_url has a value which is a string
-	new_id has a value which is a workspaceService.object_id
-	new_workspace has a value which is a workspaceService.workspace_id
-	source_id has a value which is a workspaceService.object_id
+	new_id has a value which is an object_id
+	new_workspace has a value which is a workspace_id
+	source_id has a value which is an object_id
 	instance has a value which is an int
-	type has a value which is a workspaceService.object_type
-	source_workspace has a value which is a workspaceService.workspace_id
+	type has a value which is an object_type
+	source_workspace has a value which is a workspace_id
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 object_type is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -3505,32 +3505,32 @@ workspace_ref is a string
 
 =begin text
 
-$params is a workspaceService.copy_object_params
-$metadata is a workspaceService.object_metadata
+$params is a copy_object_params
+$metadata is an object_metadata
 copy_object_params is a reference to a hash where the following keys are defined:
 	new_workspace_url has a value which is a string
-	new_id has a value which is a workspaceService.object_id
-	new_workspace has a value which is a workspaceService.workspace_id
-	source_id has a value which is a workspaceService.object_id
+	new_id has a value which is an object_id
+	new_workspace has a value which is a workspace_id
+	source_id has a value which is an object_id
 	instance has a value which is an int
-	type has a value which is a workspaceService.object_type
-	source_workspace has a value which is a workspaceService.workspace_id
+	type has a value which is an object_type
+	source_workspace has a value which is a workspace_id
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 object_type is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -3790,31 +3790,31 @@ sub copy_object
 =begin html
 
 <pre>
-$params is a workspaceService.move_object_params
-$metadata is a workspaceService.object_metadata
+$params is a move_object_params
+$metadata is an object_metadata
 move_object_params is a reference to a hash where the following keys are defined:
 	new_workspace_url has a value which is a string
-	new_id has a value which is a workspaceService.object_id
-	new_workspace has a value which is a workspaceService.workspace_id
-	source_id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	source_workspace has a value which is a workspaceService.workspace_id
+	new_id has a value which is an object_id
+	new_workspace has a value which is a workspace_id
+	source_id has a value which is an object_id
+	type has a value which is an object_type
+	source_workspace has a value which is a workspace_id
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 object_type is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -3827,31 +3827,31 @@ workspace_ref is a string
 
 =begin text
 
-$params is a workspaceService.move_object_params
-$metadata is a workspaceService.object_metadata
+$params is a move_object_params
+$metadata is an object_metadata
 move_object_params is a reference to a hash where the following keys are defined:
 	new_workspace_url has a value which is a string
-	new_id has a value which is a workspaceService.object_id
-	new_workspace has a value which is a workspaceService.workspace_id
-	source_id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	source_workspace has a value which is a workspaceService.workspace_id
+	new_id has a value which is an object_id
+	new_workspace has a value which is a workspace_id
+	source_id has a value which is an object_id
+	type has a value which is an object_type
+	source_workspace has a value which is a workspace_id
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 workspace_id is a string
 object_type is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -3933,13 +3933,13 @@ sub move_object
 =begin html
 
 <pre>
-$params is a workspaceService.has_object_params
-$object_present is a workspaceService.bool
+$params is a has_object_params
+$object_present is a bool
 has_object_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
+	id has a value which is an object_id
 	instance has a value which is an int
-	type has a value which is a workspaceService.object_type
-	workspace has a value which is a workspaceService.workspace_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
 object_id is a string
 object_type is a string
@@ -3952,13 +3952,13 @@ bool is an int
 
 =begin text
 
-$params is a workspaceService.has_object_params
-$object_present is a workspaceService.bool
+$params is a has_object_params
+$object_present is a bool
 has_object_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
+	id has a value which is an object_id
 	instance has a value which is an int
-	type has a value which is a workspaceService.object_type
-	workspace has a value which is a workspaceService.workspace_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
 object_id is a string
 object_type is a string
@@ -4033,28 +4033,28 @@ sub has_object
 =begin html
 
 <pre>
-$params is a workspaceService.object_history_params
-$metadatas is a reference to a list where each element is a workspaceService.object_metadata
+$params is an object_history_params
+$metadatas is a reference to a list where each element is an object_metadata
 object_history_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	workspace has a value which is a workspaceService.workspace_id
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -4067,28 +4067,28 @@ workspace_ref is a string
 
 =begin text
 
-$params is a workspaceService.object_history_params
-$metadatas is a reference to a list where each element is a workspaceService.object_metadata
+$params is an object_history_params
+$metadatas is a reference to a list where each element is an object_metadata
 object_history_params is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.object_id
-	type has a value which is a workspaceService.object_type
-	workspace has a value which is a workspaceService.workspace_id
+	id has a value which is an object_id
+	type has a value which is an object_type
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 object_id is a string
 object_type is a string
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 timestamp is a string
@@ -4158,23 +4158,23 @@ sub object_history
 =begin html
 
 <pre>
-$params is a workspaceService.create_workspace_params
-$metadata is a workspaceService.workspace_metadata
+$params is a create_workspace_params
+$metadata is a workspace_metadata
 create_workspace_params is a reference to a hash where the following keys are defined:
-	workspace has a value which is a workspaceService.workspace_id
-	default_permission has a value which is a workspaceService.permission
+	workspace has a value which is a workspace_id
+	default_permission has a value which is a permission
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspaceService.workspace_id
-	1: (owner) a workspaceService.username
-	2: (moddate) a workspaceService.timestamp
+	0: (id) a workspace_id
+	1: (owner) a username
+	2: (moddate) a timestamp
 	3: (objects) an int
-	4: (user_permission) a workspaceService.permission
-	5: (global_permission) a workspaceService.permission
+	4: (user_permission) a permission
+	5: (global_permission) a permission
 username is a string
 timestamp is a string
 
@@ -4184,23 +4184,23 @@ timestamp is a string
 
 =begin text
 
-$params is a workspaceService.create_workspace_params
-$metadata is a workspaceService.workspace_metadata
+$params is a create_workspace_params
+$metadata is a workspace_metadata
 create_workspace_params is a reference to a hash where the following keys are defined:
-	workspace has a value which is a workspaceService.workspace_id
-	default_permission has a value which is a workspaceService.permission
+	workspace has a value which is a workspace_id
+	default_permission has a value which is a permission
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspaceService.workspace_id
-	1: (owner) a workspaceService.username
-	2: (moddate) a workspaceService.timestamp
+	0: (id) a workspace_id
+	1: (owner) a username
+	2: (moddate) a timestamp
 	3: (objects) an int
-	4: (user_permission) a workspaceService.permission
-	5: (global_permission) a workspaceService.permission
+	4: (user_permission) a permission
+	5: (global_permission) a permission
 username is a string
 timestamp is a string
 
@@ -4271,21 +4271,21 @@ sub create_workspace
 =begin html
 
 <pre>
-$params is a workspaceService.get_workspacemeta_params
-$metadata is a workspaceService.workspace_metadata
+$params is a get_workspacemeta_params
+$metadata is a workspace_metadata
 get_workspacemeta_params is a reference to a hash where the following keys are defined:
-	workspace has a value which is a workspaceService.workspace_id
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 workspace_id is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspaceService.workspace_id
-	1: (owner) a workspaceService.username
-	2: (moddate) a workspaceService.timestamp
+	0: (id) a workspace_id
+	1: (owner) a username
+	2: (moddate) a timestamp
 	3: (objects) an int
-	4: (user_permission) a workspaceService.permission
-	5: (global_permission) a workspaceService.permission
+	4: (user_permission) a permission
+	5: (global_permission) a permission
 username is a string
 timestamp is a string
 permission is a string
@@ -4296,21 +4296,21 @@ permission is a string
 
 =begin text
 
-$params is a workspaceService.get_workspacemeta_params
-$metadata is a workspaceService.workspace_metadata
+$params is a get_workspacemeta_params
+$metadata is a workspace_metadata
 get_workspacemeta_params is a reference to a hash where the following keys are defined:
-	workspace has a value which is a workspaceService.workspace_id
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 workspace_id is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspaceService.workspace_id
-	1: (owner) a workspaceService.username
-	2: (moddate) a workspaceService.timestamp
+	0: (id) a workspace_id
+	1: (owner) a username
+	2: (moddate) a timestamp
 	3: (objects) an int
-	4: (user_permission) a workspaceService.permission
-	5: (global_permission) a workspaceService.permission
+	4: (user_permission) a permission
+	5: (global_permission) a permission
 username is a string
 timestamp is a string
 permission is a string
@@ -4375,10 +4375,10 @@ sub get_workspacemeta
 =begin html
 
 <pre>
-$params is a workspaceService.get_workspacepermissions_params
-$user_permissions is a reference to a hash where the key is a workspaceService.username and the value is a workspaceService.permission
+$params is a get_workspacepermissions_params
+$user_permissions is a reference to a hash where the key is a username and the value is a permission
 get_workspacepermissions_params is a reference to a hash where the following keys are defined:
-	workspace has a value which is a workspaceService.workspace_id
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
 workspace_id is a string
 username is a string
@@ -4390,10 +4390,10 @@ permission is a string
 
 =begin text
 
-$params is a workspaceService.get_workspacepermissions_params
-$user_permissions is a reference to a hash where the key is a workspaceService.username and the value is a workspaceService.permission
+$params is a get_workspacepermissions_params
+$user_permissions is a reference to a hash where the key is a username and the value is a permission
 get_workspacepermissions_params is a reference to a hash where the following keys are defined:
-	workspace has a value which is a workspaceService.workspace_id
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
 workspace_id is a string
 username is a string
@@ -4458,21 +4458,21 @@ sub get_workspacepermissions
 =begin html
 
 <pre>
-$params is a workspaceService.delete_workspace_params
-$metadata is a workspaceService.workspace_metadata
+$params is a delete_workspace_params
+$metadata is a workspace_metadata
 delete_workspace_params is a reference to a hash where the following keys are defined:
-	workspace has a value which is a workspaceService.workspace_id
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 workspace_id is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspaceService.workspace_id
-	1: (owner) a workspaceService.username
-	2: (moddate) a workspaceService.timestamp
+	0: (id) a workspace_id
+	1: (owner) a username
+	2: (moddate) a timestamp
 	3: (objects) an int
-	4: (user_permission) a workspaceService.permission
-	5: (global_permission) a workspaceService.permission
+	4: (user_permission) a permission
+	5: (global_permission) a permission
 username is a string
 timestamp is a string
 permission is a string
@@ -4483,21 +4483,21 @@ permission is a string
 
 =begin text
 
-$params is a workspaceService.delete_workspace_params
-$metadata is a workspaceService.workspace_metadata
+$params is a delete_workspace_params
+$metadata is a workspace_metadata
 delete_workspace_params is a reference to a hash where the following keys are defined:
-	workspace has a value which is a workspaceService.workspace_id
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 workspace_id is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspaceService.workspace_id
-	1: (owner) a workspaceService.username
-	2: (moddate) a workspaceService.timestamp
+	0: (id) a workspace_id
+	1: (owner) a username
+	2: (moddate) a timestamp
 	3: (objects) an int
-	4: (user_permission) a workspaceService.permission
-	5: (global_permission) a workspaceService.permission
+	4: (user_permission) a permission
+	5: (global_permission) a permission
 username is a string
 timestamp is a string
 permission is a string
@@ -4564,25 +4564,25 @@ sub delete_workspace
 =begin html
 
 <pre>
-$params is a workspaceService.clone_workspace_params
-$metadata is a workspaceService.workspace_metadata
+$params is a clone_workspace_params
+$metadata is a workspace_metadata
 clone_workspace_params is a reference to a hash where the following keys are defined:
-	new_workspace has a value which is a workspaceService.workspace_id
+	new_workspace has a value which is a workspace_id
 	new_workspace_url has a value which is a string
-	current_workspace has a value which is a workspaceService.workspace_id
-	default_permission has a value which is a workspaceService.permission
+	current_workspace has a value which is a workspace_id
+	default_permission has a value which is a permission
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspaceService.workspace_id
-	1: (owner) a workspaceService.username
-	2: (moddate) a workspaceService.timestamp
+	0: (id) a workspace_id
+	1: (owner) a username
+	2: (moddate) a timestamp
 	3: (objects) an int
-	4: (user_permission) a workspaceService.permission
-	5: (global_permission) a workspaceService.permission
+	4: (user_permission) a permission
+	5: (global_permission) a permission
 username is a string
 timestamp is a string
 
@@ -4592,25 +4592,25 @@ timestamp is a string
 
 =begin text
 
-$params is a workspaceService.clone_workspace_params
-$metadata is a workspaceService.workspace_metadata
+$params is a clone_workspace_params
+$metadata is a workspace_metadata
 clone_workspace_params is a reference to a hash where the following keys are defined:
-	new_workspace has a value which is a workspaceService.workspace_id
+	new_workspace has a value which is a workspace_id
 	new_workspace_url has a value which is a string
-	current_workspace has a value which is a workspaceService.workspace_id
-	default_permission has a value which is a workspaceService.permission
+	current_workspace has a value which is a workspace_id
+	default_permission has a value which is a permission
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 workspace_id is a string
 permission is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspaceService.workspace_id
-	1: (owner) a workspaceService.username
-	2: (moddate) a workspaceService.timestamp
+	0: (id) a workspace_id
+	1: (owner) a username
+	2: (moddate) a timestamp
 	3: (objects) an int
-	4: (user_permission) a workspaceService.permission
-	5: (global_permission) a workspaceService.permission
+	4: (user_permission) a permission
+	5: (global_permission) a permission
 username is a string
 timestamp is a string
 
@@ -4883,20 +4883,20 @@ sub clone_workspace
 =begin html
 
 <pre>
-$params is a workspaceService.list_workspaces_params
-$workspaces is a reference to a list where each element is a workspaceService.workspace_metadata
+$params is a list_workspaces_params
+$workspaces is a reference to a list where each element is a workspace_metadata
 list_workspaces_params is a reference to a hash where the following keys are defined:
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
-	excludeGlobal has a value which is a workspaceService.bool
+	asHash has a value which is a bool
+	excludeGlobal has a value which is a bool
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspaceService.workspace_id
-	1: (owner) a workspaceService.username
-	2: (moddate) a workspaceService.timestamp
+	0: (id) a workspace_id
+	1: (owner) a username
+	2: (moddate) a timestamp
 	3: (objects) an int
-	4: (user_permission) a workspaceService.permission
-	5: (global_permission) a workspaceService.permission
+	4: (user_permission) a permission
+	5: (global_permission) a permission
 workspace_id is a string
 username is a string
 timestamp is a string
@@ -4908,20 +4908,20 @@ permission is a string
 
 =begin text
 
-$params is a workspaceService.list_workspaces_params
-$workspaces is a reference to a list where each element is a workspaceService.workspace_metadata
+$params is a list_workspaces_params
+$workspaces is a reference to a list where each element is a workspace_metadata
 list_workspaces_params is a reference to a hash where the following keys are defined:
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
-	excludeGlobal has a value which is a workspaceService.bool
+	asHash has a value which is a bool
+	excludeGlobal has a value which is a bool
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspaceService.workspace_id
-	1: (owner) a workspaceService.username
-	2: (moddate) a workspaceService.timestamp
+	0: (id) a workspace_id
+	1: (owner) a username
+	2: (moddate) a timestamp
 	3: (objects) an int
-	4: (user_permission) a workspaceService.permission
-	5: (global_permission) a workspaceService.permission
+	4: (user_permission) a permission
+	5: (global_permission) a permission
 workspace_id is a string
 username is a string
 timestamp is a string
@@ -5002,26 +5002,26 @@ sub list_workspaces
 =begin html
 
 <pre>
-$params is a workspaceService.list_workspace_objects_params
-$objects is a reference to a list where each element is a workspaceService.object_metadata
+$params is a list_workspace_objects_params
+$objects is a reference to a list where each element is an object_metadata
 list_workspace_objects_params is a reference to a hash where the following keys are defined:
-	workspace has a value which is a workspaceService.workspace_id
+	workspace has a value which is a workspace_id
 	type has a value which is a string
-	showDeletedObject has a value which is a workspaceService.bool
+	showDeletedObject has a value which is a bool
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 object_id is a string
@@ -5036,26 +5036,26 @@ workspace_ref is a string
 
 =begin text
 
-$params is a workspaceService.list_workspace_objects_params
-$objects is a reference to a list where each element is a workspaceService.object_metadata
+$params is a list_workspace_objects_params
+$objects is a reference to a list where each element is an object_metadata
 list_workspace_objects_params is a reference to a hash where the following keys are defined:
-	workspace has a value which is a workspaceService.workspace_id
+	workspace has a value which is a workspace_id
 	type has a value which is a string
-	showDeletedObject has a value which is a workspaceService.bool
+	showDeletedObject has a value which is a bool
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 workspace_id is a string
 bool is an int
 object_metadata is a reference to a list containing 11 items:
-	0: (id) a workspaceService.object_id
-	1: (type) a workspaceService.object_type
-	2: (moddate) a workspaceService.timestamp
+	0: (id) an object_id
+	1: (type) an object_type
+	2: (moddate) a timestamp
 	3: (instance) an int
 	4: (command) a string
-	5: (lastmodifier) a workspaceService.username
-	6: (owner) a workspaceService.username
-	7: (workspace) a workspaceService.workspace_id
-	8: (ref) a workspaceService.workspace_ref
+	5: (lastmodifier) a username
+	6: (owner) a username
+	7: (workspace) a workspace_id
+	8: (ref) a workspace_ref
 	9: (chsum) a string
 	10: (metadata) a reference to a hash where the key is a string and the value is a string
 object_id is a string
@@ -5132,23 +5132,23 @@ sub list_workspace_objects
 =begin html
 
 <pre>
-$params is a workspaceService.set_global_workspace_permissions_params
-$metadata is a workspaceService.workspace_metadata
+$params is a set_global_workspace_permissions_params
+$metadata is a workspace_metadata
 set_global_workspace_permissions_params is a reference to a hash where the following keys are defined:
-	new_permission has a value which is a workspaceService.permission
-	workspace has a value which is a workspaceService.workspace_id
+	new_permission has a value which is a permission
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 permission is a string
 workspace_id is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspaceService.workspace_id
-	1: (owner) a workspaceService.username
-	2: (moddate) a workspaceService.timestamp
+	0: (id) a workspace_id
+	1: (owner) a username
+	2: (moddate) a timestamp
 	3: (objects) an int
-	4: (user_permission) a workspaceService.permission
-	5: (global_permission) a workspaceService.permission
+	4: (user_permission) a permission
+	5: (global_permission) a permission
 username is a string
 timestamp is a string
 
@@ -5158,23 +5158,23 @@ timestamp is a string
 
 =begin text
 
-$params is a workspaceService.set_global_workspace_permissions_params
-$metadata is a workspaceService.workspace_metadata
+$params is a set_global_workspace_permissions_params
+$metadata is a workspace_metadata
 set_global_workspace_permissions_params is a reference to a hash where the following keys are defined:
-	new_permission has a value which is a workspaceService.permission
-	workspace has a value which is a workspaceService.workspace_id
+	new_permission has a value which is a permission
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
-	asHash has a value which is a workspaceService.bool
+	asHash has a value which is a bool
 permission is a string
 workspace_id is a string
 bool is an int
 workspace_metadata is a reference to a list containing 6 items:
-	0: (id) a workspaceService.workspace_id
-	1: (owner) a workspaceService.username
-	2: (moddate) a workspaceService.timestamp
+	0: (id) a workspace_id
+	1: (owner) a username
+	2: (moddate) a timestamp
 	3: (objects) an int
-	4: (user_permission) a workspaceService.permission
-	5: (global_permission) a workspaceService.permission
+	4: (user_permission) a permission
+	5: (global_permission) a permission
 username is a string
 timestamp is a string
 
@@ -5241,12 +5241,12 @@ sub set_global_workspace_permissions
 =begin html
 
 <pre>
-$params is a workspaceService.set_workspace_permissions_params
-$success is a workspaceService.bool
+$params is a set_workspace_permissions_params
+$success is a bool
 set_workspace_permissions_params is a reference to a hash where the following keys are defined:
-	users has a value which is a reference to a list where each element is a workspaceService.username
-	new_permission has a value which is a workspaceService.permission
-	workspace has a value which is a workspaceService.workspace_id
+	users has a value which is a reference to a list where each element is a username
+	new_permission has a value which is a permission
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
 username is a string
 permission is a string
@@ -5259,12 +5259,12 @@ bool is an int
 
 =begin text
 
-$params is a workspaceService.set_workspace_permissions_params
-$success is a workspaceService.bool
+$params is a set_workspace_permissions_params
+$success is a bool
 set_workspace_permissions_params is a reference to a hash where the following keys are defined:
-	users has a value which is a reference to a list where each element is a workspaceService.username
-	new_permission has a value which is a workspaceService.permission
-	workspace has a value which is a workspaceService.workspace_id
+	users has a value which is a reference to a list where each element is a username
+	new_permission has a value which is a permission
+	workspace has a value which is a workspace_id
 	auth has a value which is a string
 username is a string
 permission is a string
@@ -5333,12 +5333,12 @@ sub set_workspace_permissions
 =begin html
 
 <pre>
-$params is a workspaceService.get_user_settings_params
-$output is a workspaceService.user_settings
+$params is a get_user_settings_params
+$output is a user_settings
 get_user_settings_params is a reference to a hash where the following keys are defined:
 	auth has a value which is a string
 user_settings is a reference to a hash where the following keys are defined:
-	workspace has a value which is a workspaceService.workspace_id
+	workspace has a value which is a workspace_id
 workspace_id is a string
 
 </pre>
@@ -5347,12 +5347,12 @@ workspace_id is a string
 
 =begin text
 
-$params is a workspaceService.get_user_settings_params
-$output is a workspaceService.user_settings
+$params is a get_user_settings_params
+$output is a user_settings
 get_user_settings_params is a reference to a hash where the following keys are defined:
 	auth has a value which is a string
 user_settings is a reference to a hash where the following keys are defined:
-	workspace has a value which is a workspaceService.workspace_id
+	workspace has a value which is a workspace_id
 workspace_id is a string
 
 
@@ -5414,14 +5414,14 @@ sub get_user_settings
 =begin html
 
 <pre>
-$params is a workspaceService.set_user_settings_params
-$output is a workspaceService.user_settings
+$params is a set_user_settings_params
+$output is a user_settings
 set_user_settings_params is a reference to a hash where the following keys are defined:
 	setting has a value which is a string
 	value has a value which is a string
 	auth has a value which is a string
 user_settings is a reference to a hash where the following keys are defined:
-	workspace has a value which is a workspaceService.workspace_id
+	workspace has a value which is a workspace_id
 workspace_id is a string
 
 </pre>
@@ -5430,14 +5430,14 @@ workspace_id is a string
 
 =begin text
 
-$params is a workspaceService.set_user_settings_params
-$output is a workspaceService.user_settings
+$params is a set_user_settings_params
+$output is a user_settings
 set_user_settings_params is a reference to a hash where the following keys are defined:
 	setting has a value which is a string
 	value has a value which is a string
 	auth has a value which is a string
 user_settings is a reference to a hash where the following keys are defined:
-	workspace has a value which is a workspaceService.workspace_id
+	workspace has a value which is a workspace_id
 workspace_id is a string
 
 
@@ -5500,8 +5500,8 @@ sub set_user_settings
 =begin html
 
 <pre>
-$params is a workspaceService.queue_job_params
-$job is a workspaceService.JobObject
+$params is a queue_job_params
+$job is a JobObject
 queue_job_params is a reference to a hash where the following keys are defined:
 	auth has a value which is a string
 	state has a value which is a string
@@ -5509,7 +5509,7 @@ queue_job_params is a reference to a hash where the following keys are defined:
 	queuecommand has a value which is a string
 	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 JobObject is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.job_id
+	id has a value which is a job_id
 	type has a value which is a string
 	auth has a value which is a string
 	status has a value which is a string
@@ -5527,8 +5527,8 @@ job_id is a string
 
 =begin text
 
-$params is a workspaceService.queue_job_params
-$job is a workspaceService.JobObject
+$params is a queue_job_params
+$job is a JobObject
 queue_job_params is a reference to a hash where the following keys are defined:
 	auth has a value which is a string
 	state has a value which is a string
@@ -5536,7 +5536,7 @@ queue_job_params is a reference to a hash where the following keys are defined:
 	queuecommand has a value which is a string
 	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 JobObject is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.job_id
+	id has a value which is a job_id
 	type has a value which is a string
 	auth has a value which is a string
 	status has a value which is a string
@@ -5632,8 +5632,8 @@ sub queue_job
 =begin html
 
 <pre>
-$params is a workspaceService.set_job_status_params
-$job is a workspaceService.JobObject
+$params is a set_job_status_params
+$job is a JobObject
 set_job_status_params is a reference to a hash where the following keys are defined:
 	jobid has a value which is a string
 	status has a value which is a string
@@ -5641,7 +5641,7 @@ set_job_status_params is a reference to a hash where the following keys are defi
 	currentStatus has a value which is a string
 	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 JobObject is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.job_id
+	id has a value which is a job_id
 	type has a value which is a string
 	auth has a value which is a string
 	status has a value which is a string
@@ -5659,8 +5659,8 @@ job_id is a string
 
 =begin text
 
-$params is a workspaceService.set_job_status_params
-$job is a workspaceService.JobObject
+$params is a set_job_status_params
+$job is a JobObject
 set_job_status_params is a reference to a hash where the following keys are defined:
 	jobid has a value which is a string
 	status has a value which is a string
@@ -5668,7 +5668,7 @@ set_job_status_params is a reference to a hash where the following keys are defi
 	currentStatus has a value which is a string
 	jobdata has a value which is a reference to a hash where the key is a string and the value is a string
 JobObject is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.job_id
+	id has a value which is a job_id
 	type has a value which is a string
 	auth has a value which is a string
 	status has a value which is a string
@@ -5796,15 +5796,15 @@ sub set_job_status
 =begin html
 
 <pre>
-$params is a workspaceService.get_jobs_params
-$jobs is a reference to a list where each element is a workspaceService.JobObject
+$params is a get_jobs_params
+$jobs is a reference to a list where each element is a JobObject
 get_jobs_params is a reference to a hash where the following keys are defined:
 	jobids has a value which is a reference to a list where each element is a string
 	type has a value which is a string
 	status has a value which is a string
 	auth has a value which is a string
 JobObject is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.job_id
+	id has a value which is a job_id
 	type has a value which is a string
 	auth has a value which is a string
 	status has a value which is a string
@@ -5822,15 +5822,15 @@ job_id is a string
 
 =begin text
 
-$params is a workspaceService.get_jobs_params
-$jobs is a reference to a list where each element is a workspaceService.JobObject
+$params is a get_jobs_params
+$jobs is a reference to a list where each element is a JobObject
 get_jobs_params is a reference to a hash where the following keys are defined:
 	jobids has a value which is a reference to a list where each element is a string
 	type has a value which is a string
 	status has a value which is a string
 	auth has a value which is a string
 JobObject is a reference to a hash where the following keys are defined:
-	id has a value which is a workspaceService.job_id
+	id has a value which is a job_id
 	type has a value which is a string
 	auth has a value which is a string
 	status has a value which is a string
@@ -5990,8 +5990,8 @@ sub get_types
 =begin html
 
 <pre>
-$params is a workspaceService.add_type_params
-$success is a workspaceService.bool
+$params is an add_type_params
+$success is a bool
 add_type_params is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	auth has a value which is a string
@@ -6003,8 +6003,8 @@ bool is an int
 
 =begin text
 
-$params is a workspaceService.add_type_params
-$success is a workspaceService.bool
+$params is an add_type_params
+$success is a bool
 add_type_params is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	auth has a value which is a string
@@ -6084,8 +6084,8 @@ sub add_type
 =begin html
 
 <pre>
-$params is a workspaceService.remove_type_params
-$success is a workspaceService.bool
+$params is a remove_type_params
+$success is a bool
 remove_type_params is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	auth has a value which is a string
@@ -6097,8 +6097,8 @@ bool is an int
 
 =begin text
 
-$params is a workspaceService.remove_type_params
-$success is a workspaceService.bool
+$params is a remove_type_params
+$success is a bool
 remove_type_params is a reference to a hash where the following keys are defined:
 	type has a value which is a string
 	auth has a value which is a string
@@ -6169,8 +6169,8 @@ sub remove_type
 =begin html
 
 <pre>
-$params is a workspaceService.patch_params
-$success is a workspaceService.bool
+$params is a patch_params
+$success is a bool
 patch_params is a reference to a hash where the following keys are defined:
 	patch_id has a value which is a string
 	auth has a value which is a string
@@ -6182,8 +6182,8 @@ bool is an int
 
 =begin text
 
-$params is a workspaceService.patch_params
-$success is a workspaceService.bool
+$params is a patch_params
+$success is a bool
 patch_params is a reference to a hash where the following keys are defined:
 	patch_id has a value which is a string
 	auth has a value which is a string
@@ -6624,15 +6624,15 @@ Meta data associated with an object stored in a workspace.
 
 <pre>
 a reference to a list containing 11 items:
-0: (id) a workspaceService.object_id
-1: (type) a workspaceService.object_type
-2: (moddate) a workspaceService.timestamp
+0: (id) an object_id
+1: (type) an object_type
+2: (moddate) a timestamp
 3: (instance) an int
 4: (command) a string
-5: (lastmodifier) a workspaceService.username
-6: (owner) a workspaceService.username
-7: (workspace) a workspaceService.workspace_id
-8: (ref) a workspaceService.workspace_ref
+5: (lastmodifier) a username
+6: (owner) a username
+7: (workspace) a workspace_id
+8: (ref) a workspace_ref
 9: (chsum) a string
 10: (metadata) a reference to a hash where the key is a string and the value is a string
 
@@ -6643,15 +6643,15 @@ a reference to a list containing 11 items:
 =begin text
 
 a reference to a list containing 11 items:
-0: (id) a workspaceService.object_id
-1: (type) a workspaceService.object_type
-2: (moddate) a workspaceService.timestamp
+0: (id) an object_id
+1: (type) an object_type
+2: (moddate) a timestamp
 3: (instance) an int
 4: (command) a string
-5: (lastmodifier) a workspaceService.username
-6: (owner) a workspaceService.username
-7: (workspace) a workspaceService.workspace_id
-8: (ref) a workspaceService.workspace_ref
+5: (lastmodifier) a username
+6: (owner) a username
+7: (workspace) a workspace_id
+8: (ref) a workspace_ref
 9: (chsum) a string
 10: (metadata) a reference to a hash where the key is a string and the value is a string
 
@@ -6686,12 +6686,12 @@ Meta data associated with a workspace.
 
 <pre>
 a reference to a list containing 6 items:
-0: (id) a workspaceService.workspace_id
-1: (owner) a workspaceService.username
-2: (moddate) a workspaceService.timestamp
+0: (id) a workspace_id
+1: (owner) a username
+2: (moddate) a timestamp
 3: (objects) an int
-4: (user_permission) a workspaceService.permission
-5: (global_permission) a workspaceService.permission
+4: (user_permission) a permission
+5: (global_permission) a permission
 
 </pre>
 
@@ -6700,12 +6700,12 @@ a reference to a list containing 6 items:
 =begin text
 
 a reference to a list containing 6 items:
-0: (id) a workspaceService.workspace_id
-1: (owner) a workspaceService.username
-2: (moddate) a workspaceService.timestamp
+0: (id) a workspace_id
+1: (owner) a username
+2: (moddate) a timestamp
 3: (objects) an int
-4: (user_permission) a workspaceService.permission
-5: (global_permission) a workspaceService.permission
+4: (user_permission) a permission
+5: (global_permission) a permission
 
 
 =end text
@@ -6742,7 +6742,7 @@ string queuecommand - command used to queue job
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.job_id
+id has a value which is a job_id
 type has a value which is a string
 auth has a value which is a string
 status has a value which is a string
@@ -6760,7 +6760,7 @@ queuecommand has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.job_id
+id has a value which is a job_id
 type has a value which is a string
 auth has a value which is a string
 status has a value which is a string
@@ -6797,7 +6797,7 @@ Settings for user accounts stored in the workspace
 
 <pre>
 a reference to a hash where the following keys are defined:
-workspace has a value which is a workspaceService.workspace_id
+workspace has a value which is a workspace_id
 
 </pre>
 
@@ -6806,7 +6806,7 @@ workspace has a value which is a workspaceService.workspace_id
 =begin text
 
 a reference to a hash where the following keys are defined:
-workspace has a value which is a workspaceService.workspace_id
+workspace has a value which is a workspace_id
 
 
 =end text
@@ -6838,13 +6838,13 @@ Input parameters for the "load_media_from_bio" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-mediaWS has a value which is a workspaceService.workspace_id
-bioid has a value which is a workspaceService.object_id
-bioWS has a value which is a workspaceService.workspace_id
-clearExisting has a value which is a workspaceService.bool
-overwrite has a value which is a workspaceService.bool
+mediaWS has a value which is a workspace_id
+bioid has a value which is an object_id
+bioWS has a value which is a workspace_id
+clearExisting has a value which is a bool
+overwrite has a value which is a bool
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -6853,13 +6853,13 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-mediaWS has a value which is a workspaceService.workspace_id
-bioid has a value which is a workspaceService.object_id
-bioWS has a value which is a workspaceService.workspace_id
-clearExisting has a value which is a workspaceService.bool
-overwrite has a value which is a workspaceService.bool
+mediaWS has a value which is a workspace_id
+bioid has a value which is an object_id
+bioWS has a value which is a workspace_id
+clearExisting has a value which is a bool
+overwrite has a value which is a bool
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -6891,14 +6891,14 @@ Input parameters for the "import_bio" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-bioid has a value which is a workspaceService.object_id
-bioWS has a value which is a workspaceService.workspace_id
+bioid has a value which is an object_id
+bioWS has a value which is a workspace_id
 url has a value which is a string
-compressed has a value which is a workspaceService.bool
-clearExisting has a value which is a workspaceService.bool
-overwrite has a value which is a workspaceService.bool
+compressed has a value which is a bool
+clearExisting has a value which is a bool
+overwrite has a value which is a bool
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -6907,14 +6907,14 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-bioid has a value which is a workspaceService.object_id
-bioWS has a value which is a workspaceService.workspace_id
+bioid has a value which is an object_id
+bioWS has a value which is a workspace_id
 url has a value which is a string
-compressed has a value which is a workspaceService.bool
-clearExisting has a value which is a workspaceService.bool
-overwrite has a value which is a workspaceService.bool
+compressed has a value which is a bool
+clearExisting has a value which is a bool
+overwrite has a value which is a bool
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -6946,15 +6946,15 @@ Input parameters for the "import_map" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-bioid has a value which is a workspaceService.object_id
-bioWS has a value which is a workspaceService.workspace_id
-mapid has a value which is a workspaceService.object_id
-mapWS has a value which is a workspaceService.workspace_id
+bioid has a value which is an object_id
+bioWS has a value which is a workspace_id
+mapid has a value which is an object_id
+mapWS has a value which is a workspace_id
 url has a value which is a string
-compressed has a value which is a workspaceService.bool
-overwrite has a value which is a workspaceService.bool
+compressed has a value which is a bool
+overwrite has a value which is a bool
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -6963,15 +6963,15 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-bioid has a value which is a workspaceService.object_id
-bioWS has a value which is a workspaceService.workspace_id
-mapid has a value which is a workspaceService.object_id
-mapWS has a value which is a workspaceService.workspace_id
+bioid has a value which is an object_id
+bioWS has a value which is a workspace_id
+mapid has a value which is an object_id
+mapWS has a value which is a workspace_id
 url has a value which is a string
-compressed has a value which is a workspaceService.bool
-overwrite has a value which is a workspaceService.bool
+compressed has a value which is a bool
+overwrite has a value which is a bool
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -7009,17 +7009,17 @@ Input parameters for the "save_objects function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-data has a value which is a workspaceService.ObjectData
-workspace has a value which is a workspaceService.workspace_id
+id has a value which is an object_id
+type has a value which is an object_type
+data has a value which is an ObjectData
+workspace has a value which is a workspace_id
 command has a value which is a string
 metadata has a value which is a reference to a hash where the key is a string and the value is a string
 auth has a value which is a string
-json has a value which is a workspaceService.bool
-compressed has a value which is a workspaceService.bool
-retrieveFromURL has a value which is a workspaceService.bool
-asHash has a value which is a workspaceService.bool
+json has a value which is a bool
+compressed has a value which is a bool
+retrieveFromURL has a value which is a bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -7028,17 +7028,17 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-data has a value which is a workspaceService.ObjectData
-workspace has a value which is a workspaceService.workspace_id
+id has a value which is an object_id
+type has a value which is an object_type
+data has a value which is an ObjectData
+workspace has a value which is a workspace_id
 command has a value which is a string
 metadata has a value which is a reference to a hash where the key is a string and the value is a string
 auth has a value which is a string
-json has a value which is a workspaceService.bool
-compressed has a value which is a workspaceService.bool
-retrieveFromURL has a value which is a workspaceService.bool
-asHash has a value which is a workspaceService.bool
+json has a value which is a bool
+compressed has a value which is a bool
+retrieveFromURL has a value which is a bool
+asHash has a value which is a bool
 
 
 =end text
@@ -7070,11 +7070,11 @@ Input parameters for the "delete_object" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-workspace has a value which is a workspaceService.workspace_id
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -7083,11 +7083,11 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-workspace has a value which is a workspaceService.workspace_id
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -7119,11 +7119,11 @@ Input parameters for the "delete_object_permanently" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-workspace has a value which is a workspaceService.workspace_id
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -7132,11 +7132,11 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-workspace has a value which is a workspaceService.workspace_id
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -7170,13 +7170,13 @@ Input parameters for the "get_object" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-workspace has a value which is a workspaceService.workspace_id
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
-asJSON has a value which is a workspaceService.bool
+asHash has a value which is a bool
+asJSON has a value which is a bool
 
 </pre>
 
@@ -7185,13 +7185,13 @@ asJSON has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-workspace has a value which is a workspaceService.workspace_id
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
-asJSON has a value which is a workspaceService.bool
+asHash has a value which is a bool
+asJSON has a value which is a bool
 
 
 =end text
@@ -7221,7 +7221,7 @@ Output generated by the "get_object" function.
 <pre>
 a reference to a hash where the following keys are defined:
 data has a value which is a string
-metadata has a value which is a workspaceService.object_metadata
+metadata has a value which is an object_metadata
 
 </pre>
 
@@ -7231,7 +7231,7 @@ metadata has a value which is a workspaceService.object_metadata
 
 a reference to a hash where the following keys are defined:
 data has a value which is a string
-metadata has a value which is a workspaceService.object_metadata
+metadata has a value which is an object_metadata
 
 
 =end text
@@ -7265,13 +7265,13 @@ Input parameters for the "get_object" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-ids has a value which is a reference to a list where each element is a workspaceService.object_id
-types has a value which is a reference to a list where each element is a workspaceService.object_type
-workspaces has a value which is a reference to a list where each element is a workspaceService.workspace_id
+ids has a value which is a reference to a list where each element is an object_id
+types has a value which is a reference to a list where each element is an object_type
+workspaces has a value which is a reference to a list where each element is a workspace_id
 instances has a value which is a reference to a list where each element is an int
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
-asJSON has a value which is a workspaceService.bool
+asHash has a value which is a bool
+asJSON has a value which is a bool
 
 </pre>
 
@@ -7280,13 +7280,13 @@ asJSON has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-ids has a value which is a reference to a list where each element is a workspaceService.object_id
-types has a value which is a reference to a list where each element is a workspaceService.object_type
-workspaces has a value which is a reference to a list where each element is a workspaceService.workspace_id
+ids has a value which is a reference to a list where each element is an object_id
+types has a value which is a reference to a list where each element is an object_type
+workspaces has a value which is a reference to a list where each element is a workspace_id
 instances has a value which is a reference to a list where each element is an int
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
-asJSON has a value which is a workspaceService.bool
+asHash has a value which is a bool
+asJSON has a value which is a bool
 
 
 =end text
@@ -7317,10 +7317,10 @@ Input parameters for the "get_object_by_ref" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-reference has a value which is a workspaceService.workspace_ref
+reference has a value which is a workspace_ref
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
-asJSON has a value which is a workspaceService.bool
+asHash has a value which is a bool
+asJSON has a value which is a bool
 
 </pre>
 
@@ -7329,10 +7329,10 @@ asJSON has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-reference has a value which is a workspaceService.workspace_ref
+reference has a value which is a workspace_ref
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
-asJSON has a value which is a workspaceService.bool
+asHash has a value which is a bool
+asJSON has a value which is a bool
 
 
 =end text
@@ -7371,18 +7371,18 @@ Input parameters for the "save_object_by_ref" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-data has a value which is a workspaceService.ObjectData
+id has a value which is an object_id
+type has a value which is an object_type
+data has a value which is an ObjectData
 command has a value which is a string
 metadata has a value which is a reference to a hash where the key is a string and the value is a string
-reference has a value which is a workspaceService.workspace_ref
-json has a value which is a workspaceService.bool
-compressed has a value which is a workspaceService.bool
-retrieveFromURL has a value which is a workspaceService.bool
-replace has a value which is a workspaceService.bool
+reference has a value which is a workspace_ref
+json has a value which is a bool
+compressed has a value which is a bool
+retrieveFromURL has a value which is a bool
+replace has a value which is a bool
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -7391,18 +7391,18 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-data has a value which is a workspaceService.ObjectData
+id has a value which is an object_id
+type has a value which is an object_type
+data has a value which is an ObjectData
 command has a value which is a string
 metadata has a value which is a reference to a hash where the key is a string and the value is a string
-reference has a value which is a workspaceService.workspace_ref
-json has a value which is a workspaceService.bool
-compressed has a value which is a workspaceService.bool
-retrieveFromURL has a value which is a workspaceService.bool
-replace has a value which is a workspaceService.bool
+reference has a value which is a workspace_ref
+json has a value which is a bool
+compressed has a value which is a bool
+retrieveFromURL has a value which is a bool
+replace has a value which is a bool
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -7435,12 +7435,12 @@ Input parameters for the "get_objectmeta" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-workspace has a value which is a workspaceService.workspace_id
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -7449,12 +7449,12 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-workspace has a value which is a workspaceService.workspace_id
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -7484,9 +7484,9 @@ Input parameters for the "get_objectmeta_by_ref" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-reference has a value which is a workspaceService.workspace_ref
+reference has a value which is a workspace_ref
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -7495,9 +7495,9 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-reference has a value which is a workspaceService.workspace_ref
+reference has a value which is a workspace_ref
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -7530,12 +7530,12 @@ Input parameters for the "revert_object" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-workspace has a value which is a workspaceService.workspace_id
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -7544,12 +7544,12 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-workspace has a value which is a workspaceService.workspace_id
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
 instance has a value which is an int
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -7586,14 +7586,14 @@ Input parameters for the "copy_object" function.
 <pre>
 a reference to a hash where the following keys are defined:
 new_workspace_url has a value which is a string
-new_id has a value which is a workspaceService.object_id
-new_workspace has a value which is a workspaceService.workspace_id
-source_id has a value which is a workspaceService.object_id
+new_id has a value which is an object_id
+new_workspace has a value which is a workspace_id
+source_id has a value which is an object_id
 instance has a value which is an int
-type has a value which is a workspaceService.object_type
-source_workspace has a value which is a workspaceService.workspace_id
+type has a value which is an object_type
+source_workspace has a value which is a workspace_id
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -7603,14 +7603,14 @@ asHash has a value which is a workspaceService.bool
 
 a reference to a hash where the following keys are defined:
 new_workspace_url has a value which is a string
-new_id has a value which is a workspaceService.object_id
-new_workspace has a value which is a workspaceService.workspace_id
-source_id has a value which is a workspaceService.object_id
+new_id has a value which is an object_id
+new_workspace has a value which is a workspace_id
+source_id has a value which is an object_id
 instance has a value which is an int
-type has a value which is a workspaceService.object_type
-source_workspace has a value which is a workspaceService.workspace_id
+type has a value which is an object_type
+source_workspace has a value which is a workspace_id
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -7646,13 +7646,13 @@ Input parameters for the "move_object" function.
 <pre>
 a reference to a hash where the following keys are defined:
 new_workspace_url has a value which is a string
-new_id has a value which is a workspaceService.object_id
-new_workspace has a value which is a workspaceService.workspace_id
-source_id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-source_workspace has a value which is a workspaceService.workspace_id
+new_id has a value which is an object_id
+new_workspace has a value which is a workspace_id
+source_id has a value which is an object_id
+type has a value which is an object_type
+source_workspace has a value which is a workspace_id
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -7662,13 +7662,13 @@ asHash has a value which is a workspaceService.bool
 
 a reference to a hash where the following keys are defined:
 new_workspace_url has a value which is a string
-new_id has a value which is a workspaceService.object_id
-new_workspace has a value which is a workspaceService.workspace_id
-source_id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-source_workspace has a value which is a workspaceService.workspace_id
+new_id has a value which is an object_id
+new_workspace has a value which is a workspace_id
+source_id has a value which is an object_id
+type has a value which is an object_type
+source_workspace has a value which is a workspace_id
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -7700,10 +7700,10 @@ Input parameters for the "has_object" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
+id has a value which is an object_id
 instance has a value which is an int
-type has a value which is a workspaceService.object_type
-workspace has a value which is a workspaceService.workspace_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
 auth has a value which is a string
 
 </pre>
@@ -7713,10 +7713,10 @@ auth has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
+id has a value which is an object_id
 instance has a value which is an int
-type has a value which is a workspaceService.object_type
-workspace has a value which is a workspaceService.workspace_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
 auth has a value which is a string
 
 
@@ -7749,11 +7749,11 @@ Input parameters for the "object_history" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-workspace has a value which is a workspaceService.workspace_id
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -7762,11 +7762,11 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-id has a value which is a workspaceService.object_id
-type has a value which is a workspaceService.object_type
-workspace has a value which is a workspaceService.workspace_id
+id has a value which is an object_id
+type has a value which is an object_type
+workspace has a value which is a workspace_id
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -7797,10 +7797,10 @@ Input parameters for the "create_workspace" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-workspace has a value which is a workspaceService.workspace_id
-default_permission has a value which is a workspaceService.permission
+workspace has a value which is a workspace_id
+default_permission has a value which is a permission
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -7809,10 +7809,10 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-workspace has a value which is a workspaceService.workspace_id
-default_permission has a value which is a workspaceService.permission
+workspace has a value which is a workspace_id
+default_permission has a value which is a permission
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -7842,9 +7842,9 @@ Input parameters for the "get_workspacemeta" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-workspace has a value which is a workspaceService.workspace_id
+workspace has a value which is a workspace_id
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -7853,9 +7853,9 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-workspace has a value which is a workspaceService.workspace_id
+workspace has a value which is a workspace_id
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -7884,7 +7884,7 @@ Input parameters for the "get_workspacepermissions" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-workspace has a value which is a workspaceService.workspace_id
+workspace has a value which is a workspace_id
 auth has a value which is a string
 
 </pre>
@@ -7894,7 +7894,7 @@ auth has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-workspace has a value which is a workspaceService.workspace_id
+workspace has a value which is a workspace_id
 auth has a value which is a string
 
 
@@ -7925,9 +7925,9 @@ Input parameters for the "delete_workspace" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-workspace has a value which is a workspaceService.workspace_id
+workspace has a value which is a workspace_id
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -7936,9 +7936,9 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-workspace has a value which is a workspaceService.workspace_id
+workspace has a value which is a workspace_id
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -7971,12 +7971,12 @@ Input parameters for the "clone_workspace" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-new_workspace has a value which is a workspaceService.workspace_id
+new_workspace has a value which is a workspace_id
 new_workspace_url has a value which is a string
-current_workspace has a value which is a workspaceService.workspace_id
-default_permission has a value which is a workspaceService.permission
+current_workspace has a value which is a workspace_id
+default_permission has a value which is a permission
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -7985,12 +7985,12 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-new_workspace has a value which is a workspaceService.workspace_id
+new_workspace has a value which is a workspace_id
 new_workspace_url has a value which is a string
-current_workspace has a value which is a workspaceService.workspace_id
-default_permission has a value which is a workspaceService.permission
+current_workspace has a value which is a workspace_id
+default_permission has a value which is a permission
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -8021,8 +8021,8 @@ Input parameters for the "list_workspaces" function.
 <pre>
 a reference to a hash where the following keys are defined:
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
-excludeGlobal has a value which is a workspaceService.bool
+asHash has a value which is a bool
+excludeGlobal has a value which is a bool
 
 </pre>
 
@@ -8032,8 +8032,8 @@ excludeGlobal has a value which is a workspaceService.bool
 
 a reference to a hash where the following keys are defined:
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
-excludeGlobal has a value which is a workspaceService.bool
+asHash has a value which is a bool
+excludeGlobal has a value which is a bool
 
 
 =end text
@@ -8065,11 +8065,11 @@ Input parameters for the "list_workspace_objects" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-workspace has a value which is a workspaceService.workspace_id
+workspace has a value which is a workspace_id
 type has a value which is a string
-showDeletedObject has a value which is a workspaceService.bool
+showDeletedObject has a value which is a bool
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -8078,11 +8078,11 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-workspace has a value which is a workspaceService.workspace_id
+workspace has a value which is a workspace_id
 type has a value which is a string
-showDeletedObject has a value which is a workspaceService.bool
+showDeletedObject has a value which is a bool
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -8113,10 +8113,10 @@ Input parameters for the "set_global_workspace_permissions" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-new_permission has a value which is a workspaceService.permission
-workspace has a value which is a workspaceService.workspace_id
+new_permission has a value which is a permission
+workspace has a value which is a workspace_id
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 </pre>
 
@@ -8125,10 +8125,10 @@ asHash has a value which is a workspaceService.bool
 =begin text
 
 a reference to a hash where the following keys are defined:
-new_permission has a value which is a workspaceService.permission
-workspace has a value which is a workspaceService.workspace_id
+new_permission has a value which is a permission
+workspace has a value which is a workspace_id
 auth has a value which is a string
-asHash has a value which is a workspaceService.bool
+asHash has a value which is a bool
 
 
 =end text
@@ -8159,9 +8159,9 @@ Input parameters for the "set_workspace_permissions" function.
 
 <pre>
 a reference to a hash where the following keys are defined:
-users has a value which is a reference to a list where each element is a workspaceService.username
-new_permission has a value which is a workspaceService.permission
-workspace has a value which is a workspaceService.workspace_id
+users has a value which is a reference to a list where each element is a username
+new_permission has a value which is a permission
+workspace has a value which is a workspace_id
 auth has a value which is a string
 
 </pre>
@@ -8171,9 +8171,9 @@ auth has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-users has a value which is a reference to a list where each element is a workspaceService.username
-new_permission has a value which is a workspaceService.permission
-workspace has a value which is a workspaceService.workspace_id
+users has a value which is a reference to a list where each element is a username
+new_permission has a value which is a permission
+workspace has a value which is a workspace_id
 auth has a value which is a string
 
 
