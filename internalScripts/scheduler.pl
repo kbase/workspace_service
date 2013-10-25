@@ -85,7 +85,7 @@ sub runexecutable {
 }
 
 sub runningJobs {
-	my ($self) = @_;
+	my ($self,$type) = @_;
 	my $runningJobs;
 	if ($self->queuetype() eq "sge") {
 		my $output = $self->runexecutable("qstat");
@@ -103,7 +103,7 @@ sub runningJobs {
 				if ($line =~ m/^\s+(\d+)\s.+\/([^\/]+)/) {
 					my $cmd = $2;
 					my $pid = $1;
-					my $script = $self->script();
+					my $script = $self->script($type);
 					if ($cmd =~ m/$script/) {
 						print "Match:".$pid."|".$script."\n";
 						$runningJobs->{$pid} = 1;
@@ -117,70 +117,74 @@ sub runningJobs {
 
 sub monitor {
     my($self) = @_;
-    my $count = $self->threads();
     my $continue = 1;
+	my $jobHash = $self->jobtypes();
 	while ($continue == 1) {
 		local $Bio::KBase::workspaceService::Server::CallContext = {};
-		my $jobs;
-		eval {
-			$jobs = $self->client()->get_jobs({
-				status => "running",
-				type => $self->jobtype(),
-				auth => $self->auth()
-			});
-		};
-		if (defined($jobs)) {
-			my $runningCount = @{$jobs};
-			#Checking if outstanding queued jobs exist
-			my $runningJobs = $self->runningJobs();
-			for (my $i=0; $i < @{$jobs}; $i++) {
-				my $job = $jobs->[$i];
-				if (defined($job->{jobdata}->{qsubid}) && $job->{jobdata}->{schedulerstatus} eq $self->jobstatus()) {
-					my $id = $job->{jobdata}->{qsubid};
-					if (!defined($runningJobs->{$id})) {
-						my $input = {
-							jobid => $job->{id},
-							status => "error",
-							auth => $self->auth(),
-							currentStatus => "running"
-						};
-						my $filename = $self->jobdirectory()."/errors/".$self->script().".e".$id;
-						if (-e $filename) {
-							my $error = "";
-							open (INPUT, "<", $filename);
-						    while (my $Line = <INPUT>) {
-						        chomp($Line);
-						        $Line =~ s/\r//;
-								$error .= $Line."\n";
-						    }
-						    close(INPUT);
-							$input->{jobdata}->{error} = $error;
-						}
-						eval {
-							local $Bio::KBase::workspaceService::Server::CallContext = {};
-							my $status = $self->client()->set_job_status($input);
-						};
-						$runningCount--;
-					}
-				}
-			}
-			print "JOBS:".$runningCount."\n";
-			#Queuing new jobs
-			my $openSlots = ($count - $runningCount);
-			$jobs = undef;
+		foreach my $type (keys(%{$jobHash})) {
+			my $count = $jobHash->{$type}->{threads};
+			my $jobs;
 			eval {
 				$jobs = $self->client()->get_jobs({
-					status => "queued",
-					type => $self->jobtype(),
+					status => "running",
+					type => $type,
 					auth => $self->auth()
 				});
 			};
-			if (defined($jobs) && $openSlots > 0) {
-				while ($openSlots > 0 && @{$jobs} > 0) {
-					my $job = shift(@{$jobs});
-					print "Queuing job:".$job->{id}."\n";
-					$self->queueJob($job);
-					$openSlots--;
+			if (defined($jobs)) {
+				my $runningCount = @{$jobs};
+				#Checking if outstanding queued jobs exist
+				my $runningJobs = $self->runningJobs($type);
+				for (my $i=0; $i < @{$jobs}; $i++) {
+					my $job = $jobs->[$i];
+					if (defined($job->{jobdata}->{qsubid}) && $job->{jobdata}->{schedulerstatus} eq $jobHash->{$type}->{status}) {
+						my $id = $job->{jobdata}->{qsubid};
+						if (!defined($runningJobs->{$id})) {
+							my $input = {
+								jobid => $job->{id},
+								status => "error",
+								auth => $self->auth(),
+								currentStatus => "running"
+							};
+							my $filename = $self->jobdirectory()."/errors/".$self->script($type).".e".$id;
+							if (-e $filename) {
+								my $error = "";
+								open (INPUT, "<", $filename);
+							    while (my $Line = <INPUT>) {
+							        chomp($Line);
+							        $Line =~ s/\r//;
+									$error .= $Line."\n";
+							    }
+							    close(INPUT);
+								$input->{jobdata}->{error} = $error;
+							}
+							eval {
+								local $Bio::KBase::workspaceService::Server::CallContext = {};
+								my $status = $self->client()->set_job_status($input);
+							};
+							$runningCount--;
+						}
+					}
+				}
+				print $runningCount." jobs of type ".$type." now running!\n";
+				#Queuing new jobs
+				my $openSlots = ($count - $runningCount);
+				$jobs = undef;
+				eval {
+					$jobs = $self->client()->get_jobs({
+						status => "queued",
+						type => $type,
+						auth => $self->auth()
+					});
+				};
+				print @{$jobs}." jobs of type ".$type." with ".$openSlots." open slots!\n";
+				if (defined($jobs) && $openSlots > 0) {
+					while ($openSlots > 0 && @{$jobs} > 0) {
+						my $job = shift(@{$jobs});
+						print "Queuing job:".$job->{id}."\n";
+						$self->queueJob($job);
+						$openSlots--;
+					}
 				}
 			}
 		}
@@ -217,7 +221,7 @@ sub queueJob {
 	$job->{accounttype} = $self->accounttype();
 	my $jobdir = $self->printJobFile($job);
 	my $pid;
-	my $executable = $self->executable()." ".$jobdir;
+	my $executable = $self->jobtypes()->{$job->{type}}->{executable}." ".$jobdir;
 	if ($self->queuetype() eq "sge") {
 		my $cmd = "qsub -l arch=lx26-amd64 -b yes -e ".$self->jobdirectory()."/errors/ -o ".$self->jobdirectory()."/output/ ".$executable;	
 		my $execOut = $self->runexecutable($cmd);
@@ -241,7 +245,7 @@ sub queueJob {
 			status => "running",
 			auth => $self->auth(),
 			jobdata => {
-				schedulerstatus => $self->jobstatus(),
+				schedulerstatus => $self->jobtypes()->{$job->{type}}->{status},
 				qsubid => $pid
 			}
 		});
@@ -249,14 +253,17 @@ sub queueJob {
 }
 
 sub haltalljobs {
-    my($self) = @_; 
-	my $runningJobs = $self->runningJobs();
-	foreach my $key (keys(%{$runningJobs})) {
-		if ($self->queuetype() eq "sge") {
-			system("qdel ".$key);
-		} elsif ($self->queuetype() eq "nohup") {
-			system("kill -9 ".$key);
-		}		
+    my($self) = @_;
+	my $jobHash = $self->jobtypes();
+	foreach my $type (keys(%{$jobHash})) {
+		my $runningJobs = $self->runningJobs($type);
+		foreach my $key (keys(%{$runningJobs})) {
+			if ($self->queuetype() eq "sge") {
+				system("qdel ".$key);
+			} elsif ($self->queuetype() eq "nohup") {
+				system("kill -9 ".$key);
+			}		
+		}
 	}
 }
 
@@ -264,20 +271,23 @@ sub readconfig {
     my($self,$file) = @_; 
 	my $c = Config::Simple->new();
 	$c->read($file);
-	$self->{_threads} = $c->param("scheduler.threads");
 	$self->{_jobdirectory} = $c->param("scheduler.jobdirectory");
-	$self->{_executable} = $c->param("scheduler.executable");
-	$self->{_jobtype} = $c->param("scheduler.jobtype");
-	$self->{_queuetype} = $c->param("scheduler.queuetype");
 	$self->{_wsurl} = $c->param("scheduler.wsurl");
 	$self->{_auth} = $c->param("scheduler.auth");
-	$self->{_jobstatus} = $c->param("scheduler.jobstatus");
+	$self->{_queuetype} = $c->param("scheduler.queuetype");
 	$self->{_accounttype} = $c->param("scheduler.accounttype");
-}
-
-sub threads {
-	 my($self) = @_;
-	 return $self->{_threads};
+	my $types = [split(/;/,$c->param("scheduler.jobtype"))];
+	my $executables = [split(/;/,$c->param("scheduler.executable"))];
+	my $statuses = [split(/;/,$c->param("scheduler.jobstatus"))];
+	my $threads = [split(/;/,$c->param("scheduler.threads"))];
+	for (my $i=0; $i < @{$types}; $i++) {
+		$self->{_jobtypes}->{$types->[$i]} = {
+			type => $types->[$i],
+			executable => $executables->[$i],
+			status => $statuses->[$i],
+			threads => $threads->[$i]
+		};
+	}
 }
 
 sub wsurl {
@@ -295,32 +305,22 @@ sub jobdirectory {
 	 return $self->{_jobdirectory};
 }
 
-sub executable {
-	 my($self) = @_;
-	 return $self->{_executable};
+sub jobtypes {
+	my($self) = @_;
+	return $self->{_jobtypes};
 }
 
 sub script {
-	my($self) = @_;
-	if ($self->executable() =~ m/([^\/]+)$/) {
+	my($self,$type) = @_;
+	if ($self->jobtypes()->{$type}->{executable} =~ m/([^\/]+)$/) {
 		return $1;
 	}
 	return "";
 }
 
-sub jobtype {
-	 my($self) = @_;
-	 return $self->{_jobtype};
-}
-
 sub auth {
 	 my($self) = @_;
 	 return $self->{_auth};
-}
-
-sub jobstatus {
-	my($self) = @_;
-	return $self->{_jobstatus};
 }
 
 sub accounttype {
@@ -339,7 +339,6 @@ sub clearOldDirectoryFiles {
 	foreach my $file (@{$files}) {	
 		my @stat = stat($directory."/".$file);
 		if ($stat[9] < ($now - $age)) {
-			print "Deleting $file...";
 			unlink($directory."/".$file);
 		}
 	}

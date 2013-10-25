@@ -10,4 +10,4 @@ export KB_SERVICE_DIR=$KB_TOP/services/$KB_SERVICE_NAME
 kb_service_psgi=[% kb_service_psgi %]
 pid_file=$KB_SERVICE_DIR/service.pid
 
-exec $KB_RUNTIME/bin/starman -D --listen :[% kb_service_port %] --pid $pid_file $KB_TOP/$kb_service_psgi  --error-log $KB_SERVICE_DIR/error.log
+exec $KB_RUNTIME/bin/starman --max-requests 20 --workers 5 -D --listen :[% kb_service_port %] --pid $pid_file $KB_TOP/$kb_service_psgi  --error-log $KB_SERVICE_DIR/error.log
