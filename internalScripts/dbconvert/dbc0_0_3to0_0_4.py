@@ -81,7 +81,7 @@ print '...done.\n'
 
 # remove all permissions to public workspaces from all users except public
 print '***Removing permissions for public workspaces and deleting integer ' +\
-    'named workspaces...'
+    'named workspaces from user object...'
 for u in wsdb[USERS].find({ID: {'$ne': PUBLIC}}, snapshot=True):
     p = False
     workspaces = u[WS].keys()
@@ -144,8 +144,10 @@ for ws in wsdb[WS].find(snapshot=True):
     except ValueError as ve:
         pass  # good it's not an int
     else:
+        print '**** deleting workspace {}'.format(ws[ID])
         if not DRY_RUN:
-            wsdb[WS].remove(ws)
+            wsdb[WS].remove({'id': ws[ID]})
+        continue
     if ws[ID] in wsids:
         print 'already seen {}!'.format(ws[ID])
         sys.exit(1)
@@ -232,8 +234,11 @@ for wso in wsdb[WSO].find(snapshot=True):
     except ValueError:
         pass  # not an integer, moving on
     else:
+        print "**** deleting workspace object {}/{}".format(
+            wso[WORKSPACE], wso[ID])
         if not DRY_RUN:
-            wsdb[WSO].remove(wso)
+            wsdb[WSO].remove({'workspace': wso[WORKSPACE], 'id': wso[ID]})
+        continue
     oldtype = wso[TYPE]
     oldid = wso[ID]
     wso[TYPE] = newtype[wso[TYPE]]
