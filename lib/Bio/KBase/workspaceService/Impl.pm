@@ -1162,8 +1162,10 @@ sub _tohtml {
 
 sub _validateWorkspaceID {
 	my ($self,$id) = @_;
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Workspace name must contain only alphanumeric characters!",
-		method_name => '_validateWorkspaceID') if ($id !~ m/^\w+$/ || $id eq "NO_WORKSPACE");
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+		"Workspace name must contain only alphanumeric characters and cannot be an integer!",
+		method_name => '_validateWorkspaceID') if ($id !~ m/^\w+$/ || $id =~ m/^\d+$/
+			|| $id eq "NO_WORKSPACE");
 }
 
 sub _validateUserID {
@@ -1175,7 +1177,7 @@ sub _validateUserID {
 sub _validateObjectID {
 	my ($self,$id) = @_;
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => "Object ID failed validation!",
-		method_name => '_validateUserID') if ($id !~ m/^[\w\|.-]+$/);
+		method_name => '_validateUserID') if ($id !~ m/^[\w\|.-]+$/ || $id =~ m/^\d+$/);
 }
 
 sub _validatePermission {

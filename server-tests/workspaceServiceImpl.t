@@ -7,7 +7,7 @@ use Test::More;
 use Test::Exception;
 use Test::Deep;
 use Data::Dumper;
-my $test_count = 91;
+my $test_count = 93;
 
 ################################################################################
 #Test intiailization: setting test config, instantiating Impl, getting auth token
@@ -166,6 +166,19 @@ eval {
 										})
 				} qr/Authentication required: Create workspace/,
 				"Creating a workspace w/o auth fails";
+};
+################################################################################
+# Creating a public workspace w/ int as id should fail
+################################################################################
+eval {
+	local $Bio::KBase::workspaceService::Server::CallContext = {};
+	throws_ok {$impl->create_workspace({
+										workspace => "4",
+										default_permission => "n",
+										auth => $oauth2
+										})
+				} qr/Workspace name must contain only alphanumeric characters and cannot be an integer!/,
+				"Creating a workspace w/ int as id fails";
 };
 ################################################################################
 # List workspaces returns the right workspaces
@@ -515,6 +528,16 @@ is($bool,0, "Confirm that Test2 does not exist");
 		throws_ok {$impl->save_object($params)} qr/$err/ , 
 			"shouldn't save $params->{id} - bad chars";
 	}
+	
+	$params = {
+		workspace => "testworkspace",
+		type => "Unspecified",
+		auth => $oauth,
+		data => {"ItsNotFunny" => "MyPantsAreOnFire"},
+		id => '7'
+	};
+	throws_ok {$impl->save_object($params)} qr/Object ID failed validation!/ , 
+			"shouldn't save object with integer as id";
 }
 
 # Test a few good characters when saving IDs
