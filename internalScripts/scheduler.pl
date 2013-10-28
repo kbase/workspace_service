@@ -169,7 +169,7 @@ sub monitor {
 				print $runningCount." jobs of type ".$type." now running!\n";
 				#Queuing new jobs
 				my $openSlots = ($count - $runningCount);
-				$jobs = undef;
+				$jobs = [];
 				eval {
 					$jobs = $self->client()->get_jobs({
 						status => "queued",
