@@ -25,6 +25,7 @@ OWNER = 'owner'
 TYPE = 'type'
 OBJS = 'objects'
 WORKSPACE = 'workspace'
+INSTANCE = 'instance'
 
 PER_DEF = 'defaultPermissions'
 PER_NONE = 'n'
@@ -61,8 +62,8 @@ for ws in pubws:
     except ValueError:
         pass  # it's not an int, good
     else:
-        print 'found public workspace that has an integer for a name, need ' +\
-            'code fix: ' + ws
+        print '**** found public workspace that has an integer for a name, ' +\
+            'need code fix: ' + ws
 
 # get the public user and set all perms to read only
 print '***Swapping public user permissions for read only...'
@@ -101,7 +102,7 @@ for u in wsdb[USERS].find({ID: {'$ne': PUBLIC}}, snapshot=True):
             del u[WS][ws]
             deleted.append(ws)
     if deleted:
-        print '****User {} deleted workspaces:'.format(u[ID])
+        print '**** User {} deleted workspaces:'.format(u[ID])
         for d in deleted:
             print '****\t{}'.format(d)
     if not DRY_RUN:
@@ -176,12 +177,11 @@ for ws in wsdb[WS].find(snapshot=True):
             try:
                 int(id_)
             except ValueError:
-                pass  # it's not an int, good
+                fixedid = id_.replace('_DOT_', '.')
+                obj_types[fixedid][fixedtype] = ws[OBJS][type_][id_]
             else:
-                print '****found object id that has an integer for a name, ' +\
-                    'need code fix: {}/{}'.format(ws[ID], id_)
-            fixedid = id_.replace('_DOT_', '.')
-            obj_types[fixedid][fixedtype] = ws[OBJS][type_][id_]
+                print '**** deleting object {} from workspace {}'.format(
+                    id_, ws[ID])
     ws[OBJS] = {}  # delete the ws subdoc
     # fix the id names
     id_to_fix = {}
@@ -227,23 +227,30 @@ for ws in wsdb[WS].find(snapshot=True):
         wsdb[WS].save(ws)
 print '...done.\n'
 
+def delObjOnInt(wso, field):
+    try:
+        int(wso[field])
+    except ValueError:
+        return False
+    else:
+        print "**** deleting workspace object {}/{}/{}".format(
+            wso[WORKSPACE], wso[ID], wso[INSTANCE])
+        if not DRY_RUN:
+            wsdb[WSO].remove({WORKSPACE: wso[WORKSPACE], ID: wso[ID],
+                              INSTANCE: wso[INSTANCE]})
+    return True
+
 print '***Correcting workspaceObjects...'
 for wso in wsdb[WSO].find(snapshot=True):
-    try:
-        int(wso[WORKSPACE])
-    except ValueError:
-        pass  # not an integer, moving on
-    else:
-        print "**** deleting workspace object {}/{}".format(
-            wso[WORKSPACE], wso[ID])
-        if not DRY_RUN:
-            wsdb[WSO].remove({'workspace': wso[WORKSPACE], 'id': wso[ID]})
+    if delObjOnInt(wso, WORKSPACE):
+        continue
+    if delObjOnInt(wso, ID):
         continue
     oldtype = wso[TYPE]
     oldid = wso[ID]
     wso[TYPE] = newtype[wso[TYPE]]
-    if wso[TYPE] in ws_obj_ids[wso['workspace']][wso[ID]]:
-        newid, uuid = ws_obj_ids[wso['workspace']][wso[ID]][wso[TYPE]]
+    if wso[TYPE] in ws_obj_ids[wso[WORKSPACE]][wso[ID]]:
+        newid, uuid = ws_obj_ids[wso[WORKSPACE]][wso[ID]][wso[TYPE]]
         # note instances earlier than current won't match on UUIDs
         wso[ID] = newid
     changeUUID = False
@@ -253,7 +260,7 @@ for wso in wsdb[WSO].find(snapshot=True):
     if (not (changeUUID and SUPPRESS_NO_WORKSPACE_ID_CHANGE_OUTPUT) and
             (oldtype != wso[TYPE] or oldid != wso[ID])):
         print "Updating object {}/{}/{}/{}->{} {}->{}".format(
-            wso[OWNER], wso['workspace'], oldid, wso['instance'], wso[ID],
+            wso[OWNER], wso[WORKSPACE], oldid, wso[INSTANCE], wso[ID],
             oldtype, wso[TYPE])
         if not DRY_RUN:
             wsdb[WSO].save(wso)
