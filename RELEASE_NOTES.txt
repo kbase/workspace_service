@@ -32,6 +32,9 @@ UPDATED FEATURES / MAJOR BUG FIXES:
 - Object names are now limited to ascii alphanumeric characters and .|_-
 - Object names must now be unique per workspace, even if the objects are
     different types
+- Object and workspace names may not be integers
+- Removed one of the two python clients in lib/, as it was not being updated on
+    a make while the other was
 
 ANTICIPATED FUTURE DEVELOPMENTS:
 - Shock integration
