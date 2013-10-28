@@ -227,6 +227,7 @@ for ws in wsdb[WS].find(snapshot=True):
         wsdb[WS].save(ws)
 print '...done.\n'
 
+
 def delObjOnInt(wso, field):
     try:
         int(wso[field])
