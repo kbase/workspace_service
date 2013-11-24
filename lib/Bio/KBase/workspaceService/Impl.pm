@@ -178,6 +178,14 @@ sub _authenticate {
 			authentication => $auth,
 			user => $username
 		};
+	} elsif ($self->{_accounttype} eq "simple") {
+		if ($auth !~ m/^[a-zA-Z0-9_]*$/) {
+			$self->_error("Simple accounts must be alphanumeric!",'_setContext');
+		}
+		return {
+			authentication => $auth,
+			user => $auth
+		};
 	}
 }
 
@@ -253,9 +261,6 @@ Description:
 =cut
 sub _idServer {
 	my $self = shift;
-	if (!defined($self->{_idserver})) {
-		$self->{_idserver} = Bio::KBase::IDServer::Client->new("http://kbase.us/services/idserver");
-	}
 	return $self->{_idserver};
 }
 
@@ -1427,8 +1432,8 @@ sub new
 	$ENV{KB_NO_FILE_ENVIRONMENT} = 1;
 	my $params;
 	$self->{_accounttype} = "kbase";
-	$self->{'_idserver-url'} = "http://bio-data-1.mcs.anl.gov/services/idserver";
-	$self->{'_mssserver-url'} = "http://biologin-4.mcs.anl.gov:7050";
+	$self->{'_idserver-url'} = "http://kbase.us/services/idserver";
+	$self->{'_mssserver-url'} = "http://bio-data-1.mcs.anl.gov/services/ms_fba";
 	my $host = "localhost";
 	my $db = "workspace_service";
 	my $user = undef;
@@ -1449,6 +1454,9 @@ sub new
 
 	if ((my $e = $ENV{KB_DEPLOYMENT_CONFIG}) && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
 		my $service = $ENV{KB_SERVICE_NAME};
+		if (!defined($service)) {
+			$service = "workspaceService";
+		}
 		if (defined($service)) {
 			my $c = Config::Simple->new();
 			$c->read($e);
@@ -1498,12 +1506,12 @@ sub new
 			$self->{'_mssserver-url'} = $params->{'mssserver-url'};
 	}
 	
-	print STDERR "***Starting workspace service with mongo parameters:***\n";
-	print STDERR "Host: $host\n";
-	print STDERR "Database: $db\n";
-	print STDERR "User: $user\n";
+	#print STDERR "***Starting workspace service with mongo parameters:***\n";
+	#print STDERR "Host: $host\n";
+	#print STDERR "Database: $db\n";
+	#print STDERR "User: $user\n";
 	if($pwd) {
-		print STDERR "Password of length " . length($pwd) . "\n";
+		#print STDERR "Password of length " . length($pwd) . "\n";
 	}
 	my $config = {
 		host => $host,
@@ -1519,6 +1527,13 @@ sub new
 	Bio::KBase::Exceptions::KBaseException->throw(error => "Unable to connect: $@",
 								method_name => 'Impl::new') if (!defined($conn));
 	$self->{_mongodb} = $conn->get_database($db);
+	
+	if ($self->{'_idserver-url'} eq "impl") {
+		require "Bio/KBase/IDServer/Impl.pm";
+		$self->{_idserver} = Bio::KBase::IDServer::Impl->new();
+	} else {
+		$self->{_idserver} = Bio::KBase::IDServer::Client->new($self->{'_idserver-url'});
+	}
 	
     #END_CONSTRUCTOR
 

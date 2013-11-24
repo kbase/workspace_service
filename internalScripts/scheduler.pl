@@ -290,6 +290,28 @@ sub readconfig {
 	}
 }
 
+sub write_running_jobs {
+    my($self) = @_; 
+	my $filename = $self->jobdirectory()."jobs.lst";
+	my $runningjobs = $self->runningjobs();
+	open( my $fh, ">", $jobdir."pid");
+	for (my $i=0; $i < @{$runningjobs}; $i++) {
+		print $fh $runningjobs->[$i]."\n";
+	}
+	close($fh);
+}
+
+sub read_running_jobs {
+    my($self) = @_; 
+	my $filename = $self->jobdirectory()."jobs.lst";
+	my $runningjobs = $self->runningjobs();
+	open( my $fh, ">", $jobdir."pid");
+	for (my $i=0; $i < @{$runningjobs}; $i++) {
+		print $fh $runningjobs->[$i]."\n";
+	}
+	close($fh);
+}
+
 sub wsurl {
 	 my($self) = @_;
 	 return $self->{_wsurl};
