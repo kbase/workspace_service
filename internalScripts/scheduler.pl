@@ -294,7 +294,7 @@ sub write_running_jobs {
     my($self) = @_; 
 	my $filename = $self->jobdirectory()."jobs.lst";
 	my $runningjobs = $self->runningjobs();
-	open( my $fh, ">", $jobdir."pid");
+	open( my $fh, ">", $filename);
 	for (my $i=0; $i < @{$runningjobs}; $i++) {
 		print $fh $runningjobs->[$i]."\n";
 	}
@@ -305,7 +305,7 @@ sub read_running_jobs {
     my($self) = @_; 
 	my $filename = $self->jobdirectory()."jobs.lst";
 	my $runningjobs = $self->runningjobs();
-	open( my $fh, ">", $jobdir."pid");
+	open( my $fh, ">", $filename);
 	for (my $i=0; $i < @{$runningjobs}; $i++) {
 		print $fh $runningjobs->[$i]."\n";
 	}
