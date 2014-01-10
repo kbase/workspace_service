@@ -1651,7 +1651,7 @@ sub load_media_from_bio
 							       method_name => 'load_media_from_bio');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($mediaMetas);
     #BEGIN load_media_from_bio
 	$self->_setContext($params->{auth});
@@ -1804,7 +1804,7 @@ sub import_bio
 							       method_name => 'import_bio');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN import_bio
 	$self->_setContext($params->{auth});
@@ -1973,7 +1973,7 @@ sub import_map
 							       method_name => 'import_map');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN import_map
 	$self->_setContext($params->{auth});
@@ -2153,7 +2153,7 @@ sub save_object
 							       method_name => 'save_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN save_object
 	$self->_setContext($params->{auth}, 'Save object', 'save_object');
@@ -2297,7 +2297,7 @@ sub delete_object
 							       method_name => 'delete_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN delete_object
 	$self->_setContext($params->{auth}, 'Delete object', 'delete_object');
@@ -2422,7 +2422,7 @@ sub delete_object_permanently
 							       method_name => 'delete_object_permanently');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN delete_object_permanently
 	$self->_setContext($params->{auth}, 'Permanently delete an object',
@@ -2566,7 +2566,7 @@ sub get_object
 							       method_name => 'get_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($output);
     #BEGIN get_object
 	$self->_setContext($params->{auth});
@@ -2721,7 +2721,7 @@ sub get_objects
 							       method_name => 'get_objects');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($output);
     #BEGIN get_objects
 	$self->_setContext($params->{auth});
@@ -2900,7 +2900,7 @@ sub get_object_by_ref
 							       method_name => 'get_object_by_ref');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($output);
     #BEGIN get_object_by_ref
 	$self->_setContext($params->{auth});
@@ -3053,7 +3053,7 @@ sub save_object_by_ref
 							       method_name => 'save_object_by_ref');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN save_object_by_ref
 	$self->_setContext($params->{auth}, 'Save object by reference',
@@ -3196,7 +3196,7 @@ sub get_objectmeta
 							       method_name => 'get_objectmeta');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN get_objectmeta
 	$self->_setContext($params->{auth});
@@ -3321,7 +3321,7 @@ sub get_objectmeta_by_ref
 							       method_name => 'get_objectmeta_by_ref');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN get_objectmeta_by_ref
 	$self->_setContext($params->{auth});
@@ -3448,7 +3448,7 @@ sub revert_object
 							       method_name => 'revert_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN revert_object
 	$self->_setContext($params->{auth}, 'Revert object', 'revert_object');
@@ -3582,7 +3582,7 @@ sub copy_object
 							       method_name => 'copy_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN copy_object
 	$self->_setContext($params->{auth});
@@ -3902,7 +3902,7 @@ sub move_object
 							       method_name => 'move_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN move_object
 	$self->_setContext($params->{auth}, 'Move object', 'move_object');
@@ -4009,7 +4009,7 @@ sub has_object
 							       method_name => 'has_object');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($object_present);
     #BEGIN has_object
 	$self->_setContext($params->{auth});
@@ -4138,7 +4138,7 @@ sub object_history
 							       method_name => 'object_history');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadatas);
     #BEGIN object_history
 	$self->_setContext($params->{auth});
@@ -4247,7 +4247,7 @@ sub create_workspace
 							       method_name => 'create_workspace');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN create_workspace
 	$self->_setContext($params->{auth}, 'Create workspace',
@@ -4358,7 +4358,7 @@ sub get_workspacemeta
 							       method_name => 'get_workspacemeta');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN get_workspacemeta
 	$self->_setContext($params->{auth});
@@ -4443,7 +4443,7 @@ sub get_workspacepermissions
 							       method_name => 'get_workspacepermissions');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($user_permissions);
     #BEGIN get_workspacepermissions
 	$self->_setContext($params->{auth});
@@ -4545,7 +4545,7 @@ sub delete_workspace
 							       method_name => 'delete_workspace');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN delete_workspace
 	$self->_setContext($params->{auth}, 'Delete workspace',
@@ -4657,7 +4657,7 @@ sub clone_workspace
 							       method_name => 'clone_workspace');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN clone_workspace
 	$self->_setContext($params->{auth});
@@ -4970,7 +4970,7 @@ sub list_workspaces
 							       method_name => 'list_workspaces');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($workspaces);
     #BEGIN list_workspaces
 	$self->_setContext($params->{auth});
@@ -5107,7 +5107,7 @@ sub list_workspace_objects
 							       method_name => 'list_workspace_objects');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($objects);
     #BEGIN list_workspace_objects
 	$self->_setContext($params->{auth});
@@ -5222,7 +5222,7 @@ sub set_global_workspace_permissions
 							       method_name => 'set_global_workspace_permissions');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($metadata);
     #BEGIN set_global_workspace_permissions
 	$self->_setContext($params->{auth}, 'Set workspace global permissions',
@@ -5316,7 +5316,7 @@ sub set_workspace_permissions
 							       method_name => 'set_workspace_permissions');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($success);
     #BEGIN set_workspace_permissions
 	$self->_setContext($params->{auth}, 'Set workspace permissions',
@@ -5398,7 +5398,7 @@ sub get_user_settings
 							       method_name => 'get_user_settings');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($output);
     #BEGIN get_user_settings
 	$self->_setContext($params->{auth}, 'Get user settings', 
@@ -5483,7 +5483,7 @@ sub set_user_settings
 							       method_name => 'set_user_settings');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($output);
     #BEGIN set_user_settings
 	$self->_setContext($params->{auth}, 'Set user settings',
@@ -5591,7 +5591,7 @@ sub queue_job
 							       method_name => 'queue_job');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($job);
     #BEGIN queue_job
    $self->_setContext($params->{auth});
@@ -5724,7 +5724,7 @@ sub set_job_status
 							       method_name => 'set_job_status');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($job);
     #BEGIN set_job_status
 	$self->_setContext($params->{auth});
@@ -5885,7 +5885,7 @@ sub get_jobs
 							       method_name => 'get_jobs');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($jobs);
     #BEGIN get_jobs
 	$self->_setContext($params->{auth});
@@ -5974,7 +5974,7 @@ sub get_types
 {
     my $self = shift;
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($types);
     #BEGIN get_types
 	$types = [keys(%{$self->_permanentTypes()})];
@@ -6054,7 +6054,7 @@ sub add_type
 							       method_name => 'add_type');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($success);
     #BEGIN add_type
 	$self->_setContext($params->{auth}, 'Add new type', 'add_type');
@@ -6148,7 +6148,7 @@ sub remove_type
 							       method_name => 'remove_type');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($success);
     #BEGIN remove_type
 	$self->_setContext($params->{auth}, 'Remove type', 'remove_type');
@@ -6232,7 +6232,7 @@ sub patch
 							       method_name => 'patch');
     }
 
-    my $ctx = $Bio::KBase::workspaceService::Server::CallContext;
+    my $ctx = $Bio::KBase::workspaceService::Service::CallContext;
     my($success);
     #BEGIN patch
 	$self->_setContext($params->{auth});
