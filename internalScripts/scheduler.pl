@@ -45,7 +45,7 @@ if (!-d $sched->jobdirectory()."/output/") {
 if (-e $sched->jobdirectory()."/schedulerPID") {
 	unlink($sched->jobdirectory()."/schedulerPID");
 }
-open(PID, "> ".$sched->jobdirectory()."/schedulerPID") || die "could not open PID file!"; 
+open(PID, "> ".$sched->jobdirectory()."/../pids/schedulerPID") || die "could not open PID file!"; 
 print PID "$$\n"; 
 close(PID);
 $sched->monitor();
@@ -221,7 +221,7 @@ sub queueJob {
 	$job->{accounttype} = $self->accounttype();
 	my $jobdir = $self->printJobFile($job);
 	my $pid;
-	my $executable = $self->jobtypes()->{$job->{type}}->{executable}." ".$jobdir;
+	my $executable = $self->jobtypes()->{$job->{type}}->{executable}." ".$ARGV[0]." ".$job->{id};
 	if ($self->queuetype() eq "sge") {
 		my $cmd = "qsub -l arch=lx26-amd64 -b yes -e ".$self->jobdirectory()."/errors/ -o ".$self->jobdirectory()."/output/ ".$executable;	
 		my $execOut = $self->runexecutable($cmd);

@@ -8,16 +8,15 @@ use strict;
 use warnings;
 use Getopt::Long::Descriptive;
 use Text::Table;
-use JSON -support_by_pp;
-use Bio::KBase::workspaceService::Helpers qw(printJobData auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta);
+use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspaceURL printJobData);
 my $serv = get_ws_client();
 #Defining globals describing behavior
 my $primaryArgs = ["Job ID"];
 my $servercommand = "get_jobs";
-my $script = "ws-getjob";
+my $script = "wsj-checkjob";
 #Defining usage and options
 my ($opt, $usage) = describe_options(
-    'ws-getjob <Job ID> %o',
+    'wsj-checkjob <Job ID> %o',
     [ 'showerror|e', 'Use flag to show any errors in execution',{"default"=>0}],
     [ 'help|h|?', 'Print this usage information' ]
 );
@@ -51,5 +50,5 @@ if ($opt->{showerror} == 0){
 if (!defined($output)) {
 	print "Could not retreive job!\n";
 } else {
-    print to_json( $output->[0], { utf8 => 1, pretty => 1 } )."\n";
+    printJobData($output->[0]);
 }

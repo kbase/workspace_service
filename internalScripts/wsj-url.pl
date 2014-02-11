@@ -8,12 +8,12 @@ use strict;
 use warnings;
 use Getopt::Long::Descriptive;
 use Text::Table;
-use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta printObjectMeta);
+use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspaceURL printJobData);
 #Defining globals describing behavior
 my $primaryArgs = ["New server URL"];
 #Defining usage and options
 my ($opt, $usage) = describe_options(
-    'kbws-url <'.join("> <",@{$primaryArgs}).'> %o',
+    'wsj-url <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'help|h|?', 'Print this usage information' ],
 );
 if (defined($opt->{help})) {

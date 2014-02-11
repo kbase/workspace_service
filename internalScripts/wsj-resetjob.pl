@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use Getopt::Long::Descriptive;
 use Text::Table;
-use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta);
+use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspaceURL printJobData);
 
 my $serv = get_ws_client();
 #Defining globals describing behavior
@@ -20,7 +20,7 @@ my $translation = {
 };
 #Defining usage and options
 my ($opt, $usage) = describe_options(
-    'kbws-resetjob <'.join("> <",@{$primaryArgs}).'> %o',
+    'wsj-resetjob <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'status|s:s', 'New status to assign to job', {"default" => "queued"} ],
     [ 'delete|d', 'Delete job', {"default" => 0} ],
     [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}],
@@ -41,6 +41,7 @@ foreach my $arg (@{$primaryArgs}) {
 #Instantiating parameters
 my $params = {
 	auth => auth(),
+	jobids => [$opt->{"Job ID"}]
 };
 #Retrieving current job status
 my $output;
