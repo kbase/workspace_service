@@ -8,18 +8,20 @@ use strict;
 use warnings;
 use Getopt::Long::Descriptive;
 use Text::Table;
-use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta);
+use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspaceURL printJobData);
 
 my $serv = get_ws_client();
 #Defining globals describing behavior
 my $primaryArgs = [];
 my $servercommand = "get_jobs";
 my $translation = {
-    status => "status"
+    status => "status",
+    type => "type"
 };
 #Defining usage and options
 my ($opt, $usage) = describe_options(
-    'kbws-jobs %o',
+    'wsj-jobs %o',
+    [ 'type|t:s', 'Job type' ],
     [ 'status|s:s', 'Job status (queued,running,done)' ],
     [ 'showqsub|q', 'Use flag to show qsub ID for jobs',{"default"=>0}],
     [ 'showerror|e', 'Use flag to show any errors in execution',{"default"=>0}],
@@ -38,9 +40,7 @@ foreach my $arg (@{$primaryArgs}) {
 	}
 }
 #Instantiating parameters
-my $params = {
-	auth => auth(),
-};
+my $params = {};
 foreach my $key (keys(%{$translation})) {
 	if (defined($opt->{$key})) {
 		$params->{$translation->{$key}} = $opt->{$key};

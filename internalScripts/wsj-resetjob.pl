@@ -8,15 +8,14 @@ use strict;
 use warnings;
 use Getopt::Long::Descriptive;
 use Text::Table;
-use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspace workspaceURL parseObjectMeta parseWorkspaceMeta);
-$|=1;
+use Bio::KBase::workspaceService::Helpers qw(auth get_ws_client workspaceURL printJobData);
 my $serv = get_ws_client();
 #Defining globals describing behavior
 my $primaryArgs = ["Job IDs (; delimiter or filename)"];
 my $servercommand = "set_job_status";
 #Defining usage and options
 my ($opt, $usage) = describe_options(
-    'kbws-resetjob <'.join("> <",@{$primaryArgs}).'> %o',
+    'wsj-resetjob <'.join("> <",@{$primaryArgs}).'> %o',
     [ 'status|s:s', 'New status to assign to job', {"default" => "queued"} ],
     [ 'delete|d', 'Delete job', {"default" => 0} ],
     [ 'showerror|e', 'Set as 1 to show any errors in execution',{"default"=>0}],
@@ -34,19 +33,11 @@ foreach my $arg (@{$primaryArgs}) {
     	exit;
 	}
 }
-#Checking if input ID is actually a filename
-my $ids = [split(/;/,$opt->{$primaryArgs->[0]})];
-if ($ids->[0] !~ m/^job\.\d+$/ && -e $ids->[0]) {
-	open (my $file, "<", $ids->[0]) || die "Couldn't open ".$ids->[0]."!";
-	print $ids->[0]."\n";
-	$ids = []; 
-	while (my $line = <$file>) {
-		print $line."\n";
-		chomp($line);
-		push(@{$ids},$line);
-	}
-	close($file);
-}
+#Instantiating parameters
+my $params = {
+	auth => auth(),
+	jobids => [$opt->{"Job ID"}]
+};
 #Retrieving current job status
 my $jobs;
 if ($opt->{showerror} == 0){
